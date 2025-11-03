@@ -154,8 +154,8 @@ The key to en-to-end governance is to have multiple role assignments (with diffe
 | `sg-e2egov-avengers-devs` | `rg-e2egov-avengers-dev-weu` | Contributor | Contributor |
 | `sg-e2egov-avengers-admins` | `rg-e2egov-avengers-prd-weu` | Owner | Project Administrators |
 | `sg-e2egov-guardians-all` | - | - | - |
-| `sg-e2egov-guardians-devs` | - `rg-e2egov-guardians-dev-weu` | Contributor | Contributor |
-| `sg-e2egov-guardians-admins` | - `rg-e2egov-guardians-prd-weu` | Owner | Project Administrators |
+| `sg-e2egov-guardians-devs` | `rg-e2egov-guardians-dev-weu` | Contributor | Contributor |
+| `sg-e2egov-guardians-admins` | `rg-e2egov-guardians-prd-weu` | Owner | Project Administrators |
 | `sg-e2egov-galaxy-all` | - | - | - |
 | `sg-e2egov-galaxy-devs` | `rg-e2egov-galaxy-dev-weu` | Contributor | Contributor |
 | `sg-e2egov-galaxy-admins` | `rg-e2egov-galaxy-prd-weu` | Owner | Project Administrators |
@@ -193,3 +193,16 @@ The project demo structure illustrates different governance models and their tra
 ## Considerations
 
 🚧 Todo → Description
+
+<!-- omit from toc -->
+## License
+
+![logo small martin swinkels cloud](.assets/logo-small.png)  
+<small>Part of Martin's Cloud on GitHub</small>
+
+[MIT License](LICENSE) | Copyright (c) 2025 MSc365.eu by Martin Swinkels
+
+<!-- omit from toc -->
+## Disclaimer
+
+Sample only – this is not an official supported repository. Use at your own risk.
