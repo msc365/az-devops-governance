@@ -1,14 +1,17 @@
 ﻿[CmdletBinding()]
 param (
     [Parameter()]
+    [string]$templateFile = 'main.ps1',
+
+    [Parameter()]
+    [string]$templateParameterFile = 'params\main.parameters.json',
+
+    [Parameter()]
     [switch]$RemoveDeployment
 )
 
 begin {
     Write-Debug ('Command : {0}' -f $MyInvocation.MyCommand.Name)
-
-    $templateFile = 'main.ps1'
-    $templateParameterFile = 'params\main.parameters.json'
 }
 
 process {
