@@ -1,0 +1,16 @@
+{
+    "Organization": "msc365",
+    "Name": "MyProject",
+    "Description": "My project description",
+    "DefaultTeam": "MyTeam",
+    "SourceControl": "Git",
+    "Process": "Agile",
+    "Features": {
+        "TestPlans": "disabled",
+        "Artifacts": "enabled",
+        "Pipelines": "enabled",
+        "Repos": "enabled",
+        "Boards": "enabled"
+    },
+    "Visibility": "Private"
+}
