@@ -1,17 +1,17 @@
 <!-- omit from toc -->
 # az-devops-governance
 
-In addition to the [Azure.DevOps.PSModule](https://github.com/msc365/az-devops-psmodule) module, this repository includes sample scripts that demonstrate a complete Azure governance model. These examples showcase how to implement end-to-end governance from CI/CD pipelines to Azure Resource Manager deployments, aligning with best practices for enterprise-grade cloud architecture.
+This repository includes template scripts that demonstrate a complete Azure governance model. The template examples showcase how to implement end-to-end governance from Azure DevOps and CI/CD pipelines to Azure Resource Manager deployments, aligning with best practices for enterprise-grade cloud architecture.
 
 > [!NOTE]
-> This project is built upon the foundational concepts derived from [DevOps Governance](https://github.com/Azure/devops-governance) by [Julie Ng](https://github.com/julie-ng) using Terraform. I have enhanced it by incorporating the latest best practices. Specifically, I utilized **Bicep** as Infrastructure as Code (IaC) where possible and used this custom **PowerShell** module and sample scripts to bootstrap Azure DevOps projects, Azure resources and Entra identities. Additionally, I implemented [workload identity federation](https://devblogs.microsoft.com/devops/workload-identity-federation-for-azure-deployments-is-now-generally-available/) for Azure Pipelines, moving away from traditional _service principals_ to improve security and manageability.
+> This project is based on the concepts described in [End-to-end governance in Azure when using CI/CD](https://learn.microsoft.com/en-us/devops/operate/governance-cicd) (Julie Ng, Microsoft), which illustrates the approach using Terraform as the infrastructure-as-code (IaC) tool. As an alternative, this repository uses Bicep for IaC where applicable and provides template scripts built on the [Azure.DevOps.PSModule](https://github.com/msc365/az-devops-psmodule). The repository also adopts modern best practices by using [workload identity federation](https://devblogs.microsoft.com/devops/workload-identity-federation-for-azure-deployments-is-now-generally-available/) for Azure Pipelines instead of traditional service principals, improving both security and manageability.
 
 <!-- omit from toc -->
-## Features
+## Key features
 
-- Secure authentication with Workload Identity Federation
-- Sample scripts for CI/CD, resource provisioning, and policy enforcement
 - Practical guidance for implementing end-to-end governance at scale
+- Template scripts and CI/CD pipelines for resource provisioning, and policy enforcement
+- Secure authentication with workload identity federation
 
 <!-- omit from toc -->
 <!-- ## Use Cases
@@ -41,8 +41,8 @@ End‑to‑end governance is platform‑agnostic. This repository illustrates on
 - [Branch strategy](#branch-strategy)
 - [Architecture](#architecture)
 - [Azure resources](#azure-resources)
-- [Entra ID Groups](#entra-id-groups)
 - [Azure DevOps Projects](#azure-devops-projects)
+- [Entra ID Groups](#entra-id-groups)
 - [Components](#components)
 - [Considerations](#considerations)
 
@@ -60,7 +60,8 @@ End‑to‑end governance is platform‑agnostic. This repository illustrates on
 
 This simplified diagram shows how branches in a Git repository map to development, staging, and production environments:
 
-![e2egov-git](./.assets/e2egov-git.png)  
+![e2egov-git](./.assets/e2egov-git.png)
+
 <small>Image: Branch strategy diagram</small>
 
 🚧 Todo → Description
@@ -69,11 +70,12 @@ This simplified diagram shows how branches in a Git repository map to developmen
 
 This diagram illustrates that connecting Azure Resource Manager (ARM) and CI/CD to Microsoft Entra ID is crucial for establishing a comprehensive governance model.
 
-![e2egov-design](./.assets/e2egov-design.png)  
+![e2egov-design](./.assets/e2egov-design.png)
+
 <small>Image: End-to-end governance diagram</small>
 
 > [!NOTE]  
-> To make the concept easier to understand, the diagram illustrates a general "e2egov" business domain. Other business domains would look similar and use the same naming conventions.
+> To make the concept easier to understand, the diagram illustrates a general `e2egov` business domain. Other business domains would look similar and use the same naming conventions, for example: `e2egov-avengers-devs`.
 
 The numbering reflects the order in which administrators and enterprise architects think about and configure their cloud resources.
 
@@ -107,12 +109,9 @@ The numbering reflects the order in which administrators and enterprise architec
    | `id-e2egov-prd` | _Custom Role_ * | - |
 
 > [!WARNING]  
-> In production you should create a _Custom Role_ that prevents a managed identity from removing any [management locks](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/lock-resources) that you've placed on your resources. This helps protect resources from accidental damage, such as database deletion.
+> In production you should create a _Custom Role_ that prevents a managed identity from removing any [management locks](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/lock-resources) that you've placed on your resources. This helps protect resources from accidental damage, such as database deletion. This can be easily done with the Bicep [avm/ptn/authorization/role-definition](https://github.com/Azure/bicep-registry-modules/tree/main/avm/ptn/authorization/role-definition) template from the [Azure Verified Modules](https://github.com/Azure/bicep-registry-modules) repo. An [example](iac/authorization/role-definition/main.bicep) is included in this demo project.
 
-> [!TIP]  
-> This can be easily done with the Bicep [avm/ptn/authorization/role-definition](https://github.com/Azure/bicep-registry-modules/tree/main/avm/ptn/authorization/role-definition) template from the [Azure Verified Modules](https://github.com/Azure/bicep-registry-modules) repo. An example is included in this demo project.
-
-5. **Group assignments in Azure DevOps**  
+1. **Group assignments in Azure DevOps**  
    Security groups function like roles in Azure. Take advantage of built-in roles and default to [Contributor](https://learn.microsoft.com/en-us/azure/devops/user-guide/roles#contributor-roles) for developers. Admins get assigned to the [Project Administrator](https://learn.microsoft.com/en-us/azure/devops/user-guide/roles#project-administrators) security group for elevated permissions, allowing them to configure security permissions.
 
    Note that Azure DevOps and Azure have different permissions models:
@@ -121,7 +120,7 @@ The numbering reflects the order in which administrators and enterprise architec
 
    For this reason, membership to the `*-admins` and `*-devs` groups must be mutually exclusive. Otherwise, the affected persons would have less access than expected in Azure DevOps. To address this conceptual problem the `*-all` groups could be used. See the [Entra ID Groups](#entra-id-groups) section for more details.
 
-6. **Service connections**  
+2. **Service connections**  
    In Azure DevOps, a [Service Connection](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints) is a generic wrapper around a credential. This demo creates a service connection that holds the [App Registration](https://learn.microsoft.com/en-us/azure/devops/pipelines/release/configure-workload-identity?view=azure-devops&tabs=app-registration) and [Workload Identity Federation](https://learn.microsoft.com/en-us/azure/devops/pipelines/release/configure-workload-identity?view=azure-devops&tabs=managed-identity) configuration. Project Administrators can configure access to this [protected resource](https://learn.microsoft.com/en-us/azure/devops/pipelines/security/resources#protected-resources) when needed, such as when requiring human approval before deploying. This reference architecture has two minimum protections on the service connection:
 
    - Admins must configure [pipeline permissions](https://learn.microsoft.com/en-us/azure/devops/pipelines/security/resources#permissions) to control which pipelines can access the credentials.
@@ -141,12 +140,34 @@ To simplify the demo deployment, this reference implementation uses _Resource Gr
 - `rg-e2egov-guardians-prd-weu`
 - `rg-e2egov-galaxy-shared-weu`
 
+## Azure DevOps Projects
+
+The project demo structure illustrates different governance models and their trade-offs.
+
+![e2egov-projects](.assets/e2egov-projects.png)
+
+<small>Image: Azure DevOps organization created with scripts form this repo</small>
+
+- The isolated model with the `avengers` and `guardians` projects means less governance management - at the cost of less collaboration.
+- The `fantastic-four` project prioritizes collaboration via multiple shared Azure Boards - but requires more governance management, especially for repositories and pipelines.
+
+| Project | Boards | Repos | Pipelines | Description |
+| :-- | :-- | :-- | :-- | :-- |
+| `avengers` |  Yes | Yes | Yes | Isolated by project scope |
+| `guardians` | Yes | Yes | Yes | Isolated by project scope |
+| `galaxy` | No | Yes | Yes | Shared resources |
+| `fantastic-four` | Yes | Yes | Yes | Prioritizes collaboration with 4 Teams and shared Boards. |
+| `collaboration` | Yes | No | No | Another possible scenario |
+
 ## Entra ID Groups
 
 The key to en-to-end governance is to have multiple role assignments (with different role definitions and different resource scopes to the same Entra ID Groups).
 
-![e2egov-rbac](./.assets/e2egov-rbac.png)  
+![e2egov-rbac](./.assets/e2egov-rbac.png)
+
 <small>Image: Role Assignment diagram</small>
+
+### Isolated governance model
 
 | Group name | Scope | Azure role | Azure DevOps role |
 |:--|:--|:--|:--|
@@ -160,27 +181,17 @@ The key to en-to-end governance is to have multiple role assignments (with diffe
 | `sg-e2egov-galaxy-devs` | `rg-e2egov-galaxy-dev-weu` | Contributor | Contributor |
 | `sg-e2egov-galaxy-admins` | `rg-e2egov-galaxy-prd-weu` | Owner | Project Administrators |
 
-¹ In a scenario of limited collaboration, such as the `Avengers` team inviting the `Guardians` team to collaborate on a _single_ repository, they would use the `*-avenger-all` group.
+¹ In a scenario of limited collaboration, such as the `avengers` team inviting the `guardians` team to collaborate on a _single_ repository, they would use the `*-avenger-all` group.
+
+### Collaboration governance model
+
+| Group name | Scope | Azure role | Azure DevOps role |
+|:--|:--|:--|:--|
+| `sg-e2egov-fantastic-four-all` | - | - | - |
+| `sg-e2egov-fantastic-four-devs` | `rg-e2egov-fantastic-four-dev-weu` | Contributor | Contributor |
+| `sg-e2egov-fantastic-four-admins` | `rg-e2egov-fantastic-four-prd-weu` | Owner | Project Administrators |
 
 To understand the reasoning behind the individual role assignments, refer to the [Considerations](#considerations) section.
-
-## Azure DevOps Projects
-
-The project demo structure illustrates different governance models and their trade-offs.
-
-![e2egov-projects](.assets/e2egov-projects.png)  
-<small>Image: Azure DevOps organization created with scripts form this repo</small>
-
-- The isolated model with the `Avengers` and `Guardians` projects means less governance management - at the cost of less collaboration.
-- The `Fantastic Four` project prioritizes collaboration via shared Azure Boards - but requires more governance management, especially for repositories and pipelines.
-
-| Project | Boards | Repos | Pipelines | Description |
-| :-- | :-- | :-- | :-- | :-- |
-| `avengers` |  Yes | Yes | Yes | Isolated by project scope |
-| `guardians` | Yes | Yes | Yes | Isolated by project scope |
-| `galaxy` | No | Yes | Yes | Shared resources |
-| `fantastic-four` | Yes | Yes | Yes | Prioritizes collaboration with multiple teams. |
-| `collaboration` | Yes | No | No | - |
 
 ## Components
 
@@ -191,6 +202,40 @@ The project demo structure illustrates different governance models and their tra
 - [Azure Pipelines](https://azure.microsoft.com/en-us/products/devops/pipelines/)
 
 ## Considerations
+
+To achieve end-to-end governance in Azure, it's important to understand the security and permissions profile of the path from developer's computer to production. The following diagram illustrates a baseline CI/CD workflow with Azure DevOps. The lock ![workflow lock](.assets/e2egov-lock.png) icon indicates security permissions that must be configured by the user. Not configuring or misconfigured permissions will leave your workloads vulnerable.
+
+To successfully secure your workloads, you must use a combination of security permission configurations and human checks in your workflow. It's important that any RBAC model must also extend to both pipelines and code. These often run with privileged identities and will destroy your workloads if instructed to do so. To prevent this from happening, you should configure [branch policies](https://learn.microsoft.com/en-us/azure/devops/repos/git/branch-policies) on your repository to require human approval before accepting changes that trigger automation pipelines.
+
+![workflow](.assets/e2egov-workflow.png)
+
+<small>Image: Consideration workflow</small>
+
+| No. | Dev Stage | Responsibility | Description |
+| :-- | :-- | :-- | :-- |
+| 1 | Pull Requests | User | Engineers should peer review their work, including the Pipeline code itself. |
+| 2 | Branch Protection | Shared | Configure [Azure DevOps](https://learn.microsoft.com/en-us/azure/devops/repos/git/branch-policies) to reject changes that do not meet certain standards, such as CI checks and peer reviews (via pull requests). |
+| 3 | Pipeline as Code | User  | A build server will delete your entire production environment if the pipeline code instructs it to do so. Help prevent this by using a combination of pull requests and branch protection rules, such as human approval. |
+| 4 | Service Connections | Shared | Configure Azure DevOps to restrict access to these credentials. |
+| 5 | Azure Resources | Shared | Configure RBAC in Resource Manager. |
+
+The following concepts and questions are important to consider when designing a governance model. Bear in mind the [potential use cases](#use-cases) of the demo organization.
+
+### Safeguard your environments with branch policies
+
+![bullet 1](.assets/e2egov-no1.png) ![bullet 2](.assets/e2egov-no2.png)
+
+🚧 Todo → Description
+
+### What access do security principals need?
+
+![bullet 3](.assets/e2egov-no3.png)
+
+🚧 Todo → Description
+
+### Create a custom role for the service principal
+
+![bullet 4](.assets/e2egov-no4.png)
 
 🚧 Todo → Description
 
