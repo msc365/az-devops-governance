@@ -132,11 +132,11 @@ The numbering reflects the order in which administrators and enterprise architec
 
 To simplify the demo deployment, this reference implementation uses _Resource Groups_ to represent the `environments`. In practice, you should use different _Subscriptions_.
 
-- `rg-e2egov-avengers-dev-weu`
-- `rg-e2egov-avengers-prd-weu`
-- `rg-e2egov-guardians-dev-weu`
-- `rg-e2egov-guardians-prd-weu`
-- `rg-e2egov-galaxy-shared-weu`
+- `rg-e2egov-avengers-dev`
+- `rg-e2egov-avengers-prd`
+- `rg-e2egov-guardians-dev`
+- `rg-e2egov-guardians-prd`
+- `rg-e2egov-galaxy-shared`
 
 ## Azure DevOps Projects
 
@@ -168,14 +168,14 @@ The key to en-to-end governance is to have multiple role assignments (with diffe
 | Group name | Scope | Azure role | Azure DevOps role |
 |:--|:--|:--|:--|
 | `sg-e2egov-avengers-all` ¹ | - | - | - |
-| `sg-e2egov-avengers-devs` | `rg-e2egov-avengers-dev-weu` | Contributor | Contributor |
-| `sg-e2egov-avengers-admins` | `rg-e2egov-avengers-prd-weu` | Owner | Project Administrators |
+| `sg-e2egov-avengers-devs` | `rg-e2egov-avengers-dev` | Contributor | Contributor |
+| `sg-e2egov-avengers-admins` | `rg-e2egov-avengers-prd` | Owner | Project Administrators |
 | `sg-e2egov-guardians-all` | - | - | - |
-| `sg-e2egov-guardians-devs` | `rg-e2egov-guardians-dev-weu` | Contributor | Contributor |
-| `sg-e2egov-guardians-admins` | `rg-e2egov-guardians-prd-weu` | Owner | Project Administrators |
+| `sg-e2egov-guardians-devs` | `rg-e2egov-guardians-dev` | Contributor | Contributor |
+| `sg-e2egov-guardians-admins` | `rg-e2egov-guardians-prd` | Owner | Project Administrators |
 | `sg-e2egov-galaxy-all` | - | - | - |
-| `sg-e2egov-galaxy-devs` | `rg-e2egov-galaxy-dev-weu` | Contributor | Contributor |
-| `sg-e2egov-galaxy-admins` | `rg-e2egov-galaxy-prd-weu` | Owner | Project Administrators |
+| `sg-e2egov-galaxy-devs` | `rg-e2egov-galaxy-dev` | Contributor | Contributor |
+| `sg-e2egov-galaxy-admins` | `rg-e2egov-galaxy-prd` | Owner | Project Administrators |
 
 ¹ In a scenario of limited collaboration, such as the `avengers` team inviting the `guardians` team to collaborate on a _single_ repository, they would use the `*-avenger-all` group.
 
@@ -184,8 +184,8 @@ The key to en-to-end governance is to have multiple role assignments (with diffe
 | Group name | Scope | Azure role | Azure DevOps role |
 |:--|:--|:--|:--|
 | `sg-e2egov-fantastic-four-all` | - | - | - |
-| `sg-e2egov-fantastic-four-devs` | `rg-e2egov-fantastic-four-dev-weu` | Contributor | Contributor |
-| `sg-e2egov-fantastic-four-admins` | `rg-e2egov-fantastic-four-prd-weu` | Owner | Project Administrators |
+| `sg-e2egov-fantastic-four-devs` | `rg-e2egov-fantastic-four-dev` | Contributor | Contributor |
+| `sg-e2egov-fantastic-four-admins` | `rg-e2egov-fantastic-four-prd` | Owner | Project Administrators |
 
 To understand the reasoning behind the individual role assignments, refer to the [Considerations](#considerations) section.
 
