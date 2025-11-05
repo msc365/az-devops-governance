@@ -206,7 +206,7 @@ To successfully secure your workloads, you must use a combination of security pe
 ![workflow](.assets/e2egov-workflow.png)  
 <sub>Image: Consideration workflow</sub>
 
-| # | Dev Stage | Responsibility | Description |
+| No. | Dev Stage | Responsibility | Description |
 | :-- | :-- | :-- | :-- |
 | ![bullet 1](.assets/e2egov-no1.png) | Pull Requests | User | Engineers should peer review their work, including the Pipeline code itself. |
 | ![bullet 2](.assets/e2egov-no2.png) | Branch Protection | Shared | Configure [Azure DevOps](https://learn.microsoft.com/en-us/azure/devops/repos/git/branch-policies) to reject changes that do not meet certain standards, such as CI checks and peer reviews (via pull requests). |
