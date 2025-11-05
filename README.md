@@ -60,9 +60,8 @@ End‑to‑end governance is platform‑agnostic. This repository illustrates on
 
 This simplified diagram shows how branches in a Git repository map to development, staging, and production environments:
 
-![e2egov-git](./.assets/e2egov-git.png)
-
-<small>Image: Branch strategy diagram</small>
+![e2egov-git](./.assets/e2egov-git.png)  
+<sub>Image: Branch strategy diagram</sub>
 
 🚧 Todo → Description
 
@@ -70,9 +69,8 @@ This simplified diagram shows how branches in a Git repository map to developmen
 
 This diagram illustrates that connecting Azure Resource Manager (ARM) and CI/CD to Microsoft Entra ID is crucial for establishing a comprehensive governance model.
 
-![e2egov-design](./.assets/e2egov-design.png)
-
-<small>Image: End-to-end governance diagram</small>
+![e2egov-design](./.assets/e2egov-design.png)  
+<sub>Image: End-to-end governance diagram</sub>
 
 > [!NOTE]  
 > To make the concept easier to understand, the diagram illustrates a general `e2egov` business domain. Other business domains would look similar and use the same naming conventions, for example: `e2egov-avengers-devs`.
@@ -144,9 +142,8 @@ To simplify the demo deployment, this reference implementation uses _Resource Gr
 
 The project demo structure illustrates different governance models and their trade-offs.
 
-![e2egov-projects](.assets/e2egov-projects.png)
-
-<small>Image: Azure DevOps organization created with scripts form this repo</small>
+![e2egov-projects](.assets/e2egov-projects.png)  
+<sub>Image: Azure DevOps organization created with scripts form this repo</sub>
 
 - The isolated model with the `avengers` and `guardians` projects means less governance management - at the cost of less collaboration.
 - The `fantastic-four` project prioritizes collaboration via multiple shared Azure Boards - but requires more governance management, especially for repositories and pipelines.
@@ -163,15 +160,14 @@ The project demo structure illustrates different governance models and their tra
 
 The key to en-to-end governance is to have multiple role assignments (with different role definitions and different resource scopes to the same Entra ID Groups).
 
-![e2egov-rbac](./.assets/e2egov-rbac.png)
-
-<small>Image: Role Assignment diagram</small>
+![e2egov-rbac](./.assets/e2egov-rbac.png)  
+<sub>Image: Role Assignment diagram</sub>
 
 ### Isolated governance model
 
 | Group name | Scope | Azure role | Azure DevOps role |
 |:--|:--|:--|:--|
-| `sg-e2egov-avengers-all` | - | - | - |
+| `sg-e2egov-avengers-all` ¹ | - | - | - |
 | `sg-e2egov-avengers-devs` | `rg-e2egov-avengers-dev-weu` | Contributor | Contributor |
 | `sg-e2egov-avengers-admins` | `rg-e2egov-avengers-prd-weu` | Owner | Project Administrators |
 | `sg-e2egov-guardians-all` | - | - | - |
@@ -207,17 +203,16 @@ To achieve end-to-end governance in Azure, it's important to understand the secu
 
 To successfully secure your workloads, you must use a combination of security permission configurations and human checks in your workflow. It's important that any RBAC model must also extend to both pipelines and code. These often run with privileged identities and will destroy your workloads if instructed to do so. To prevent this from happening, you should configure [branch policies](https://learn.microsoft.com/en-us/azure/devops/repos/git/branch-policies) on your repository to require human approval before accepting changes that trigger automation pipelines.
 
-![workflow](.assets/e2egov-workflow.png)
+![workflow](.assets/e2egov-workflow.png)  
+<sub>Image: Consideration workflow</sub>
 
-<small>Image: Consideration workflow</small>
-
-| No. | Dev Stage | Responsibility | Description |
+| # | Dev Stage | Responsibility | Description |
 | :-- | :-- | :-- | :-- |
-| 1 | Pull Requests | User | Engineers should peer review their work, including the Pipeline code itself. |
-| 2 | Branch Protection | Shared | Configure [Azure DevOps](https://learn.microsoft.com/en-us/azure/devops/repos/git/branch-policies) to reject changes that do not meet certain standards, such as CI checks and peer reviews (via pull requests). |
-| 3 | Pipeline as Code | User  | A build server will delete your entire production environment if the pipeline code instructs it to do so. Help prevent this by using a combination of pull requests and branch protection rules, such as human approval. |
-| 4 | Service Connections | Shared | Configure Azure DevOps to restrict access to these credentials. |
-| 5 | Azure Resources | Shared | Configure RBAC in Resource Manager. |
+| ![bullet 1](.assets/e2egov-no1.png) | Pull Requests | User | Engineers should peer review their work, including the Pipeline code itself. |
+| ![bullet 2](.assets/e2egov-no2.png) | Branch Protection | Shared | Configure [Azure DevOps](https://learn.microsoft.com/en-us/azure/devops/repos/git/branch-policies) to reject changes that do not meet certain standards, such as CI checks and peer reviews (via pull requests). |
+| ![bullet 3](.assets/e2egov-no3.png) | Pipeline as Code | User  | A build server will delete your entire production environment if the pipeline code instructs it to do so. Help prevent this by using a combination of pull requests and branch protection rules, such as human approval. |
+| ![bullet 4](.assets/e2egov-no4.png) | Service Connections | Shared | Configure Azure DevOps to restrict access to these credentials. |
+| ![bullet 5](.assets/e2egov-no5.png) | Azure Resources | Shared | Configure RBAC in Resource Manager. |
 
 The following concepts and questions are important to consider when designing a governance model. Bear in mind the [potential use cases](#use-cases) of the demo organization.
 
@@ -243,7 +238,7 @@ The following concepts and questions are important to consider when designing a 
 ## License
 
 ![logo small martin swinkels cloud](.assets/logo-small.png)  
-<small>Part of Martin's Cloud on GitHub</small>
+<sub>Part of Martin's Cloud on GitHub</sub>
 
 [MIT License](LICENSE) | Copyright (c) 2025 MSc365.eu by Martin Swinkels
 
