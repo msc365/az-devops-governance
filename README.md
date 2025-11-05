@@ -204,10 +204,13 @@ To achieve end-to-end governance in Azure, it's important to understand the secu
 To successfully secure your workloads, you must use a combination of security permission configurations and human checks in your workflow. It's important that any RBAC model must also extend to both pipelines and code. These often run with privileged identities and will destroy your workloads if instructed to do so. To prevent this from happening, you should configure [branch policies](https://learn.microsoft.com/en-us/azure/devops/repos/git/branch-policies) on your repository to require human approval before accepting changes that trigger automation pipelines.
 
 ![workflow](.assets/e2egov-workflow.png)  
-<sub>Image: Consideration workflow</sub>
+<sub>Image: Baseline CI/CD workflow</sub>
 
-| No. | Dev Stage | Responsibility | Description |
-| :-- | :-- | :-- | :-- |
+<!-- omit from toc -->
+## Baseline CI/CD workflow breakdown
+
+| No <br><br> | Development stages | Responsibility <br><br> | Description <br><br> |
+| :-- | --- | :-- | :-- |
 | ![bullet 1](.assets/e2egov-no1.png) | Pull Requests | User | Engineers should peer review their work, including the Pipeline code itself. |
 | ![bullet 2](.assets/e2egov-no2.png) | Branch Protection | Shared | Configure [Azure DevOps](https://learn.microsoft.com/en-us/azure/devops/repos/git/branch-policies) to reject changes that do not meet certain standards, such as CI checks and peer reviews (via pull requests). |
 | ![bullet 3](.assets/e2egov-no3.png) | Pipeline as Code | User  | A build server will delete your entire production environment if the pipeline code instructs it to do so. Help prevent this by using a combination of pull requests and branch protection rules, such as human approval. |
