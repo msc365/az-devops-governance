@@ -153,8 +153,7 @@ The project demo structure illustrates different governance models and their tra
 | `avengers` |  Yes | Yes | Yes | Isolated by project scope |
 | `guardians` | Yes | Yes | Yes | Isolated by project scope |
 | `galaxy` | No | Yes | Yes | Shared resources |
-| `fantastic-four` | Yes | Yes | Yes | Prioritizes collaboration with 4 Teams and shared Boards. |
-| `collaboration` | Yes | No | No | Another possible scenario |
+| `fantastic-four` | Yes | Yes | Yes | One project multiple teams, prioritizes collaboration |
 
 ## Entra ID Groups
 
@@ -223,7 +222,34 @@ The following concepts and questions are important to consider when designing a 
 
 ![bullet 1](.assets/e2egov-no1.png) ![bullet 2](.assets/e2egov-no2.png)
 
-🚧 Todo → Description
+Because your source code defines and triggers deployments, your first line of defense is to secure your source code management (SCM) repository. In practice, this is achieved by using the [pull request workflow](https://learn.microsoft.com/en-us/azure/devops/repos/git/about-pull-requests) in combination with [branch policies](https://learn.microsoft.com/en-us/azure/devops/repos/git/branch-policies), which define checks and requirements before code can be accepted.
+
+When planning your end-to-end governance model, privileged users (`*-admins`) will be responsible for configuring branch protection. Common branch protection checks used to secure your deployments include:
+
+- **Require CI build to pass**  
+  Useful for establishing baseline code quality, such as code linting, unit tests, and even security checks like virus and credential scans.
+
+- **Require peer review**  
+  Have another human double check that code works as intended. Be extra careful when changes are made to pipeline code. Combine with CI builds to make peer reviews less tedious.
+
+#### What happens if a developer tries to push directly to production?
+
+Remember that Git is a distributed SCM system. A developer can commit directly to their local production branch. But when Git is properly configured, such a push will be automatically rejected by the Git server. For example:
+
+#### PowerShell
+
+```cmd
+remote: Resolving deltas: 100% (3/3), completed with 3 local objects.
+remote: error: GH006: Protected branch update failed for refs/heads/main.
+remote: error: Required status check "continuous-integration" is expected.
+To https://github.com/msc365/az-devops-governance
+ ! [remote rejected] main -> main (protected branch hook declined)
+error: failed to push some refs to 'https://github.com/msc365/az-devops-governance'
+```
+
+Note that the workflow in the example is vendor agnostic. The pull request and branch protection features are available from multiple SCM providers, including [Azure Repos](https://azure.microsoft.com/services/devops/repos), [GitHub](https://github.com/), and [GitLab](https://gitlab.com/).
+
+Once the code has been accepted into a protected branch, the next layer of access controls will be applied by the build server (such as [Azure Pipelines](https://azure.microsoft.com/products/devops/pipelines/)).
 
 ### What access do security principals need?
 
