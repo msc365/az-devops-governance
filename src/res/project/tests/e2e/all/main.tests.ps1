@@ -3,9 +3,9 @@
 # ========== #
 
 $params = @{
-    Organization  = 'MyOrg'
-    Name          = 'MyProject'
-    DefaultTeam   = 'MyTeam'
+    Organization  = 'my-org'
+    Name          = 'my-project'
+    DefaultTeam   = 'my-team'
     Description   = 'My project description'
     Process       = 'Agile'
     SourceControl = 'Git'

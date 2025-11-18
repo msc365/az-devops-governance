@@ -62,9 +62,9 @@
 
 .EXAMPLE
     $paramSplat = @{
-        Organization     = 'MyOrg'
-        ProjectName      = 'MyProject'
-        DefaultTeamName  = 'MyTeam'
+        Organization     = 'my-org'
+        ProjectName      = 'my-project'
+        DefaultTeamName  = 'my-team'
         Description      = 'My project description'
         Process          = 'Agile'
         SourceControl    = 'Git'
@@ -80,7 +80,7 @@
 
     .\src\res\project\main.ps1 @paramSplat
 
-    This example deploys or updates a project named 'MyProject' in the 'MyOrg' organization with the specified parameters.
+    This example deploys or updates a project named 'my-project' in the 'my-org' organization with the specified parameters.
 #>
 [CmdletBinding()]
 param (

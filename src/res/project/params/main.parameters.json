@@ -1,8 +1,8 @@
 {
     "Organization": "msc365",
-    "Name": "MyProject",
+    "Name": "my-project",
     "Description": "My project description",
-    "DefaultTeam": "MyTeam",
+    "DefaultTeam": "my-team",
     "SourceControl": "Git",
     "Process": "Agile",
     "Features": {
