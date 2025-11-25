@@ -1,0 +1,23 @@
+{
+    "organization": "msc365",
+    "projectId": "my-project",
+    "teamId": "my-other-team",
+    "name": "",
+    "description": "My team description",
+    "settings": {
+        "backlogVisibilities": {
+            "Microsoft.EpicCategory": false,
+            "Microsoft.FeatureCategory": true,
+            "Microsoft.RequirementCategory": true
+        },
+        "bugsBehavior": "asRequirements",
+        "defaultIterationMacro": "@currentIteration",
+        "workingDays": [
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday"
+        ]
+    }
+}

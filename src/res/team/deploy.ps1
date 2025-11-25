@@ -1,0 +1,38 @@
+﻿[CmdletBinding()]
+param (
+    [Parameter()]
+    [string]$templateFile = 'main.ps1',
+
+    [Parameter()]
+    [string]$templateParameterFile = 'params\main.parameters.json',
+
+    [Parameter()]
+    [switch]$RemoveDeployment
+)
+
+begin {
+    Write-Debug ('Command : {0}' -f $MyInvocation.MyCommand.Name)
+}
+
+process {
+    try {
+        # Load parameters from JSON file
+        $paramsFromJson = Get-Content -Path (Join-Path $PSScriptRoot -ChildPath $templateParameterFile) -Raw
+
+        Write-Verbose 'Using params:'
+        Write-Verbose $paramsFromJson
+
+        # Convert JSON string to Hashtable
+        $params = $paramsFromJson | ConvertFrom-Json -Depth 3 -AsHashtable
+
+        # Execute the deployment template with parameters
+        & (Join-Path $PSScriptRoot -ChildPath $templateFile) @params -RemoveDeployment:$RemoveDeployment.IsPresent
+
+    } catch {
+        throw $_
+    }
+}
+
+end {
+    Write-Debug ('Exit : {0}' -f $MyInvocation.MyCommand.Name)
+}
