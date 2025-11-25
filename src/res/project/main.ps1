@@ -127,7 +127,7 @@ begin {
         'Azure.DevOps.PSModule'
     )
     $modules | ForEach-Object {
-        if (-not (Get-Module $_ -ListAvailable)) {
+        if (-not (Get-Module $_) -or (Get-Module $_ -ListAvailable)) {
             Import-Module $_ -Force -Verbose:$false
         }
     }
