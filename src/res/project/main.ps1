@@ -153,7 +153,7 @@ process {
             $project = Get-AdoProject -ProjectId $Name -Verbose:$VerbosePreference
 
             if ($null -ne $project) {
-                Remove-AdoProject -ProjectId $project.Id -Verbose:$VerbosePreference | Out-Null
+                Remove-AdoProject -ProjectId $project.id -Verbose:$VerbosePreference | Out-Null
 
                 Write-Verbose ("Project '{0}' has been removed." -f $Name)
                 return $true
@@ -185,11 +185,11 @@ process {
             # Update existing project
             Write-Verbose ("Project '{0}' exists." -f $Name)
 
-            if ($project.Description -ne $Description -or $project.Visibility -ne $Visibility) {
+            if ($project.description -ne $Description -or $project.visibility -ne $Visibility) {
                 Write-Verbose ("Updating project '{0}' properties..." -f $Name)
 
                 $updateSplat = @{
-                    ProjectId   = $project.Id
+                    ProjectId   = $project.id
                     Description = $Description
                     Visibility  = $Visibility
                 }
@@ -209,7 +209,7 @@ process {
         }
 
         # Update project feature states
-        $currentFeatureStates = Get-AdoFeatureState -ProjectId $project.Id -Verbose:$VerbosePreference
+        $currentFeatureStates = Get-AdoFeatureState -ProjectId $project.id -Verbose:$VerbosePreference
 
         foreach ($currentFeatureId in $currentFeatureStates.featureIds) {
             # Map feature ID to feature name
@@ -242,8 +242,8 @@ process {
         # Set default team name if different
         if ($project.defaultTeam.name -ne $DefaultTeam) {
             $defaultTeamSplat = @{
-                ProjectId = $project.Id
-                TeamId    = $project.DefaultTeam.Id
+                ProjectId = $project.id
+                TeamId    = $project.defaultTeam.id
                 Name      = $DefaultTeam
             }
 
