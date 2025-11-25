@@ -83,6 +83,7 @@
     This example deploys or updates a project named 'my-project' in the 'my-org' organization with the specified parameters.
 #>
 [CmdletBinding()]
+[OutputType([object])]
 param (
     [Parameter(Mandatory = $true)]
     [string]$Organization,
@@ -156,11 +157,17 @@ process {
                 Remove-AdoProject -ProjectId $project.id -Verbose:$VerbosePreference | Out-Null
 
                 Write-Verbose ("Project '{0}' has been removed." -f $Name)
-                return $true
+                return [System.PSCustomObject]::new = @{
+                    Removed = $true
+                    Message = 'Project has been removed.'
+                }
             }
 
             Write-Verbose ("Project '{0}' does not exist. No action taken." -f $Name)
-            return $false
+            return [System.PSCustomObject]::new = @{
+                Removed = $false
+                Message = 'Project does not exist. No action taken.'
+            }
         }
 
         # Check if project exists
