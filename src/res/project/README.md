@@ -1,11 +1,20 @@
 <!-- cSpell: ignore hashtable msc365 -->
+<!-- omit from toc -->
 # Azure DevOps Project Resource
-
-## Overview
 
 This PowerShell script (`main.ps1`) creates or updates an Azure DevOps Project within a specified organization. It provides comprehensive project management capabilities including configuration of project properties, feature states, and team settings.
 
-## Description
+- [Overview](#overview)
+- [Parameters](#parameters)
+- [Return Values](#return-values)
+- [Exceptions and Errors](#exceptions-and-errors)
+- [Dependencies](#dependencies)
+- [Usage Examples](#usage-examples)
+- [Script Behavior](#script-behavior)
+- [Feature ID Mapping](#feature-id-mapping)
+- [Notes](#notes)
+
+## Overview
 
 The script manages Azure DevOps Projects with the following capabilities:
 - Creates new projects with specified configuration
@@ -231,6 +240,7 @@ The script uses internal Azure DevOps feature IDs:
 - Automatic connection to Azure DevOps organization if not already connected
 - Project refresh operations occur after modifications to ensure data consistency
 
+<!-- omit from toc -->
 ## Version Information
 
 - **Version:** 1.0

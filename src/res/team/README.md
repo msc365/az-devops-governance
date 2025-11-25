@@ -1,11 +1,22 @@
 <!-- cSpell: ignore hashtable msc365 -->
-# Azure DevOps Team Resource
 
-## Overview
+<!-- omit from toc -->
+# Azure DevOps Team Resource
 
 This PowerShell script (`main.ps1`) creates or updates an Azure DevOps Team within a specified project. It provides comprehensive team management capabilities including configuration of team properties, settings, iteration paths, and area paths.
 
-## Description
+- [Overview](#overview)
+- [Parameters](#parameters)
+- [Return Values](#return-values)
+- [Exceptions and Errors](#exceptions-and-errors)
+- [Dependencies](#dependencies)
+- [Usage Examples](#usage-examples)
+- [Script Behavior](#script-behavior)
+- [Team Configuration Details](#team-configuration-details)
+- [Notes](#notes)
+
+
+## Overview
 
 The script manages Azure DevOps Teams with the following capabilities:
 - Creates new teams with specified configuration
@@ -223,6 +234,7 @@ $paramSplat = @{
 - Team refresh operations occur after modifications to ensure data consistency
 - Avoids unnecessary updates when team properties are already up to date
 
+<!-- omit from toc -->
 ## Version Information
 
 - **Version:** 1.0
