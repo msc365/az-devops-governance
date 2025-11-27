@@ -38,7 +38,31 @@ This PowerShell script (`main.ps1`) creates or updates an Azure DevOps Project w
 
 ## Usage examples
 
-### Example 1: Create a new project with default settings
+### Example 1: Deploy using the deploy script with parameter file
+
+```powershell
+.\src\res\project\deploy.ps1
+```
+
+This uses the `deploy.ps1` script which:
+
+- Reads configuration from `params\main.parameters.json`
+- Executes `main.ps1` with the parameters from the JSON file
+- Simplifies deployment by separating configuration from execution
+
+You can also specify custom parameter files:
+
+```powershell
+.\src\res\project\deploy.ps1 -templateParameterFile 'params\custom.parameters.json'
+```
+
+To remove a project using the deploy script:
+
+```powershell
+.\src\res\project\deploy.ps1 -Remove -Force
+```
+
+### Example 2: Create a new project with default settings
 
 ```powershell
 $paramSplat = @{
@@ -58,7 +82,7 @@ This creates a project with:
 - Visibility: Private (default)
 - All features enabled except TestPlans
 
-### Example 2: Create a scrum project with custom configuration
+### Example 3: Create a scrum project with custom configuration
 
 ```powershell
 $paramSplat = @{
@@ -81,7 +105,7 @@ $paramSplat = @{
 .\src\res\project\main.ps1 @paramSplat
 ```
 
-### Example 3: Update an existing project's description and visibility
+### Example 4: Update an existing project's description and visibility
 
 ```powershell
 $paramSplat = @{
@@ -95,10 +119,10 @@ $paramSplat = @{
 .\src\res\project\main.ps1 @paramSplat
 ```
 
-> [!NOTE] Note  
+> [!NOTE]  
 > Project `Process` and `SourceControl` cannot be changed for existing projects.
 
-### Example 4: Disable specific features
+### Example 5: Disable specific features
 
 ```powershell
 $paramSplat = @{
@@ -118,7 +142,7 @@ $paramSplat = @{
 .\src\res\project\main.ps1 @paramSplat
 ```
 
-### Example 5: Remove a project (destructive operation)
+### Example 6: Remove a project (destructive operation)
 
 ```powershell
 $paramSplat = @{
