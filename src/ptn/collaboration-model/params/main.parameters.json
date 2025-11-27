@@ -1,0 +1,99 @@
+{
+    "projects": [
+        {
+            "organization": "msc365",
+            "name": "e2egov-fantastic-4",
+            "description": "End-to-end collaboration sample with multiple teams",
+            "defaultTeam": "Fantastic 4 Team",
+            "sourceControl": "Git",
+            "process": "Agile",
+            "features": {
+                "testPlans": "disabled",
+                "artifacts": "enabled",
+                "pipelines": "enabled",
+                "repos": "enabled",
+                "boards": "enabled"
+            },
+            "visibility": "Private"
+        }
+    ],
+    "teams": [
+        {
+            "organization": "msc365",
+            "projectId": "e2egov-fantastic-4",
+            "teamId": "Avengers Team",
+            "name": "",
+            "description": "Avengers team description",
+            "settings": {
+                "backlogVisibilities": {
+                    "Microsoft.EpicCategory": false,
+                    "Microsoft.FeatureCategory": true,
+                    "Microsoft.RequirementCategory": true
+                },
+                "bugsBehavior": "asRequirements",
+                "defaultIterationMacro": "@currentIteration",
+                "workingDays": [
+                    "monday",
+                    "tuesday",
+                    "wednesday",
+                    "thursday",
+                    "friday"
+                ]
+            }
+        },
+        {
+            "organization": "msc365",
+            "projectId": "e2egov-fantastic-4",
+            "teamId": "Guardians Team",
+            "name": "",
+            "description": "Guardians team description",
+            "settings": {
+                "backlogVisibilities": {
+                    "Microsoft.EpicCategory": false,
+                    "Microsoft.FeatureCategory": true,
+                    "Microsoft.RequirementCategory": true
+                },
+                "bugsBehavior": "asRequirements",
+                "defaultIterationMacro": "@currentIteration",
+                "workingDays": [
+                    "monday",
+                    "tuesday",
+                    "wednesday",
+                    "thursday",
+                    "friday"
+                ]
+            }
+        },
+        {
+            "organization": "msc365",
+            "projectId": "e2egov-fantastic-4",
+            "teamId": "Galaxy Team",
+            "name": "",
+            "description": "Galaxy team description",
+            "settings": {
+                "backlogVisibilities": {
+                    "Microsoft.EpicCategory": false,
+                    "Microsoft.FeatureCategory": true,
+                    "Microsoft.RequirementCategory": true
+                },
+                "bugsBehavior": "asRequirements",
+                "defaultIterationMacro": "@currentIteration",
+                "workingDays": [
+                    "monday",
+                    "tuesday",
+                    "wednesday"
+                ]
+            }
+        },
+        {
+            "organization": "msc365",
+            "projectId": "e2egov-fantastic-4",
+            "teamId": "Fantastic 4 Team",
+            "name": "",
+            "description": "Fantastic Four team description",
+            "settings": {
+                "bugsBehavior": "asRequirements"
+            }
+        }
+    ]
+}
