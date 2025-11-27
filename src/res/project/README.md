@@ -13,28 +13,27 @@ This PowerShell script (`main.ps1`) creates or updates an Azure DevOps Project w
 <!-- omit from toc -->
 ## Navigation
 
-- [PowerShell modules](#powershell-modules)
+- [PowerShell Functions](#powershell-functions)
 - [Usage examples](#usage-examples)
 - [Parameters](#parameters)
 - [Outputs](#outputs)
 - [Notes](#notes)
 
-## PowerShell modules
+## PowerShell Functions
 
-- **Azure.DevOps.PSModule**  
-  Required for all Azure DevOps operations
+The `Azure.DevOps.PSModule` is required for the following Azure DevOps operations:
 
-### Functions used
-
-- `Connect-AdoOrganization` - Establishes connection to Azure DevOps
-- `Get-AdoContext` - Retrieves current Azure DevOps context
-- `Get-AdoProject` - Retrieves project information
-- `New-AdoProject` - Creates new projects
-- `Set-AdoProject` - Updates project properties
-- `Remove-AdoProject` - Deletes projects
-- `Get-AdoFeatureState` - Retrieves feature states
-- `Set-AdoFeatureState` - Updates feature states
-- `Set-AdoTeam` - Updates team properties
+| Function | Description |
+| --- | --- |
+| `Connect-AdoOrganization` | Establishes connection to Azure DevOps |
+| `Get-AdoContext` | Retrieves current Azure DevOps context |
+| `Get-AdoProject` | Retrieves project information |
+| `New-AdoProject` | Creates new projects |
+| `Set-AdoProject` | Updates project properties |
+| `Remove-AdoProject` | Deletes projects |
+| `Get-AdoFeatureState` | Retrieves feature states |
+| `Set-AdoFeatureState` | Updates feature states |
+| `Set-AdoTeam` | Updates team properties |
 
 ## Usage examples
 
