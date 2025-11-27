@@ -17,7 +17,7 @@
 
     .ICONURI https://raw.githubusercontent.com/msc365/az-devops-governance/main/.assets/icon.png
 
-    .EXTERNALMODULEDEPENDENCIES Az.Accounts
+    .EXTERNALMODULEDEPENDENCIES Az.Accounts, Azure.DevOps.PSModule
 #>
 <#
 .SYNOPSIS
@@ -119,17 +119,26 @@ param (
     },
 
     [Parameter()]
-    [switch]$RemoveDeployment
+    [switch]$Remove,
+
+    [Parameter()]
+    [switch]$Force
 )
 
 begin {
+
+    if ($null -eq (Get-AzContext)) {
+        Write-Error 'No Azure context found. Please login using Connect-AzAccount.'
+        return
+    }
+
     # Import required modules
     $modules = @(
         'Azure.DevOps.PSModule'
     )
     $modules | ForEach-Object {
         if (-not (Get-Module $_) -or (Get-Module $_ -ListAvailable)) {
-            Import-Module $_ -Force -Verbose:$false
+            Import-Module $_ -Force -Verbose:$false -ErrorAction Stop
         }
     }
 
@@ -148,7 +157,24 @@ process {
         $project = $null
         $refreshProject = $false
 
-        if ($RemoveDeployment.IsPresent) {
+        if ($Remove.IsPresent -and -not $Force.IsPresent) {
+            # Prompt user to confirm
+            $prompt = @(
+                "This script will delete project $($Name)."
+                'All related resources like repositories, pipelines, artifacts and boards will be lost.'
+                "Do you want to continue? 'Yes [Y]' 'No [N]'"
+            ) -join "`n"
+
+            $result = Read-Host -Prompt $prompt
+            $result = $result.ToLower()
+
+            if ($result -ne 'y' -and $result -ne 'yes') {
+                Write-Warning 'Operation cancelled by user'
+                return
+            }
+        }
+
+        if ($Remove.IsPresent) {
             Write-Verbose ("Removing project '{0}' from organization '{1}'..." -f $Name, $Organization)
 
             $project = Get-AdoProject -ProjectId $Name -Verbose:$VerbosePreference
@@ -157,14 +183,14 @@ process {
                 Remove-AdoProject -ProjectId $project.id -Verbose:$VerbosePreference | Out-Null
 
                 Write-Verbose ("Project '{0}' has been removed." -f $Name)
-                return [System.PSCustomObject]::new = @{
+                return [pscustomobject]@{
                     Removed = $true
                     Message = 'Project has been removed.'
                 }
             }
 
             Write-Verbose ("Project '{0}' does not exist. No action taken." -f $Name)
-            return [System.PSCustomObject]::new = @{
+            return [pscustomobject]@{
                 Removed = $false
                 Message = 'Project does not exist. No action taken.'
             }
@@ -221,11 +247,11 @@ process {
         foreach ($currentFeatureId in $currentFeatureStates.featureIds) {
             # Map feature ID to feature name
             $featureId = switch ($currentFeatureId) {
-                'ms.vss-work.agile' { 'Boards' }
-                'ms.vss-code.version-control' { 'Repos' }
-                'ms.vss-build.pipelines' { 'Pipelines' }
-                'ms.vss-test-web.test' { 'TestPlans' }
-                'ms.azure-artifacts.feature' { 'Artifacts' }
+                'ms.vss-work.agile' { 'boards' }
+                'ms.vss-code.version-control' { 'repos' }
+                'ms.vss-build.pipelines' { 'pipelines' }
+                'ms.vss-test-web.test' { 'testPlans' }
+                'ms.azure-artifacts.feature' { 'artifacts' }
             }
 
             if ($Features.ContainsKey($featureId)) {

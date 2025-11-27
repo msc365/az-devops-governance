@@ -7,7 +7,10 @@ param (
     [string]$templateParameterFile = 'params\main.parameters.json',
 
     [Parameter()]
-    [switch]$RemoveDeployment
+    [switch]$Remove,
+
+    [Parameter()]
+    [switch]$Force
 )
 
 begin {
@@ -26,7 +29,7 @@ process {
         $params = $paramsFromJson | ConvertFrom-Json -AsHashtable
 
         # Execute the deployment template with parameters
-        & (Join-Path $PSScriptRoot -ChildPath $templateFile) @params -RemoveDeployment:$RemoveDeployment.IsPresent
+        & (Join-Path $PSScriptRoot -ChildPath $templateFile) @params -Remove:$Remove.IsPresent -Force:$Force.IsPresent
 
     } catch {
         throw $_

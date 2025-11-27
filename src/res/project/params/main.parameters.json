@@ -1,16 +1,16 @@
 {
-    "Organization": "msc365",
-    "Name": "my-project",
-    "Description": "My project description",
-    "DefaultTeam": "my-team",
-    "SourceControl": "Git",
-    "Process": "Agile",
-    "Features": {
-        "TestPlans": "disabled",
-        "Artifacts": "enabled",
-        "Pipelines": "enabled",
-        "Repos": "enabled",
-        "Boards": "enabled"
+    "organization": "msc365",
+    "name": "my-project",
+    "description": "My project description",
+    "defaultTeam": "My Default Team",
+    "sourceControl": "Git",
+    "process": "Agile",
+    "features": {
+        "testPlans": "disabled",
+        "artifacts": "enabled",
+        "pipelines": "enabled",
+        "repos": "enabled",
+        "boards": "enabled"
     },
-    "Visibility": "Private"
+    "visibility": "Private"
 }
