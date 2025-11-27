@@ -17,7 +17,7 @@
 
     .ICONURI https://raw.githubusercontent.com/msc365/az-devops-governance/main/.assets/icon.png
 
-    .EXTERNALMODULEDEPENDENCIES Az.Accounts
+    .EXTERNALMODULEDEPENDENCIES Az.Accounts, Azure.DevOps.PSModule
 #>
 <#
 .SYNOPSIS
@@ -87,17 +87,26 @@ param (
     [hashtable]$Settings,
 
     [Parameter()]
-    [switch]$RemoveDeployment
+    [switch]$Remove,
+
+    [Parameter()]
+    [switch]$Force
 )
 
 begin {
+
+    if ($null -eq (Get-AzContext)) {
+        Write-Error 'No Azure context found. Please login using Connect-AzAccount.'
+        return
+    }
+
     # Import required modules
     $modules = @(
         'Azure.DevOps.PSModule'
     )
     $modules | ForEach-Object {
         if (-not (Get-Module $_) -or (Get-Module $_ -ListAvailable)) {
-            Import-Module $_ -Force -Verbose:$false
+            Import-Module $_ -Force -Verbose:$false -ErrorAction Stop
         }
     }
 
@@ -131,8 +140,24 @@ process {
 
         #region Team Removal
 
+        if ($Remove.IsPresent -and -not $Force.IsPresent) {
+            # Prompt user to confirm
+            $prompt = @(
+                "This script will delete team $($TeamId). All data and related configuration will be lost."
+                "Do you want to continue? 'Yes [Y]' 'No [N]'"
+            ) -join "`n"
+
+            $result = Read-Host -Prompt $prompt
+            $result = $result.ToLower()
+
+            if ($result -ne 'y' -and $result -ne 'yes') {
+                Write-Warning "Removing team '$($TeamId)' cancelled by user"
+                return
+            }
+        }
+
         # Remove team if specified
-        if ($RemoveDeployment.IsPresent) {
+        if ($Remove.IsPresent) {
             Write-Verbose ("Removing team '{0}' from project '{1}'..." -f $TeamId, $project.name)
 
             $team = Get-AdoTeam -ProjectId $project.id -TeamId $TeamId -Verbose:$VerbosePreference
@@ -141,14 +166,14 @@ process {
                 Remove-AdoTeam -ProjectId $project.id -TeamId $TeamId -Verbose:$VerbosePreference | Out-Null
 
                 Write-Verbose ("Team '{0}' has been removed." -f $TeamId)
-                return [System.PSCustomObject]::new = @{
+                return [pscustomobject]@{
                     Removed = $true
                     Message = 'Team has been removed.'
                 }
             }
 
             Write-Verbose ("Team '{0}' does not exist. No action taken." -f $TeamId)
-            return [System.PSCustomObject]::new = @{
+            return [pscustomobject]@{
                 Removed = $false
                 Message = 'Team does not exist. No action taken.'
             }
@@ -197,7 +222,7 @@ process {
         #region Team Settings
 
         Write-Verbose ("Getting default team settings for project '{0}'..." -f $project.name)
-        $defaultSettings = Get-AdoTeamSettings -ProjectId $project.id -TeamId $project.defaultTeam.name -Verbose:$VerbosePreference
+        $defaultSettings = Get-AdoTeamSettings -ProjectId $project.id -TeamId $project.defaultTeam.id -Verbose:$VerbosePreference
 
         if ($null -ne $Settings) {
             Write-Verbose ("Overriding default team settings with provided team settings for '{0}'..." -f $team.name)
@@ -283,7 +308,7 @@ process {
         Write-Verbose ("Checking if team area path '{0}\{1}' exists..." -f $project.name, $team.name)
         $fieldValue = Get-AdoTeamFieldValue -ProjectId $project.id -Team $team.id -Verbose:$VerbosePreference
 
-        if ($null -eq $fieldValue) {
+        if ($null -eq $fieldValue.defaultValue) {
             # Set team area path to the team
             Write-Verbose ("Set team area path '{0}\{1}'..." -f $project.name, $team.name)
             $defaultValue = ('{0}\{1}' -f $project.name, $team.name)

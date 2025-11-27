@@ -1,9 +1,9 @@
 {
     "organization": "msc365",
     "projectId": "my-project",
-    "teamId": "my-other-team",
+    "teamId": "My Other Team",
     "name": "",
-    "description": "My team description",
+    "description": "My other team description",
     "settings": {
         "backlogVisibilities": {
             "Microsoft.EpicCategory": false,

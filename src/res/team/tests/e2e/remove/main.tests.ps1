@@ -3,10 +3,10 @@
 # ========== #
 
 $params = @{
-    Organization     = 'my-org'
-    ProjectId        = 'my-project'
-    TeamId           = 'my-other-team'
-    RemoveDeployment = $true
+    Organization = 'my-org'
+    ProjectId    = 'my-project'
+    TeamId       = 'my-other-team'
+    Remove       = $true
 }
 
 # ========= #
