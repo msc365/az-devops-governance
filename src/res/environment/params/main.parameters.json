@@ -1,0 +1,17 @@
+{
+    "$schema": "https://raw.githubusercontent.com/msc365/az-devops-governance/main/schemas/environment.schema.json",
+    "name": "my-project-prd",
+    "subscriptionId": "a8919718-a1aa-41b6-9146-139e67bc7ad2",
+    "resourceGroup": {
+        "name": "rg-my-project-prd-weu",
+        "location": "westeurope",
+        "tags": {
+            "public": "false",
+            "service": "my-project",
+            "environment": "prd",
+            "security": "rbac",
+            "iac": "bicep",
+            "ci": "azure-pipelines"
+        }
+    }
+}

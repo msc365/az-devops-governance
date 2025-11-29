@@ -28,6 +28,9 @@ param (
     [object[]]$Teams,
 
     [Parameter()]
+    [object[]]$Environments,
+
+    [Parameter()]
     [switch]$Remove,
 
     [Parameter()]
@@ -88,11 +91,24 @@ process {
             }
         }
 
+        Write-Verbose 'Processing environments...'
+        $Environments | ForEach-Object -Process {
+            # Prepare splat for environment deployment
+            $environmentSplat = $_
+            # Add Remove switch
+            $environmentSplat['Remove'] = $Remove.IsPresent
+            # Add Force switch
+            $environmentSplat['Force'] = $Force.IsPresent
+
+            Write-Verbose ("Processing environment '{0}'." -f $_.Name)
+            & (Join-Path $PSScriptRoot -ChildPath '..\..\res\environment\main.ps1') @environmentSplat -Verbose:$VerbosePreference
+        }
+
     } catch {
         throw $_
     }
 }
 
 end {
-    Write-Debug ('Exit : {0}' -f $MyInvocation.MyCommand.Name)
+    Write-Verbose ('Exit : {0}' -f $MyInvocation.MyCommand.Name)
 }

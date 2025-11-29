@@ -1,0 +1,66 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://raw.githubusercontent.com/msc365/az-devops-governance/main/schemas/environment.schema.json",
+    "oneOf": [
+        {
+            "$ref": "#/definitions/environment"
+        },
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/environment"
+            },
+            "minItems": 1
+        }
+    ],
+    "definitions": {
+        "environment": {
+            "type": "object",
+            "required": [
+                "name",
+                "subscriptionId"
+            ],
+            "properties": {
+                "$schema": {
+                    "type": "string",
+                    "description": "JSON Schema reference"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "The name of the environment"
+                },
+                "subscriptionId": {
+                    "type": "string",
+                    "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+                    "description": "The subscription ID (must be a valid GUID)"
+                },
+                "resourceGroup": {
+                    "type": "object",
+                    "required": [
+                        "name",
+                        "location"
+                    ],
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "description": "The name of the resource group"
+                        },
+                        "location": {
+                            "type": "string",
+                            "description": "The location/region of the resource group"
+                        },
+                        "tags": {
+                            "type": "object",
+                            "description": "Tags to apply to the resource group",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false
+        }
+    }
+}
