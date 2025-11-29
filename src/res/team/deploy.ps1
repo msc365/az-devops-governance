@@ -14,7 +14,7 @@ param (
 )
 
 begin {
-    Write-Debug ('Command : {0}' -f $MyInvocation.MyCommand.Name)
+    Write-Verbose ('Command : {0}' -f $MyInvocation.MyCommand.Name)
 }
 
 process {
@@ -37,5 +37,5 @@ process {
 }
 
 end {
-    Write-Debug ('Exit : {0}' -f $MyInvocation.MyCommand.Name)
+    Write-Verbose ('Exit : {0}' -f $MyInvocation.MyCommand.Name)
 }

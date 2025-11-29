@@ -14,7 +14,7 @@ param (
 )
 
 begin {
-    Write-Debug ('{0} entered' -f $MyInvocation.MyCommand.Name)
+    Write-Verbose ('{0} entered' -f $MyInvocation.MyCommand.Name)
     Write-Verbose '------ START SCRIPT ------' -Verbose
 }
 
@@ -50,5 +50,5 @@ process {
 
 end {
     Write-Verbose '------- END SCRIPT -------' -Verbose
-    Write-Debug ('{0} exited' -f $MyInvocation.MyCommand.Name)
+    Write-Verbose ('{0} exited' -f $MyInvocation.MyCommand.Name)
 }
