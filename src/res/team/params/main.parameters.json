@@ -19,5 +19,8 @@
             "thursday",
             "friday"
         ]
-    }
+    },
+    "groupMembership": [
+        "Contributors"
+    ]
 }

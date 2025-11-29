@@ -2,7 +2,7 @@
     "projects": [
         {
             "organization": "msc365",
-            "name": "e2egov-fantastic-4",
+            "name": "e2egov-fantastic4",
             "description": "End-to-end collaboration sample with multiple teams",
             "defaultTeam": "Fantastic 4 Team",
             "sourceControl": "Git",
@@ -20,56 +20,10 @@
     "teams": [
         {
             "organization": "msc365",
-            "projectId": "e2egov-fantastic-4",
-            "teamId": "Avengers Team",
+            "projectId": "e2egov-fantastic4",
+            "teamId": "Mister Fantastic Team",
             "name": "",
-            "description": "Avengers team description",
-            "settings": {
-                "backlogVisibilities": {
-                    "Microsoft.EpicCategory": false,
-                    "Microsoft.FeatureCategory": true,
-                    "Microsoft.RequirementCategory": true
-                },
-                "bugsBehavior": "asRequirements",
-                "defaultIterationMacro": "@currentIteration",
-                "workingDays": [
-                    "monday",
-                    "tuesday",
-                    "wednesday",
-                    "thursday",
-                    "friday"
-                ]
-            }
-        },
-        {
-            "organization": "msc365",
-            "projectId": "e2egov-fantastic-4",
-            "teamId": "Guardians Team",
-            "name": "",
-            "description": "Guardians team description",
-            "settings": {
-                "backlogVisibilities": {
-                    "Microsoft.EpicCategory": false,
-                    "Microsoft.FeatureCategory": true,
-                    "Microsoft.RequirementCategory": true
-                },
-                "bugsBehavior": "asRequirements",
-                "defaultIterationMacro": "@currentIteration",
-                "workingDays": [
-                    "monday",
-                    "tuesday",
-                    "wednesday",
-                    "thursday",
-                    "friday"
-                ]
-            }
-        },
-        {
-            "organization": "msc365",
-            "projectId": "e2egov-fantastic-4",
-            "teamId": "Galaxy Team",
-            "name": "",
-            "description": "Galaxy team description",
+            "description": "Mister Fantastic team description",
             "settings": {
                 "backlogVisibilities": {
                     "Microsoft.EpicCategory": false,
@@ -83,16 +37,125 @@
                     "tuesday",
                     "wednesday"
                 ]
-            }
+            },
+            "groupMembership": [
+                "Contributors"
+            ]
         },
         {
             "organization": "msc365",
-            "projectId": "e2egov-fantastic-4",
+            "projectId": "e2egov-fantastic4",
+            "teamId": "Invisible Woman Team",
+            "name": "",
+            "description": "Invisible Woman team description",
+            "settings": {
+                "backlogVisibilities": {
+                    "Microsoft.EpicCategory": false,
+                    "Microsoft.FeatureCategory": true,
+                    "Microsoft.RequirementCategory": true
+                },
+                "bugsBehavior": "asRequirements",
+                "defaultIterationMacro": "@currentIteration",
+                "workingDays": [
+                    "monday",
+                    "tuesday",
+                    "wednesday"
+                ]
+            },
+            "groupMembership": [
+                "Contributors"
+            ]
+        },
+        {
+            "organization": "msc365",
+            "projectId": "e2egov-fantastic4",
+            "teamId": "Human Torch Team",
+            "name": "",
+            "description": "Human Torch team description",
+            "settings": {
+                "backlogVisibilities": {
+                    "Microsoft.EpicCategory": false,
+                    "Microsoft.FeatureCategory": true,
+                    "Microsoft.RequirementCategory": true
+                },
+                "bugsBehavior": "asRequirements",
+                "defaultIterationMacro": "@currentIteration",
+                "workingDays": [
+                    "monday",
+                    "tuesday",
+                    "wednesday"
+                ]
+            },
+            "groupMembership": [
+                "Contributors"
+            ]
+        },
+        {
+            "organization": "msc365",
+            "projectId": "e2egov-fantastic4",
+            "teamId": "The Thing Team",
+            "name": "",
+            "description": "The Thing team description",
+            "settings": {
+                "backlogVisibilities": {
+                    "Microsoft.EpicCategory": false,
+                    "Microsoft.FeatureCategory": true,
+                    "Microsoft.RequirementCategory": true
+                },
+                "bugsBehavior": "asRequirements",
+                "defaultIterationMacro": "@currentIteration",
+                "workingDays": [
+                    "monday",
+                    "tuesday",
+                    "wednesday"
+                ]
+            },
+            "groupMembership": [
+                "Contributors"
+            ]
+        },
+        {
+            "organization": "msc365",
+            "projectId": "e2egov-fantastic4",
             "teamId": "Fantastic 4 Team",
             "name": "",
             "description": "Fantastic Four team description",
             "settings": {
                 "bugsBehavior": "asRequirements"
+            }
+        }
+    ],
+    "environments": [
+        {
+            "name": "e2egov-fantastic4-prd",
+            "subscriptionId": "a8919718-a1aa-41b6-9146-139e67bc7ad2",
+            "resourceGroup": {
+                "name": "rg-e2egov-fantastic4-prd-weu",
+                "location": "westeurope",
+                "tags": {
+                    "public": "false",
+                    "service": "e2egov-fantastic4",
+                    "environment": "prd",
+                    "security": "rbac",
+                    "iac": "bicep",
+                    "ci": "azure-pipelines"
+                }
+            }
+        },
+        {
+            "name": "e2egov-fantastic4-dev",
+            "subscriptionId": "a8919718-a1aa-41b6-9146-139e67bc7ad2",
+            "resourceGroup": {
+                "name": "rg-e2egov-fantastic4-dev-weu",
+                "location": "westeurope",
+                "tags": {
+                    "public": "false",
+                    "service": "e2egov-fantastic4",
+                    "environment": "dev",
+                    "security": "rbac",
+                    "iac": "bicep",
+                    "ci": "azure-pipelines"
+                }
             }
         }
     ]
