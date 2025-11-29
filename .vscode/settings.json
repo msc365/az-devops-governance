@@ -64,5 +64,12 @@
     "powershell.scriptAnalysis.settingsPath": "./src/PSScriptAnalyzerSettings.psd1",
     "javascript.preferences.quoteStyle": "single",
     "typescript.preferences.quoteStyle": "single",
-    "yaml.format.singleQuote": true
+    "yaml.format.singleQuote": true,
+    "cSpell.words": [
+        "COMPANYNAME",
+        "EXTERNALMODULEDEPENDENCIES",
+        "ICONURI",
+        "LICENSEURI",
+        "PROJECTURI"
+    ]
 }
