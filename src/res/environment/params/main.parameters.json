@@ -1,7 +1,7 @@
 {
     "$schema": "https://raw.githubusercontent.com/msc365/az-devops-governance/main/schemas/environment.schema.json",
     "name": "my-project-prd",
-    "subscriptionId": "a8919718-a1aa-41b6-9146-139e67bc7ad2",
+    "subscriptionId": "00000000-0000-0000-0000-000000000000",
     "resourceGroup": {
         "name": "rg-my-project-prd-weu",
         "location": "westeurope",
