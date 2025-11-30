@@ -19,7 +19,53 @@
 
     .EXTERNALMODULEDEPENDENCIES Az.Accounts, Azure.DevOps.PSModule
 #>
-<##>
+<#
+.SYNOPSIS
+    Creates or updates an Azure Environment within a specified subscription.
+
+.DESCRIPTION
+    This PowerShell script creates or updates an Azure Environment within a specified subscription.
+
+    It provides comprehensive environment management capabilities including configuration of resource groups and their properties.
+
+.PARAMETER Name
+    The name of the environment to create or update.
+
+.PARAMETER SubscriptionId
+    The Azure Subscription ID where the environment will be created or updated.
+
+.PARAMETER ResourceGroup
+    An optional hashtable defining the resource group properties:
+
+    - Name: The name of the resource group.
+    - Location: The Azure region for the resource group.
+    - Tags: A hashtable of tags to apply to the resource group.
+
+.PARAMETER Remove
+    A switch indicating whether to remove the specified environment.
+
+.PARAMETER Force
+    A switch to force removal without confirmation.
+
+.EXAMPLE
+    $params = @{
+        Name           = 'my-environment'
+        SubscriptionId = '00000000-0000-0000-0000-000000000000'
+        ResourceGroup  = @{
+            Name     = 'rg-my-environment'
+            Location = 'westeurope'
+            Tags     = @{ environment = 'dev' }
+        }
+    }
+    .\main.ps1 @params
+
+    Creates or updates the 'my-environment' environment in the specified subscription with the given resource group configuration.
+
+.NOTES
+    Requires Azure PowerShell module Az.Accounts and Azure.DevOps.PSModule.
+
+    Ensure you are logged in to Azure using Connect-AzAccount before running this script.
+#>
 
 [CmdletBinding()]
 [OutputType([pscustomobject])]
