@@ -64,6 +64,11 @@
     ..\src\res\team\main.ps1 @paramSplat -Verbose
 
     This example creates or updates a team named 'my-team' in the 'my-project' project within the 'my-org' organization, setting its name and description.
+
+.NOTES
+    Requires Azure PowerShell module Az.Accounts and Azure.DevOps.PSModule.
+
+    Ensure you are logged in to Azure using Connect-AzAccount before running this script.
 #>
 [CmdletBinding()]
 [OutputType([object])]
