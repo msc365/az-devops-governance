@@ -1,14 +1,17 @@
 {
-    "$schema": "https://raw.githubusercontent.com/msc365/az-devops-governance/main/schemas/environment.schema.json",
-    "name": "my-project-prd",
-    "subscriptionId": "00000000-0000-0000-0000-000000000000",
+    "$schema": "../../../../schemas/environment.schema.json",
+    "organization": "msc365",
+    "projectId": "my-project",
+    "name": "my-project-sbx",
+    "description": "My project sandbox environment",
     "resourceGroup": {
-        "name": "rg-my-project-prd-weu",
+        "name": "rg-my-project-sbx-weu",
         "location": "westeurope",
+        "subscriptionId": "a8919718-a1aa-41b6-9146-139e67bc7ad2",
         "tags": {
             "public": "false",
             "service": "my-project",
-            "environment": "prd",
+            "environment": "sbx",
             "security": "rbac",
             "iac": "bicep",
             "ci": "azure-pipelines"

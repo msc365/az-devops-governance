@@ -17,28 +17,37 @@
         "environment": {
             "type": "object",
             "required": [
-                "name",
-                "subscriptionId"
+                "organization",
+                "projectId",
+                "name"
             ],
             "properties": {
                 "$schema": {
                     "type": "string",
                     "description": "JSON Schema reference"
                 },
+                "organization": {
+                    "type": "string",
+                    "description": "The Azure DevOps organization name"
+                },
+                "projectId": {
+                    "type": "string",
+                    "description": "The Azure DevOps project identifier"
+                },
                 "name": {
                     "type": "string",
                     "description": "The name of the environment"
                 },
-                "subscriptionId": {
+                "description": {
                     "type": "string",
-                    "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
-                    "description": "The subscription ID (must be a valid GUID)"
+                    "description": "The description of the environment"
                 },
                 "resourceGroup": {
                     "type": "object",
                     "required": [
                         "name",
-                        "location"
+                        "location",
+                        "subscriptionId"
                     ],
                     "properties": {
                         "name": {
@@ -48,6 +57,11 @@
                         "location": {
                             "type": "string",
                             "description": "The location/region of the resource group"
+                        },
+                        "subscriptionId": {
+                            "type": "string",
+                            "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+                            "description": "The subscription ID (must be a valid GUID)"
                         },
                         "tags": {
                             "type": "object",

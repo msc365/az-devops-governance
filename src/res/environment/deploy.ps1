@@ -1,4 +1,4 @@
-﻿[CmdletBinding()]
+﻿[CmdletBinding(SupportsShouldProcess)]
 param (
     [Parameter()]
     [string]$templateFile = 'main.ps1',
@@ -27,6 +27,10 @@ process {
 
         # Convert JSON string to Hashtable
         $params = $paramsFromJson | ConvertFrom-Json -AsHashtable
+        # Remove $schema key if it exists
+        if ($params.ContainsKey('$schema')) {
+            $params.Remove('$schema') | Out-Null
+        }
 
         # Execute the deployment template with parameters
         & (Join-Path $PSScriptRoot -ChildPath $templateFile) @params -Remove:$Remove.IsPresent -Force:$Force.IsPresent

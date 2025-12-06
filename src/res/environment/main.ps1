@@ -1,4 +1,5 @@
-﻿<#PSScriptInfo
+﻿#Requires -Version 7.0
+<#PSScriptInfo
     .VERSION 1.0
 
     .GUID 4adf0e7d-d5cc-4f5a-a1fb-0945e475571a
@@ -66,15 +67,20 @@
 
     Ensure you are logged in to Azure using Connect-AzAccount before running this script.
 #>
-
 [CmdletBinding()]
 [OutputType([pscustomobject])]
 param (
     [Parameter(Mandatory)]
-    [string]$Name,
+    [string]$Organization,
 
     [Parameter(Mandatory)]
-    [string]$SubscriptionId,
+    [string]$ProjectId,
+
+    [Parameter(Mandatory)]
+    [string]$Name,
+
+    [Parameter(Mandatory = $false)]
+    [string]$Description,
 
     [Parameter(Mandatory = $false)]
     [object]$ResourceGroup,
@@ -93,6 +99,24 @@ begin {
         Write-Error 'No Azure context found. Please login using Connect-AzAccount.'
         return
     }
+
+    # Import required modules
+    $modules = @(
+        'Az.Accounts'
+        'Az.Resources'
+        'Azure.DevOps.PSModule'
+    )
+
+    $modules | ForEach-Object {
+        if (-not (Get-Module $_) -or (Get-Module $_ -ListAvailable)) {
+            Import-Module $_ -Force -Verbose:$false -ErrorAction Stop
+        }
+    }
+
+    # Connect to Azure DevOps Organization
+    if ($null -eq (Get-AdoContext)) {
+        Connect-AdoOrganization -Organization $Organization -Verbose:$VerbosePreference
+    }
 }
 
 process {
@@ -100,114 +124,179 @@ process {
         $ErrorActionPreference = 'Stop'
         $Error.Clear()
 
-        if ($Remove.IsPresent -and -not $Force.IsPresent) {
-            # Prompt user to confirm
-            $prompt = @(
-                "This script will delete environment '$($Name)'."
-                'All related resources like resource group and Azure DevOps environment will be lost.'
-                "Do you want to continue? 'Yes [Y]' 'No [N]'"
-            ) -join "`n"
+        ## --------- ##
+        ## VARIABLES ##
+        ## --------- ##
 
-            $result = Read-Host -Prompt $prompt
-            $result = $result.ToLower()
+        $prj, $rg, $env = $null
 
-            if ($result -ne 'y' -and $result -ne 'yes') {
-                Write-Warning 'Operation cancelled by user'
-                return
-            }
+        ## ------------ ##
+        ## DEPENDENCIES ##
+        ## ------------ ##
+
+        $prj = Get-AdoProject -ProjectId $ProjectId -ErrorAction SilentlyContinue
+
+        if ($null -eq $prj) {
+            throw ("Doesn't exists. 'RESOURCE /projects/{0}' ." -f $ProjectId)
         }
 
         if ($null -ne $ResourceGroup) {
-            Write-Verbose ("Target scope 'resourceGroup'. Checking context...")
+            $contextSub = (Get-AzContext).Subscription
 
-            $currentSubscription = (Get-AzContext).Subscription
-            Write-Verbose ("Currently using '{0}' subscription." -f $currentSubscription.Name)
-
-            if ($SubscriptionId -ne $currentSubscription.Id) {
-
-                $targetSubscription = (Set-AzContext -SubscriptionId $SubscriptionId).Subscription
-                Write-Verbose ("Switched to '{0}' as target subscription." -f $targetSubscription.Name)
-            }
-
-            if ($Remove.IsPresent) {
-                Write-Verbose ("Removing environment '{0}'..." -f $Name)
-
-                $rg = Get-AzResourceGroup -Name $ResourceGroup.name -ErrorAction SilentlyContinue -Verbose:$false
-
-                if ($null -ne $rg) {
-                    Remove-AzResourceGroup -Name $ResourceGroup.name -Force -Verbose:$false | Out-Null
-
-                    return [pscustomobject]@{
-                        removed = $true
-                        message = ("Environment '{0}' has been removed." -f $Name)
-                    }
-                }
-
-                return [pscustomobject]@{
-                    removed = $false
-                    message = ("Environment '{0}' does not exist. No action taken." -f $Name)
-                }
-            }
-
-            Write-Verbose ("Checking if resource group '{0}' exists..." -f $ResourceGroup.name)
-            $rg = Get-AzResourceGroup -Name $ResourceGroup.name -ErrorAction SilentlyContinue -Verbose:$false
-
-            if ($null -eq $rg) {
-
-                Write-Verbose ("Resource group '{0}' does not exist. Creating resource group..." -f $ResourceGroup.name)
-                $resourceGroupSplat = @{
-                    Name     = $ResourceGroup.name
-                    Location = $ResourceGroup.location
-                    Tags     = $ResourceGroup.tags
-                }
-
-                $rg = New-AzResourceGroup @resourceGroupSplat -Verbose:$false
-
-            } else {
-                Write-Verbose ("Resource group '{0}' already exists. Updating if necessary..." -f $ResourceGroup.name)
-
-                $tagsAreDifferent = $false
-                foreach ($key in $ResourceGroup.tags.Keys) {
-                    if (-not $rg.Tags.ContainsKey($key) -or $rg.Tags[$key] -ne $ResourceGroup.tags[$key]) {
-                        $tagsAreDifferent = $true
-                        break
-                    }
-                }
-
-                if ($tagsAreDifferent) {
-                    $rg = Set-AzResourceGroup -Name $ResourceGroup.name -Tag $ResourceGroup.tags -Verbose:$false
-                    Write-Verbose ("Updated resource group '{0}'." -f $ResourceGroup.name)
-                } else {
-                    Write-Verbose ("Resource group '{0}' is up to date." -f $ResourceGroup.name)
-                }
-            }
-
-            return [pscustomobject]@{
-                name           = $Name
-                subscriptionId = $SubscriptionId
-                resourceGroup  = @{
-                    name              = $rg.ResourceGroupName
-                    location          = $rg.Location
-                    resourceId        = $rg.ResourceId
-                    tags              = $rg.Tags
-                    provisioningState = $rg.ProvisioningState
-                }
+            if ($contextSub.Id -ne $ResourceGroup.subscriptionId) {
+                $targetSub = (Set-AzContext -SubscriptionId $ResourceGroup.subscriptionId -WhatIf:$false).Subscription
             }
         }
 
-        Write-Verbose ("Target scope 'subscription'.")
-        return $null
+        ## --------- ##
+        ## RESOURCES ##
+        ## --------- ##
+
+        $env = Get-AdoEnvironmentList -ProjectId $prj.Id -Name $Name -ErrorAction SilentlyContinue
+
+        if ($Remove.IsPresent) {
+            if ($null -ne $env) {
+                if ($PSCmdlet.ShouldProcess("Call module 'Azure.DevOps.PSModule' operation.", 'Remove-AdoEnvironment')) {
+                    if (-not $Force.IsPresent) {
+                        $prompt = @(
+                            "This script will delete the environment '$($Name)'."
+                            'All related resources like Azure DevOps environment with approvals and checks will be lost.'
+                            "Do you want to continue? 'Yes [Y]' 'No [N]'"
+                        ) -join "`n"
+
+                        $result = Read-Host -Prompt $prompt
+                        $result = $result.ToLower()
+
+                        if ($result -ne 'y' -and $result -ne 'yes') {
+                            Write-Warning 'Operation cancelled by user'
+                            return
+                        }
+                    }
+
+                    ## Environment ##
+                    ## ----------- ##
+
+                    Remove-AdoEnvironment -ProjectId $prj.Id -EnvironmentId $env.Id -Verbose:$VerbosePreference | Out-Null
+                }
+            } else {
+                Write-Warning ("Doesn't Exist. 'RESOURCE /environments/{0}'" -f $Name)
+            }
+
+            ## Resource Group ##
+            ## -------------- ##
+
+            if ($null -ne $ResourceGroup) {
+                $rg = Get-AzResourceGroup -Name $ResourceGroup.name -ErrorAction SilentlyContinue -Verbose:$false
+
+                if ($null -ne $rg) {
+                    if ($PSCmdlet.ShouldProcess("Call module 'Az.Resources' operation.", 'Remove-AzResourceGroup')) {
+                        if (-not $Force.IsPresent) {
+                            $prompt = @(
+                                "This script will delete the environment '$($rg.ResourceGroupName)'."
+                                'All resources in the resource group will be lost.'
+                                "Do you want to continue? 'Yes [Y]' 'No [N]'"
+                            ) -join "`n"
+
+                            $result = Read-Host -Prompt $prompt
+                            $result = $result.ToLower()
+
+                            if ($result -ne 'y' -and $result -ne 'yes') {
+                                Write-Warning 'Operation cancelled by user'
+                                return
+                            }
+                        }
+
+                        Remove-AzResourceGroup -Id $rg.ResourceId -Force -Verbose:$VerbosePreference | Out-Null
+                    }
+                } else {
+                    Write-Warning ("Doesn't Exist. 'RESOURCE GROUP /{0}'" -f $ResourceGroup.name)
+                }
+            }
+
+            return
+        }
+
+        if ($null -eq $env) {
+            if ($PSCmdlet.ShouldProcess("Call module 'Azure.DevOps.PSModule' operation.", 'New-AdoEnvironment')) {
+
+                $envSplat = @{
+                    ProjectId   = $prj.Id
+                    Name        = $Name
+                    Description = $Description
+                    Verbose     = $VerbosePreference
+                }
+
+                $env = New-AdoEnvironment @envSplat
+            }
+        } else {
+            if ($Description -ne $env.description -or
+                $Name -ne $env.name) {
+
+                if ($PSCmdlet.ShouldProcess("Call module 'Azure.DevOps.PSModule' operation.", 'Update-AdoEnvironment')) {
+                    $envSplat = @{
+                        ProjectId     = $prj.Id
+                        EnvironmentId = $env.Id
+                        Name          = $Name
+                        Description   = $Description
+                        Verbose       = $VerbosePreference
+                    }
+
+                    $env = Set-AdoEnvironment @envSplat
+                }
+            } else {
+                Write-Verbose ("Exists. No updates. 'RESOURCE /environment/{0}'" -f $env.name)
+            }
+        }
+
+        ## ---------------- ##
+        ## NESTED RESOURCES ##
+        ## ---------------- ##
+
+        ## Resource Group ##
+        ## -------------- ##
+
+        if ($null -ne $ResourceGroup) {
+            $rgSplat = @{
+                Name     = $ResourceGroup.name
+                Location = $ResourceGroup.location
+                Tags     = $ResourceGroup.tags
+                Verbose  = $VerbosePreference
+                WhatIf   = $WhatIfPreference
+            }
+
+            $rg = & (Join-Path -Path $PSScriptRoot -ChildPath 'modules\nested_resourceGroup.ps1') @rgSplat
+
+        } else {
+            Write-Verbose ("Null. 'PARAMETER /ResourceGroup'")
+        }
+
+        ## ------- ##
+        ## OUTPUTS ##
+        ## ------- ##
+
+        $output = [pscustomobject]@{
+            name          = $env.name
+            description   = $env.description
+            environmentId = $env.Id
+        }
+
+        if ($null -ne $rg) {
+            $output | Add-Member -MemberType NoteProperty -Name 'resourceGroup' -Value ($rg | Select-Object -Property ResourceGroupName, Location, ResourceId)
+        }
+
+        return -not $WhatIfPreference ? $output : $null
 
     } catch {
         throw $_
     }
+
+    finally {
+        if ($null -ne $targetSub) {
+            Set-AzContext -SubscriptionId $contextSub.Id -Verbose:$false | Out-Null
+        }
+    }
 }
 
 end {
-    if ($SubscriptionId -ne $currentSubscription.Id) {
-        Set-AzContext -SubscriptionId $currentSubscription.Id | Out-Null
-        Write-Verbose ("Reset context to '{0}' subscription." -f $currentSubscription.Name)
-    }
-
     Write-Verbose ('Exit : {0}' -f $MyInvocation.MyCommand.Name)
 }

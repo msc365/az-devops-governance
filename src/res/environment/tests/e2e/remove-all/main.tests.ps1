@@ -3,8 +3,12 @@
 # ========== #
 
 $params = @{
-    Name   = 'my-project-tst'
-    Remove = $true
+    Name          = 'my-project-tst'
+    ResourceGroup = @{
+        Name           = 'rg-my-project-tst-weu'
+        SubscriptionId = '00000000-0000-0000-0000-000000000000'
+    }
+    Remove        = $true
 }
 
 # ========= #

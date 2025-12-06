@@ -3,12 +3,13 @@
 # ========== #
 
 $params = @{
-    Name           = 'my-project-prd'
-    SubscriptionId = '00000000-0000-0000-0000-000000000000'
-    ResourceGroup  = @{
-        Name     = 'rg-my-project-prd-weu'
-        Location = 'westeurope'
-        Tags     = @{
+    Name          = 'my-project-tst'
+    Description   = 'Test environment for my-project'
+    ResourceGroup = @{
+        Name           = 'rg-my-project-tst-weu'
+        Location       = 'westeurope'
+        SubscriptionId = '00000000-0000-0000-0000-000000000000'
+        Tags           = @{
             public      = 'false'
             service     = 'my-project'
             environment = 'prd'
