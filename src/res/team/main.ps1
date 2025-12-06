@@ -1,4 +1,5 @@
-﻿<#PSScriptInfo
+﻿#Requires -Version 7.0
+<#PSScriptInfo
     .VERSION 1.0
 
     .GUID f0c127fe-4f91-4aa8-93ac-cd99447faf0e
@@ -110,6 +111,7 @@ begin {
 
     # Import required modules
     $modules = @(
+        'Az.Accounts'
         'Azure.DevOps.PSModule'
     )
     $modules | ForEach-Object {
