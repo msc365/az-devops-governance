@@ -70,6 +70,9 @@
         "EXTERNALMODULEDEPENDENCIES",
         "ICONURI",
         "LICENSEURI",
-        "PROJECTURI"
+        "microsoftgraph",
+        "PROJECTURI",
+        "Runbook",
+        "Runbooks"
     ]
 }
