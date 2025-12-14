@@ -15,7 +15,7 @@ Create or update an Azure DevOps Project with specified settings.
 - [Outputs](#outputs)
 - [Support](#support)
 - [Dependencies](#dependencies)
-- [Related Scripts](#related-scripts)
+- [Resources](#resources)
 - [Notes](#notes)
 
 ## Description
@@ -88,12 +88,15 @@ This script requires the following PowerShell modules:
 - `Az.Accounts`
 - `Azure.DevOps.PSModule`
 
-## Related Scripts
+## Resources
 
 - [deploy](deploy.ps1)
-- [tests/e2e/all](tests/e2e/all/main.tests.ps1)
-- [tests/e2e/default](tests/e2e/default/main.tests.ps1)
-- [tests/e2e/features](tests/e2e/features/main.tests.ps1)
+
+### Tests
+
+- [all](tests/e2e/all/main.tests.ps1)
+- [default](tests/e2e/default/main.tests.ps1)
+- [features](tests/e2e/features/main.tests.ps1)
 
 
 ## Notes

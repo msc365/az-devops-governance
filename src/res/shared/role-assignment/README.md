@@ -45,8 +45,7 @@ $roleAssignmentParams = @{
 .\main.ps1 @roleAssignmentParams
 ```
 
-Creates a Contributor role assignment for the specified ObjectId at the given resource group scope.
-
+Creates a Contributor role assignment for the specified ObjectId at the given resource group scope.
 
 ### Example 2
 

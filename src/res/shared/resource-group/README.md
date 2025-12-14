@@ -48,8 +48,7 @@ $rgParams = @{
 .\main.ps1 @rgParams
 ```
 
-Creates or updates the Resource Group 'rg-my-resource-group' in the 'westeurope' region with the specified tags.
-
+Creates or updates the Resource Group 'rg-my-resource-group' in the 'westeurope' region with the specified tags.
 
 ## Outputs
 

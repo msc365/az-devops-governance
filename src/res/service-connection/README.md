@@ -15,7 +15,7 @@ Deploys an Azure DevOps Service Connection with Managed Service Identity and Rol
 - [Outputs](#outputs)
 - [Support](#support)
 - [Dependencies](#dependencies)
-- [Related Scripts](#related-scripts)
+- [Resources](#resources)
 
 ## Description
 
@@ -138,10 +138,20 @@ This script requires the following PowerShell modules:
 - `Az.Resources`
 - `Azure.DevOps.PSModule`
 
-## Related Scripts
+## Resources
 
 - [deploy](deploy.ps1)
-- [modules/dependencies](modules/dependencies.ps1)
-- [tests/e2e/default](tests/e2e/default/main.tests.ps1)
-- [tests/e2e/rollback](tests/e2e/rollback/main.tests.ps1)
+
+### Modules
+
+- [dependencies](modules/dependencies.ps1)
+
+### Shared
+
+- [role-assignment](../shared/role-assignment/main.ps1)
+
+### Tests
+
+- [default](tests/e2e/default/main.tests.ps1)
+- [rollback](tests/e2e/rollback/main.tests.ps1)
 

@@ -15,7 +15,7 @@ Creates or updates an Azure Environment within a specified subscription.
 - [Outputs](#outputs)
 - [Support](#support)
 - [Dependencies](#dependencies)
-- [Related Scripts](#related-scripts)
+- [Resources](#resources)
 - [Notes](#notes)
 
 ## Description
@@ -77,14 +77,17 @@ This script requires the following PowerShell modules:
 - `Az.Accounts`
 - `Azure.DevOps.PSModule`
 
-## Related Scripts
+## Resources
 
 - [deploy](deploy.ps1)
-- [tests/e2e/default](tests/e2e/default/main.tests.ps1)
-- [tests/e2e/remove-all](tests/e2e/remove-all/main.tests.ps1)
-- [tests/e2e/remove](tests/e2e/remove/main.tests.ps1)
-- [tests/e2e/resource-group](tests/e2e/resource-group/main.tests.ps1)
-- [tests/e2e/update](tests/e2e/update/main.tests.ps1)
+
+### Tests
+
+- [default](tests/e2e/default/main.tests.ps1)
+- [remove-all](tests/e2e/remove-all/main.tests.ps1)
+- [remove](tests/e2e/remove/main.tests.ps1)
+- [resource-group](tests/e2e/resource-group/main.tests.ps1)
+- [update](tests/e2e/update/main.tests.ps1)
 
 
 ## Notes

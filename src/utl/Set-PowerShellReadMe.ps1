@@ -622,10 +622,10 @@ function Set-DependenciesSection {
     return Merge-FileWithNewContent -OldContent $ReadMeContent -NewContent $newContent -SectionStartIdentifier '## Dependencies' -ContentType 'nextH2'
 }
 
-function Set-RelatedScriptsSection {
+function Set-ResourcesSection {
     <#
     .SYNOPSIS
-        Creates or updates the Related Scripts section by finding other PowerShell scripts in the same directory structure.
+        Creates or updates the Resources section with subsections for Modules, Shared, and Tests.
     #>
     [CmdletBinding()]
     param (
@@ -638,67 +638,134 @@ function Set-RelatedScriptsSection {
 
     $scriptDir = Split-Path -Path $ScriptPath -Parent
     $scriptName = Split-Path -Path $ScriptPath -Leaf
+    $scriptContent = Get-Content -Path $ScriptPath -Raw
 
-    # Find related scripts
-    $relatedScripts = @()
+    # Collect all resources
+    $hasDeploy = $false
+    $hasModules = $false
+    $hasShared = $false
+    $hasTests = $false
 
-    # Check for modules folder
-    $modulesPath = Join-Path -Path $scriptDir -ChildPath 'modules'
-    if (Test-Path -Path $modulesPath) {
-        $moduleScripts = Get-ChildItem -Path $modulesPath -Filter '*.ps1' -File -Recurse
-        foreach ($moduleScript in $moduleScripts) {
-            $relativePath = $moduleScript.FullName.Replace($scriptDir, '').TrimStart('\').TrimStart('/')
-            $relatedScripts += @{
-                Name = $moduleScript.Name
-                Path = $relativePath -replace '\\', '/'
-            }
-        }
-    }
-
-    # Check for test scripts
-    $testsPath = Join-Path -Path $scriptDir -ChildPath 'tests'
-    if (Test-Path -Path $testsPath) {
-        $testScripts = Get-ChildItem -Path $testsPath -Filter '*.ps1' -File -Recurse
-        foreach ($testScript in $testScripts) {
-            $relativePath = $testScript.FullName.Replace($scriptDir, '').TrimStart('\').TrimStart('/')
-            $relatedScripts += @{
-                Name = $testScript.Name
-                Path = $relativePath -replace '\\', '/'
-            }
-        }
-    }
+    $deployScript = $null
+    $moduleScripts = @()
+    $sharedResources = @{}
+    $testScripts = @()
 
     # Check for deploy script
-    $deployScript = Join-Path -Path $scriptDir -ChildPath 'deploy.ps1'
-    if ((Test-Path -Path $deployScript) -and ((Split-Path -Path $deployScript -Leaf) -ne $scriptName)) {
-        $relatedScripts += @{
-            Name = 'deploy.ps1'
+    $deployScriptPath = Join-Path -Path $scriptDir -ChildPath 'deploy.ps1'
+    if ((Test-Path -Path $deployScriptPath) -and ((Split-Path -Path $deployScriptPath -Leaf) -ne $scriptName)) {
+        $deployScript = @{
+            Name = 'deploy'
             Path = 'deploy.ps1'
+        }
+        $hasDeploy = $true
+    }
+
+    # Check for modules
+    $modulesPath = Join-Path -Path $scriptDir -ChildPath 'modules'
+    if (Test-Path -Path $modulesPath) {
+        $scripts = Get-ChildItem -Path $modulesPath -Filter '*.ps1' -File -Recurse
+        foreach ($script in $scripts) {
+            $relativePath = $script.FullName.Replace($scriptDir, '').TrimStart('\').TrimStart('/')
+            $moduleScripts += @{
+                Name = $script.Name
+                Path = $relativePath -replace '\\', '/'
+            }
         }
     }
 
-    if ($relatedScripts.Count -eq 0) {
+    $hasModules = $moduleScripts.Count -gt 0
+
+    # Check for shared resources
+    $pattern = "['\`"](\.\.\\shared\\[^'\`"]+)['\`"]"
+    $matchesFound = [regex]::Matches($scriptContent, $pattern)
+
+    foreach ($match in $matchesFound) {
+        $sharedPath = $match.Groups[1].Value
+        $normalizedPath = $sharedPath -replace '\\', '/'
+
+        if ($normalizedPath -match 'shared/([^/]+)/') {
+            $resourceName = $Matches[1]
+            $resourcePath = "../shared/$resourceName/main.ps1"
+
+            if (-not $sharedResources.ContainsKey($resourceName)) {
+                $sharedResources[$resourceName] = $resourcePath
+            }
+        }
+    }
+
+    $hasShared = $sharedResources.Count -gt 0
+
+    # Check for tests
+    $testsPath = Join-Path -Path $scriptDir -ChildPath 'tests'
+    if (Test-Path -Path $testsPath) {
+        $scripts = Get-ChildItem -Path $testsPath -Filter '*.ps1' -File -Recurse
+        foreach ($script in $scripts) {
+            $relativePath = $script.FullName.Replace($scriptDir, '').TrimStart('\').TrimStart('/')
+            $testScripts += @{
+                Name = $script.Name
+                Path = $relativePath -replace '\\', '/'
+            }
+        }
+    }
+
+    $hasTests = $testScripts.Count -gt 0
+
+    # If no resources at all, return unchanged
+    if (-not $hasDeploy -and -not $hasModules -and -not $hasShared -and -not $hasTests) {
         return $ReadMeContent
     }
 
+    # Build the Resources section with subsections
     $newContent = @()
-    $newContent += '## Related Scripts'
+    $newContent += '## Resources'
     $newContent += ''
 
-    foreach ($script in ($relatedScripts | Sort-Object -Property Path)) {
-        # For test files, show directory path; for others, remove .ps1 extension from display name
-        $displayName = if ($script.Path -like 'tests/*') {
-            # Extract directory path without filename
-            $script.Path -replace '/[^/]+$', ''
-        } else {
-            $script.Path -replace '\.ps1$', ''
-        }
-        $newContent += "- [$displayName]($($script.Path))"
+    # Deploy script directly under Resources (not in a subsection)
+    if ($hasDeploy) {
+        $newContent += "- [$($deployScript.Name)]($($deployScript.Path))"
+        $newContent += ''
     }
 
-    $newContent += ''
+    # Modules subsection
+    if ($hasModules) {
+        $newContent += '### Modules'
+        $newContent += ''
+        foreach ($script in ($moduleScripts | Sort-Object -Property Path)) {
+            $displayName = $script.Name -replace '\.ps1$', ''
+            $newContent += "- [$displayName]($($script.Path))"
+        }
+        $newContent += ''
+    }
 
-    return Merge-FileWithNewContent -OldContent $ReadMeContent -NewContent $newContent -SectionStartIdentifier '## Related Scripts' -ContentType 'nextH2'
+    # Shared subsection
+    if ($hasShared) {
+        $newContent += '### Shared'
+        $newContent += ''
+        foreach ($resourceName in ($sharedResources.Keys | Sort-Object)) {
+            $resourcePath = $sharedResources[$resourceName]
+            $newContent += "- [$resourceName]($resourcePath)"
+        }
+        $newContent += ''
+    }
+
+    # Tests subsection
+    if ($hasTests) {
+        $newContent += '### Tests'
+        $newContent += ''
+        foreach ($script in ($testScripts | Sort-Object -Property Path)) {
+            # Extract test case name from path (e.g., 'tests/e2e/default' -> 'default')
+            if ($script.Path -match '/([^/]+)/[^/]+\.ps1$') {
+                $displayName = $Matches[1]
+            } else {
+                $displayName = $script.Name -replace '\.ps1$', ''
+            }
+            $newContent += "- [$displayName]($($script.Path))"
+        }
+        $newContent += ''
+    }
+
+    return Merge-FileWithNewContent -OldContent $ReadMeContent -NewContent $newContent -SectionStartIdentifier '## Resources' -ContentType 'nextH2'
 }
 
 function Set-TableOfContent {
@@ -843,7 +910,7 @@ function Set-PowerShellReadMe {
         [string] $ReadMeFilePath = (Join-Path (Split-Path $ScriptFilePath -Parent) 'README.md'),
 
         [Parameter(Mandatory = $false)]
-        [ValidateSet('Description', 'Navigation', 'Parameters', 'Examples', 'Outputs', 'Support', 'Dependencies', 'Related Scripts')]
+        [ValidateSet('Description', 'Navigation', 'Parameters', 'Examples', 'Outputs', 'Support', 'Dependencies', 'Resources')]
         [string[]] $SectionsToRefresh = @(
             'Description'
             'Navigation'
@@ -852,7 +919,7 @@ function Set-PowerShellReadMe {
             'Outputs'
             'Support'
             'Dependencies'
-            'Related Scripts'
+            'Resources'
         )
     )
 
@@ -930,8 +997,8 @@ function Set-PowerShellReadMe {
                 $tempContent = Set-DependenciesSection -ReadMeContent $tempContent -Metadata $metadata
             }
 
-            if ($SectionsToRefresh -contains 'Related Scripts') {
-                $tempContent = Set-RelatedScriptsSection -ReadMeContent $tempContent -ScriptPath $ScriptFilePath
+            if ($SectionsToRefresh -contains 'Resources') {
+                $tempContent = Set-ResourcesSection -ReadMeContent $tempContent -ScriptPath $ScriptFilePath
             }
 
             # Now generate Navigation at the top based on all sections
