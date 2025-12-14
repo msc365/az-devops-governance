@@ -234,7 +234,36 @@ function Set-DescriptionSection {
     $newContent += ''
 
     if ($Metadata.Description) {
-        $newContent += $Metadata.Description
+        # Process description lines - trim leading indentation while preserving structure
+        $descLines = $Metadata.Description -split '\r?\n'
+
+        # Find minimum indentation (excluding empty lines)
+        $minIndent = 999
+        foreach ($line in $descLines) {
+            if ($line.Trim()) {
+                if ($line -match '^(\s*)') {
+                    $leadingSpaces = $matches[1].Length
+                    if ($leadingSpaces -lt $minIndent) {
+                        $minIndent = $leadingSpaces
+                    }
+                }
+            }
+        }
+        if ($minIndent -eq 999) { $minIndent = 0 }
+
+        # Process each line: remove common indentation, preserve empty lines and trailing spaces
+        foreach ($line in $descLines) {
+            if (-not $line.Trim()) {
+                # Empty line - preserve it
+                $newContent += ''
+            } elseif ($minIndent -gt 0 -and $line.Length -ge $minIndent) {
+                # Remove common leading indentation but preserve trailing spaces
+                $newContent += $line.Substring($minIndent)
+            } else {
+                # No common indentation to remove, or line is shorter than minIndent
+                $newContent += $line.TrimStart()
+            }
+        }
     } else {
         $newContent += '{{ Fill in the Description }}'
     }
@@ -276,10 +305,64 @@ function Set-ParametersSection {
     foreach ($param in $sortedParams) {
         $required = if ($param.Required) { 'Yes' } else { 'No' }
         $type = if ($param.Type) { $param.Type } else { 'Object' }
-        $default = if ($param.Default) { $param.Default } else { '-' }
-        $description = $param.Description -replace '\r?\n', ' '
 
-        $newContent += "| ``$($param.Name)`` | ``$type`` | $required | ``$default`` | $description |"
+        # Format default value - handle hashtables specially
+        if ($param.Default) {
+            if ($param.Default -match '^@\{(.+)\}$') {
+                # Format hashtable with <br /> tags (with spaces for proper HTML rendering)
+                $hashtableContent = $matches[1].Trim()
+                # Split by semicolon, trim spaces around '=', and wrap each key-value pair in backticks
+                $pairs = $hashtableContent -split '\s*;\s*' | ForEach-Object {
+                    $pair = $_.Trim() -replace '\s*=\s*', '='
+                    "``$pair``"
+                }
+                # Join with <br /> (with spaces)
+                $default = "``@{`` <br /> " + ($pairs -join ' <br /> ') + " <br /> ``}``"
+            } else {
+                $default = "``$($param.Default)``"
+            }
+        } else {
+            $default = '-'
+        }
+
+        # Format description - preserve line breaks and trim leading indentation
+        if ($param.Description) {
+            $descLines = $param.Description -split '\r?\n'
+            # Find minimum indentation (excluding empty lines)
+            $minIndent = 999
+            foreach ($line in $descLines) {
+                if ($line.Trim()) {
+                    if ($line -match '^(\s*)') {
+                        $leadingSpaces = $matches[1].Length
+                        if ($leadingSpaces -lt $minIndent) {
+                            $minIndent = $leadingSpaces
+                        }
+                    }
+                }
+            }
+            if ($minIndent -eq 999) { $minIndent = 0 }
+
+            # Process each line: remove common indentation, preserve empty lines and trailing spaces
+            $processedLines = $descLines | ForEach-Object {
+                if (-not $_.Trim()) {
+                    # Empty line - preserve it
+                    ''
+                } else {
+                    # Remove common leading indentation but preserve trailing spaces (they're markdown line breaks)
+                    if ($minIndent -gt 0 -and $_.Length -ge $minIndent) {
+                        $_.Substring($minIndent)
+                    } else {
+                        $_
+                    }
+                }
+            }
+            # Join lines with newline (markdown supports actual line breaks in table cells)
+            $description = $processedLines -join "`n"
+        } else {
+            $description = ''
+        }
+
+        $newContent += "| ``$($param.Name)`` | ``$type`` | $required | $default | $description |"
     }
 
     $newContent += ''
@@ -469,8 +552,8 @@ function Set-SupportSection {
         $newContent += ''
         $newContent += 'This cmdlet supports the common parameters: `-Debug`, `-ErrorAction`, `-ErrorVariable`,  '
         $newContent += '`-InformationAction`, `-InformationVariable`, `-OutBuffer`, `-OutVariable`, `-PipelineVariable`,  '
-        $newContent += '`-ProgressAction`, `-Verbose`, `-WarningAction`, and `-WarningVariable`. For more information, see  '
-        $newContent += '[about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).'
+        $newContent += '`-ProgressAction`, `-Verbose`, `-WarningAction`, and `-WarningVariable`.  '
+        $newContent += 'For more information, see [about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).'
         $newContent += ''
     }
 
@@ -731,12 +814,14 @@ function Merge-FileWithNewContent {
     Currently supports: 'Description', 'Parameters', 'Examples', 'Outputs', 'Dependencies', 'Navigation'
 
 .EXAMPLE
-    Set-PowerShellReadMe.ps1 -ScriptFilePath 'c:\_git\az-devops-governance\src\res\service-connection\main.ps1'
+    . src\utl\Set-PowerShellReadMe.ps1
+    Set-PowerShellReadMe -ScriptFilePath 'c:\_git\az-devops-governance\src\res\service-connection\main.ps1'
 
     Generates or updates the README.md file for the specified PowerShell script.
 
 .EXAMPLE
-    Set-PowerShellReadMe.ps1 -ScriptFilePath '.\main.ps1' -SectionsToRefresh @('Parameters', 'Examples')
+    . src\utl\Set-PowerShellReadMe.ps1
+    Set-PowerShellReadMe -ScriptFilePath '.\main.ps1' -SectionsToRefresh @('Parameters', 'Examples')
 
     Updates only the Parameters and Examples sections in the README.
 
