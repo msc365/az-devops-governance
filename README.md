@@ -1,6 +1,8 @@
 <!-- omit from toc -->
 # az-devops-governance
 
+[![GitHub release (latest)](https://img.shields.io/github/v/release/msc365/az-devops-governance?include_prereleases&logo=github)](https://github.com/msc365/az-devops-governance/releases) [![License](https://img.shields.io/badge/license-MIT-purple)](https://github.com/msc365/az-devops-governance/blob/main/LICENSE)
+
 This repository includes template scripts that demonstrate a complete Azure governance model. The template examples showcase how to implement end-to-end governance from Azure DevOps and CI/CD pipelines to Azure Resource Manager deployments, aligning with best practices for enterprise-grade cloud architecture.
 
 > [!NOTE]
