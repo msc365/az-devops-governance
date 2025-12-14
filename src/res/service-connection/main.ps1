@@ -1,6 +1,6 @@
 ﻿#Requires -Version 7.0
 <#PSScriptInfo
-    .VERSION 1.0
+    .VERSION 1.0.0
 
     .GUID f516b5a3-35db-416c-a86f-10fa326cb692
 

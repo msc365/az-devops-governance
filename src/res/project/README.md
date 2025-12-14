@@ -2,7 +2,7 @@
 <!-- omit from toc -->
 # Project `[res\project\main.ps1]`
 
-![Version](https://img.shields.io/badge/version-1.0-blue)
+![Version](https://img.shields.io/badge/script--version-1.0-blue) [![License](https://img.shields.io/badge/license-MIT-purple)](https://github.com/msc365/az-devops-governance/blob/main/LICENSE)
 
 Create or update an Azure DevOps Project with specified settings.
 

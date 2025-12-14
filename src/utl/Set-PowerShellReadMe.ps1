@@ -46,6 +46,7 @@ function Get-ScriptMetadata {
         if ($psScriptInfoBlock -match '\.COMPANYNAME\s+(.+)') { $metadata.PSScriptInfo.CompanyName = $matches[1].Trim() }
         if ($psScriptInfoBlock -match '\.COPYRIGHT\s+(.+)') { $metadata.PSScriptInfo.Copyright = $matches[1].Trim() }
         if ($psScriptInfoBlock -match '\.TAGS\s+(.+)') { $metadata.PSScriptInfo.Tags = $matches[1].Trim() }
+        if ($psScriptInfoBlock -match '\.LICENSE\s+(.+)') { $metadata.PSScriptInfo.License = $matches[1].Trim() }
         if ($psScriptInfoBlock -match '\.LICENSEURI\s+(.+)') { $metadata.PSScriptInfo.LicenseUri = $matches[1].Trim() }
         if ($psScriptInfoBlock -match '\.PROJECTURI\s+(.+)') { $metadata.PSScriptInfo.ProjectUri = $matches[1].Trim() }
         if ($psScriptInfoBlock -match '\.EXTERNALMODULEDEPENDENCIES\s+(.+)') {
@@ -199,9 +200,44 @@ function Initialize-ReadMe {
     $readMeContent += "# $title ``[$relativePath]``"
     $readMeContent += ''
 
-    # Add version badge if available
+    # Add badges if available
+    $badges = @()
     if ($Metadata.PSScriptInfo.Version) {
-        $readMeContent += "![Version](https://img.shields.io/badge/version-$($Metadata.PSScriptInfo.Version)-blue)"
+        $badges += "![Version](https://img.shields.io/badge/script--version-$($Metadata.PSScriptInfo.Version)-blue)"
+    }
+
+    # License badge - use explicit LICENSE field or try to infer from repository LICENSE file
+    $license = $null
+    if ($Metadata.PSScriptInfo.License) {
+        $license = $Metadata.PSScriptInfo.License
+    } elseif ($Metadata.PSScriptInfo.LicenseUri) {
+        # Try to find LICENSE file in repository root
+        $repoRoot = $ScriptPath
+        while ($repoRoot -and -not (Test-Path (Join-Path $repoRoot '.git'))) {
+            $repoRoot = Split-Path -Path $repoRoot -Parent
+        }
+        if ($repoRoot) {
+            $licenseFile = Join-Path $repoRoot 'LICENSE'
+            if (Test-Path $licenseFile) {
+                $licenseContent = Get-Content -Path $licenseFile -First 1
+                if ($licenseContent -match '(MIT|Apache|GPL|BSD|ISC|MPL)') {
+                    $license = $matches[1]
+                }
+            }
+        }
+    }
+
+    if ($license) {
+        $licenseBadge = "![License](https://img.shields.io/badge/license-$license-purple)"
+        # Wrap badge in link if LicenseUri is available
+        if ($Metadata.PSScriptInfo.LicenseUri) {
+            $licenseBadge = "[$licenseBadge]($($Metadata.PSScriptInfo.LicenseUri))"
+        }
+        $badges += $licenseBadge
+    }
+
+    if ($badges.Count -gt 0) {
+        $readMeContent += ($badges -join ' ')
     }
 
     # Add synopsis
