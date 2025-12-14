@@ -26,27 +26,25 @@
 
 .DESCRIPTION
     This PowerShell script creates or updates an Azure Environment within a specified subscription.
-
     It provides comprehensive environment management capabilities including configuration of resource groups and their properties.
 
 .PARAMETER Name
-    The name of the environment to create or update.
+    Mandatory. The name of the environment to create or update.
+
+.PARAMETER Description
+    Optional. A description for the environment.
 
 .PARAMETER SubscriptionId
-    The Azure Subscription ID where the environment will be created or updated.
+    Mandatory. The Azure Subscription ID where the environment will be created or updated.
 
 .PARAMETER ResourceGroup
-    An optional hashtable defining the resource group properties:
-
-    - Name: The name of the resource group.
-    - Location: The Azure region for the resource group.
-    - Tags: A hashtable of tags to apply to the resource group.
+    Optional. An optional hashtable defining the resource group properties: Name, Location, Tags.
 
 .PARAMETER Remove
-    A switch indicating whether to remove the specified environment.
+    Optional. A switch indicating whether to remove the specified environment.
 
 .PARAMETER Force
-    A switch to force removal without confirmation.
+    Optional. A switch to force removal without confirmation.
 
 .EXAMPLE
     $params = @{
@@ -93,7 +91,7 @@ param (
 )
 
 begin {
-    Write-Verbose ('Command : {0}' -f $MyInvocation.MyCommand.Name)
+    Write-Verbose ('[Enter]: .\{0}' -f $MyInvocation.MyCommand.Name)
 
     if ($null -eq (Get-AzContext)) {
         Write-Error 'No Azure context found. Please login using Connect-AzAccount.'
@@ -137,7 +135,7 @@ process {
         $prj = Get-AdoProject -ProjectId $ProjectId -ErrorAction SilentlyContinue
 
         if ($null -eq $prj) {
-            throw ("Doesn't exists. 'RESOURCE /projects/{0}' ." -f $ProjectId)
+            throw ("Resource doesn't exists. '/projects/{0}' ." -f $ProjectId)
         }
 
         if ($null -ne $ResourceGroup) {
@@ -264,7 +262,7 @@ process {
                 WhatIf   = $WhatIfPreference
             }
 
-            $rg = & (Join-Path -Path $PSScriptRoot -ChildPath 'modules\nested_resourceGroup.ps1') @rgSplat
+            $rg = & (Join-Path -Path $PSScriptRoot -ChildPath '..\shared\modules\nested_resourceGroup.ps1') @rgSplat
 
         } else {
             Write-Verbose ("Null. 'PARAMETER /ResourceGroup'")
@@ -278,10 +276,7 @@ process {
             name          = $env.name
             description   = $env.description
             environmentId = $env.Id
-        }
-
-        if ($null -ne $rg) {
-            $output | Add-Member -MemberType NoteProperty -Name 'resourceGroup' -Value ($rg | Select-Object -Property ResourceGroupName, Location, ResourceId)
+            resourceGroup = ( $null -ne $rg ) ? ($rg | Select-Object -Property *)  : $null
         }
 
         return -not $WhatIfPreference ? $output : $null
@@ -298,5 +293,5 @@ process {
 }
 
 end {
-    Write-Verbose ('Exit : {0}' -f $MyInvocation.MyCommand.Name)
+    Write-Verbose ('[Exit]: .\{0}' -f $MyInvocation.MyCommand.Name)
 }
