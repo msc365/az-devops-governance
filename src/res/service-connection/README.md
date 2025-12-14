@@ -2,7 +2,7 @@
 <!-- omit from toc -->
 # Service Connection `[res\service-connection\main.ps1]`
 
-![Version](https://img.shields.io/badge/script--version-1.0.0-blue) [![License](https://img.shields.io/badge/license-MIT-purple)](https://github.com/msc365/az-devops-governance/blob/main/LICENSE)
+![Version](https://img.shields.io/badge/script--version-0.1.0-blue) [![License](https://img.shields.io/badge/license-MIT-purple)](https://github.com/msc365/az-devops-governance/blob/main/LICENSE)
 
 Deploys an Azure DevOps Service Connection with Managed Service Identity and Role Assignment.
 

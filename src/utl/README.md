@@ -113,7 +113,7 @@ To get the best results from these README generators, follow these practices:
 1. **Use PSScriptInfo**: Include metadata at the top of your script
    ```powershell
    <#PSScriptInfo
-       .VERSION 1.0
+       .VERSION 0.1.0
        .AUTHOR Your Name
        .COMPANYNAME Your Company
        .TAGS 'Azure', 'DevOps'
