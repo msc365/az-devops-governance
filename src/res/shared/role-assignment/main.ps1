@@ -1,4 +1,25 @@
-﻿<#
+﻿<#PSScriptInfo
+    .VERSION 0.1.0
+
+    .GUID 3faa2ff1-d06e-48d7-a03b-ab84299e0039
+
+    .AUTHOR Martin Swinkels
+
+    .COMPANYNAME MSc365.eu
+
+    .COPYRIGHT 2025 (c) MSc365.eu, Martin Swinkels
+
+    .TAGS 'Azure', 'Security', 'Governance', 'DevOps', 'Platform', 'RBAC'
+
+    .LICENSEURI https://github.com/msc365/az-devops-governance/blob/main/LICENSE
+
+    .PROJECTURI https://github.com/msc365/az-devops-governance
+
+    .ICONURI https://raw.githubusercontent.com/msc365/az-devops-governance/main/.assets/icon.png
+
+    .EXTERNALMODULEDEPENDENCIES Az.Accounts, Az.Resources
+#>
+<#
 .SYNOPSIS
     Create Azure Role Assignments.
 

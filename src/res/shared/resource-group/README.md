@@ -2,6 +2,7 @@
 <!-- omit from toc -->
 # Resource Group `[res\shared\resource-group\main.ps1]`
 
+![Version](https://img.shields.io/badge/script--version-0.1.0-blue) [![License](https://img.shields.io/badge/license-MIT-purple)](https://github.com/msc365/az-devops-governance/blob/main/LICENSE)
 
 Create or update an Azure Resource Group.
 
@@ -13,6 +14,7 @@ Create or update an Azure Resource Group.
 - [Examples](#examples)
 - [Outputs](#outputs)
 - [Support](#support)
+- [Dependencies](#dependencies)
 - [Notes](#notes)
 
 ## Description
@@ -69,6 +71,13 @@ This script supports the `-WhatIf` and `-Confirm` parameters for safe execution:
 
 - **`-WhatIf`**: Shows what would happen if the script runs without actually making any changes.
 - **`-Confirm`**: Prompts for confirmation before performing each action.
+
+## Dependencies
+
+This script requires the following PowerShell modules:
+
+- `Az.Accounts`
+- `Az.Resources`
 
 
 ## Notes

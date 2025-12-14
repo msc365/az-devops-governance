@@ -26,7 +26,7 @@
 
 .DESCRIPTION
     This script deploys an Azure DevOps Service Connection using a Managed Service Identity (MSI) for authentication.
-    It also creates the necessary role assignments for the MSI to access Azure resources.
+    It also creates the necessary role assignments for the MSI to access Azure resources aka _Azure DevOps Workload Identity Federation_.
 
 .PARAMETER Organization
     Required. The Azure DevOps organization name.
