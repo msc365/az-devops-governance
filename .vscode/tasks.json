@@ -95,6 +95,15 @@
             }
         },
         {
+            "label": "Documentation",
+            "type": "shell",
+            "command": "src/utl/Set-PowerShellReadMeAll.ps1 -Path 'src/res' -Force",
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
             "label": "Test",
             "type": "shell",
             "command": "Invoke-PSake src/Build.ps1 -taskList Test",
