@@ -84,9 +84,9 @@ This script requires the following PowerShell modules:
 
 ### Tests
 
-- [default](tests/e2e/default/main.tests.ps1)
-- [remove](tests/e2e/remove/main.tests.ps1)
-- [update](tests/e2e/update/main.tests.ps1)
+- [default](tests/e2e/default)
+- [remove](tests/e2e/remove)
+- [update](tests/e2e/update)
 
 
 ## Notes

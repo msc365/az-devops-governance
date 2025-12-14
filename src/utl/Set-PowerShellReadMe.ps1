@@ -722,7 +722,7 @@ function Set-ResourcesSection {
 
         if ($normalizedPath -match 'shared/([^/]+)/') {
             $resourceName = $Matches[1]
-            $resourcePath = "../shared/$resourceName/main.ps1"
+            $resourcePath = "../shared/$resourceName"
 
             if (-not $sharedResources.ContainsKey($resourceName)) {
                 $sharedResources[$resourceName] = $resourcePath
@@ -746,7 +746,7 @@ function Set-ResourcesSection {
 
                     if ($normalizedPath -match 'shared/([^/]+)/') {
                         $resourceName = $Matches[1]
-                        $resourcePath = "../shared/$resourceName/main.ps1"
+                        $resourcePath = "../shared/$resourceName"
 
                         if (-not $sharedResources.ContainsKey($resourceName)) {
                             $sharedResources[$resourceName] = $resourcePath
@@ -796,7 +796,13 @@ function Set-ResourcesSection {
         $newContent += ''
         foreach ($script in ($moduleScripts | Sort-Object -Property Path)) {
             $displayName = $script.Name -replace '\.ps1$', ''
-            $newContent += "- [$displayName]($($script.Path))"
+            # Link to folder if script is main.ps1, otherwise link to the file
+            if ($script.Name -eq 'main.ps1') {
+                $folderPath = $script.Path -replace '/[^/]+$', ''
+                $newContent += "- [$displayName]($folderPath)"
+            } else {
+                $newContent += "- [$displayName]($($script.Path))"
+            }
         }
         $newContent += ''
     }
@@ -823,7 +829,13 @@ function Set-ResourcesSection {
             } else {
                 $displayName = $script.Name -replace '\.ps1$', ''
             }
-            $newContent += "- [$displayName]($($script.Path))"
+            # Link to folder if script is main.tests.ps1, otherwise link to the file
+            if ($script.Name -eq 'main.tests.ps1') {
+                $folderPath = $script.Path -replace '/[^/]+$', ''
+                $newContent += "- [$displayName]($folderPath)"
+            } else {
+                $newContent += "- [$displayName]($($script.Path))"
+            }
         }
         $newContent += ''
     }

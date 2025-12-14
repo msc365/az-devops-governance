@@ -94,9 +94,9 @@ This script requires the following PowerShell modules:
 
 ### Tests
 
-- [all](tests/e2e/all/main.tests.ps1)
-- [default](tests/e2e/default/main.tests.ps1)
-- [features](tests/e2e/features/main.tests.ps1)
+- [all](tests/e2e/all)
+- [default](tests/e2e/default)
+- [features](tests/e2e/features)
 
 
 ## Notes

@@ -83,11 +83,11 @@ This script requires the following PowerShell modules:
 
 ### Tests
 
-- [default](tests/e2e/default/main.tests.ps1)
-- [remove-all](tests/e2e/remove-all/main.tests.ps1)
-- [remove](tests/e2e/remove/main.tests.ps1)
-- [resource-group](tests/e2e/resource-group/main.tests.ps1)
-- [update](tests/e2e/update/main.tests.ps1)
+- [default](tests/e2e/default)
+- [remove-all](tests/e2e/remove-all)
+- [remove](tests/e2e/remove)
+- [resource-group](tests/e2e/resource-group)
+- [update](tests/e2e/update)
 
 
 ## Notes

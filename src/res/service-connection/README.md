@@ -148,11 +148,11 @@ This script requires the following PowerShell modules:
 
 ### Shared
 
-- [resource-group](../shared/resource-group/main.ps1)
-- [role-assignment](../shared/role-assignment/main.ps1)
+- [resource-group](../shared/resource-group)
+- [role-assignment](../shared/role-assignment)
 
 ### Tests
 
-- [default](tests/e2e/default/main.tests.ps1)
-- [rollback](tests/e2e/rollback/main.tests.ps1)
+- [default](tests/e2e/default)
+- [rollback](tests/e2e/rollback)
 
