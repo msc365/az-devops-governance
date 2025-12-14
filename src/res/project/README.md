@@ -1,102 +1,73 @@
-<!-- cSpell: ignore hashtable msc365 -->
+<!-- markdownlint-disable no-duplicate-heading -->
 <!-- omit from toc -->
-# Azure DevOps Project `[res]`
+# Project `[res\project\main.ps1]`
 
-This PowerShell script (`main.ps1`) creates or updates an Azure DevOps Project within a specified organization. It provides comprehensive project management capabilities including configuration of project properties, feature states, and team settings. The script manages Azure DevOps Projects with the following capabilities:
+![Version](https://img.shields.io/badge/version-1.0-blue)
 
-- Creates new projects with specified configuration
-- Updates existing project properties (_description_, _visibility_)
-- Configures project feature states (_Boards_, _Repos_, _Pipelines_, _TestPlans_, _Artifacts_)
-- Sets default team name (other then default, e.g.: `My-Project Team`)
-- Supports project soft delete (with caution)
+Create or update an Azure DevOps Project with specified settings.
 
 <!-- omit from toc -->
 ## Navigation
 
-- [PowerShell Functions](#powershell-functions)
-- [Usage examples](#usage-examples)
+- [Description](#description)
 - [Parameters](#parameters)
+- [Examples](#examples)
 - [Outputs](#outputs)
+- [Support](#support)
+- [Dependencies](#dependencies)
+- [Related Scripts](#related-scripts)
 - [Notes](#notes)
 
-## PowerShell Functions
+## Description
 
-The `Azure.DevOps.PSModule` is required for the following Azure DevOps operations:
+This script creates or updates an Azure DevOps Project within a specified organization. It allows you to set project properties such as name, description, process template, source control type, visibility, and feature states.
 
-| Function | Description |
-| --- | --- |
-| `Connect-AdoOrganization` | Establishes connection to Azure DevOps |
-| `Get-AdoContext` | Retrieves current Azure DevOps context |
-| `Get-AdoProject` | Retrieves project information |
-| `New-AdoProject` | Creates new projects |
-| `Set-AdoProject` | Updates project properties |
-| `Remove-AdoProject` | Deletes projects |
-| `Get-AdoFeatureState` | Retrieves feature states |
-| `Set-AdoFeatureState` | Updates feature states |
-| `Set-AdoTeam` | Updates team properties |
+    If the project already exists, it updates the properties and feature states as needed.
 
-## Usage examples
+    Warning: The process template and source control type can only be set during project creation.
 
-### Example 1: Deploy using the deploy script with parameter file
+## Parameters
 
-```powershell
-.\src\res\project\deploy.ps1
-```
-
-This uses the `deploy.ps1` script which:
-
-- Reads configuration from `params\main.parameters.json`
-- Executes `main.ps1` with the parameters from the JSON file
-- Simplifies deployment by separating configuration from execution
-
-You can also specify custom parameter files:
-
-```powershell
-.\src\res\project\deploy.ps1 -templateParameterFile 'params\custom.parameters.json'
-```
-
-To remove a project using the deploy script:
-
-```powershell
-.\src\res\project\deploy.ps1 -Remove -Force
-```
-
-### Example 2: Create a new project with default settings
-
-```powershell
-$paramSplat = @{
-    Organization = 'my-org'
-    Name         = 'my-project'
-    DefaultTeam  = 'my-team'
-    Description  = 'My project description'
-}
-
-.\src\res\project\main.ps1 @paramSplat
-```
-
-This creates a project with:
-
-- Process: Agile (default)
-- Source Control: Git (default)
-- Visibility: Private (default)
-- All features enabled except TestPlans
-
-### Example 3: Create a scrum project with custom configuration
-
-```powershell
-$paramSplat = @{
-    Organization  = 'my-org'
-    Name          = 'my-webapp-project'
-    DefaultTeam   = 'Development Team'
-    Description   = 'Web application development project'
-    Process       = 'Scrum'
-    SourceControl = 'Git'
-    Visibility    = 'Private'
-    Features      = @{
+| Parameter | Type | Required | Default | Description |
+| :-- | :-- | :-- | :-- | :-- |
+| `DefaultTeam` | `String` | No | `-` | Mandatory. The name of the default team for the project. |
+| `Description` | `String` | No | `-` | Mandatory. A description for the Azure DevOps project. |
+| `Features` | `Hashtable` | No | `@{
         'Boards'    = 'enabled'
         'Repos'     = 'enabled'
         'Pipelines' = 'enabled'
-        'TestPlans' = 'enabled'
+        'TestPlans' = 'disabled'
+        'Artifacts' = 'enabled'
+    }` | Mandatory. A hashtable defining the feature states for the project. Valid features are 'Boards', 'Repos', 'Pipelines', 'TestPlans', and 'Artifacts' with states 'enabled' or 'disabled'. |
+| `Force` | `SwitchParameter` | No | `-` | No description provided. |
+| `Name` | `String` | No | `-` | Mandatory. The name of the Azure DevOps project to create or update. |
+| `Organization` | `String` | No | `-` | Mandatory. The name of the Azure DevOps organization where the project will be created or updated. |
+| `Process` | `String` | No | `'Agile'` | Mandatory. The process template to use for the project. Valid values are 'Agile', 'Scrum', 'CMMI', and 'Basic'. |
+| `Remove` | `SwitchParameter` | No | `-` | No description provided. |
+| `RemoveDeployment` | `Object` | No | `-` | Optional. If specified, the project will be removed instead of created or updated.      > [!WARNING]     > Use with caution! If the project is removed, all associated resources will also be deleted. |
+| `SourceControl` | `String` | No | `'Git'` | Mandatory. The type of source control to use for the project. Valid values are 'Git' and 'Tfvc'. |
+| `Visibility` | `String` | No | `'Private'` | Mandatory. The visibility of the project. Valid values are 'Private' and 'Public'. |
+
+## Examples
+
+### Example 1
+
+#### PowerShell
+
+```powershell
+$paramSplat = @{
+    Organization     = 'my-org'
+    ProjectName      = 'my-project'
+    DefaultTeamName  = 'my-team'
+    Description      = 'My project description'
+    Process          = 'Agile'
+    SourceControl    = 'Git'
+    Visibility       = 'Private'
+    Features         = @{
+        'Boards'    = 'enabled'
+        'Repos'     = 'enabled'
+        'Pipelines' = 'enabled'
+        'TestPlans' = 'disabled'
         'Artifacts' = 'enabled'
     }
 }
@@ -104,101 +75,35 @@ $paramSplat = @{
 .\src\res\project\main.ps1 @paramSplat
 ```
 
-### Example 4: Update an existing project's description and visibility
-
-```powershell
-$paramSplat = @{
-    Organization = 'my-org'
-    Name         = 'existing-project'
-    DefaultTeam  = 'Existing Team'
-    Description  = 'Updated project description'
-    Visibility   = 'Public'
-}
-
-.\src\res\project\main.ps1 @paramSplat
-```
-
-> [!NOTE]  
-> Project `Process` and `SourceControl` cannot be changed for existing projects.
-
-### Example 5: Disable specific features
-
-```powershell
-$paramSplat = @{
-    Organization = 'my-org'
-    Name         = 'minimal-project'
-    DefaultTeam  = 'Core Team'
-    Description  = 'Minimal project with only essential features'
-    Features     = @{
-        'Boards'    = 'enabled'
-        'Repos'     = 'enabled'
-        'Pipelines' = 'disabled'
-        'TestPlans' = 'disabled'
-        'Artifacts' = 'disabled'
-    }
-}
-
-.\src\res\project\main.ps1 @paramSplat
-```
-
-### Example 6: Remove a project (destructive operation)
-
-```powershell
-$paramSplat = @{
-    Organization     = 'my-org'
-    Name             = 'old-project'
-    DefaultTeam      = 'N/A'
-    Description      = 'N/A'
-    RemoveDeployment = $true
-}
-
-.\src\res\project\main.ps1 @paramSplat
-```
-
-> [!WARNING]
-> Using `-Remove` and `-Force` will permanently delete the project and all associated resources. Azure DevOps uses a soft-delete mechanism for projects: when you delete a project, it goes into a "Recently deleted" projects state for 28 days, after which it is permanently removed.
-
-## Parameters
-
-### Required parameters
-
-| Parameter | Type | Description |
-| --- | --- | --- |
-| `Organization` | string | The name of the Azure DevOps organization where the project will be created or updated |
-| `Name` | string | The name of the Azure DevOps project to create or update |
-| `DefaultTeam` | string | The name of the default team for the project |
-| `Description` | string | A description for the Azure DevOps project |
-
-### Optional parameters
-
-| Parameter | Type | Default | Valid values | Description |
-| --- | --- | --- | --- | --- |
-| `Process` | string | 'Agile' | 'Agile', 'Scrum', 'CMMI', 'Basic' | The process template to use for the project (only applies during creation) |
-| `SourceControl` | string | 'Git' | 'Git', 'Tfvc' | The type of source control to use (only applies during creation) |
-| `Visibility` | string | 'Private' | 'Private', 'Public' | The visibility level of the project |
-| `Features` | hashtable | See below ¹ | See below ¹ | A hashtable defining the feature states for the project |
-| `Remove` | switch |  |  | If specified, removes the project instead of creating/updating it |
-| `Force` | switch |  |  | If specified, removes the project without user feedback for automated processes |
-
-¹ Default _Features_ Configuration:
-
-```powershell
-@{
-    'boards'    = 'enabled'
-    'repos'     = 'enabled'
-    'pipelines' = 'enabled'
-    'testPlans' = 'disabled'
-    'artifacts' = 'enabled'
-}
-```
+This example deploys or updates a project named 'my-project' in the 'my-org' organization with the specified parameters.
 
 ## Outputs
 
-| Scenario | Return Type | Description |
-| --- | --- | --- |
-| Project created/updated successfully | PSCustomObject | Returns the Azure DevOps project object with all properties and capabilities |
-| Project removed successfully | PSCustomObject | Returns object with `Removed = $true` and `Status = Message` |
-| Project doesn't exist (when removing) | PSCustomObject | Returns object with `Removed = $false` and `Status = Message` |
+Returns: `object`
+
+## Support
+
+### CommonParameters
+
+This cmdlet supports the common parameters: `-Debug`, `-ErrorAction`, `-ErrorVariable`,  
+`-InformationAction`, `-InformationVariable`, `-OutBuffer`, `-OutVariable`, `-PipelineVariable`,  
+`-ProgressAction`, `-Verbose`, `-WarningAction`, and `-WarningVariable`. For more information, see  
+[about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
+
+## Dependencies
+
+This script requires the following PowerShell modules:
+
+- `Az.Accounts`
+- `Azure.DevOps.PSModule`
+
+## Related Scripts
+
+- [deploy](deploy.ps1)
+- [tests/e2e/all](tests/e2e/all/main.tests.ps1)
+- [tests/e2e/default](tests/e2e/default/main.tests.ps1)
+- [tests/e2e/features](tests/e2e/features/main.tests.ps1)
+
 
 ## Notes
 

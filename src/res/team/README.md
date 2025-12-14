@@ -1,187 +1,91 @@
-<!-- cSpell: ignore hashtable msc365 -->
+<!-- markdownlint-disable no-duplicate-heading -->
 <!-- omit from toc -->
-# Azure DevOps Team `[res]`
+# Team `[res\team\main.ps1]`
 
-This PowerShell script (`main.ps1`) creates or updates an Azure DevOps Team within a specified project. It provides comprehensive team management capabilities including configuration of team properties, settings, iteration paths, and area paths. The script manages Azure DevOps Teams with the following capabilities:
+![Version](https://img.shields.io/badge/version-1.0-blue)
 
-- Creates new teams with specified configuration
-- Updates existing team properties (_name_, _description_)
-- Configures team settings (_backlog visibilities_, _bugs behavior_, _working days_)
-- Manages iteration path assignments
-- Creates and assigns area paths
-- Supports team removal (with caution)
+Create or update an Azure DevOps Team within a specified project.
 
 <!-- omit from toc -->
 ## Navigation
 
-- [PowerShell Functions](#powershell-functions)
-- [Usage examples](#usage-examples)
+- [Description](#description)
 - [Parameters](#parameters)
+- [Examples](#examples)
 - [Outputs](#outputs)
+- [Support](#support)
+- [Dependencies](#dependencies)
+- [Related Scripts](#related-scripts)
 - [Notes](#notes)
 
-## PowerShell Functions
+## Description
 
-The `Azure.DevOps.PSModule` is required for the following Azure DevOps operations:
+This script creates or updates an Azure DevOps Team within a specified project. It allows you to set team properties such as name and description.
 
-| Function | Description |
-| --- | --- |
-| `Connect-AdoOrganization` | Establishes connection to Azure DevOps |
-| `Get-AdoContext` | Retrieves current Azure DevOps context |
-| `Get-AdoProject` | Retrieves project information |
-| `Get-AdoTeam` | Retrieves team information |
-| `New-AdoTeam` | Creates new teams |
-| `Set-AdoTeam` | Updates team properties |
-| `Remove-AdoTeam` | Deletes teams |
-| `Get-AdoTeamSetting` | Retrieves team settings |
-| `Set-AdoTeamSetting` | Updates team settings |
-| `Get-AdoTeamIteration` | Retrieves team iterations |
-| `Set-AdoTeamIteration` | Sets (copies) iterations to team |
-| `Get-AdoClassificationNode` | Retrieves area/iteration paths |
-| `New-AdoClassificationNode` | Creates area/iteration paths |
-| `Get-AdoTeamFieldValue` | Retrieves team field values |
-| `Set-AdoTeamFieldValue` | Updates team field values |
-
-## Usage examples
-
-### Example 1: Deploy using the deploy script with parameter file
-
-```powershell
-.\src\res\team\deploy.ps1
-```
-
-This uses the `deploy.ps1` script which:
-
-- Reads configuration from `params\main.parameters.json`
-- Executes `main.ps1` with the parameters from the JSON file
-- Simplifies deployment by separating configuration from execution
-
-You can also specify custom parameter files:
-
-```powershell
-.\src\res\team\deploy.ps1 -templateParameterFile 'params\custom.parameters.json'
-```
-
-To remove a team using the deploy script:
-
-```powershell
-.\src\res\team\deploy.ps1 -Remove -Force
-```
-
-### Example 2: Create a new team with default settings
-
-```powershell
-$paramSplat = @{
-    Organization = 'my-org'
-    ProjectId    = 'my-project'
-    TeamId       = 'backend-team'
-    Description  = 'Team responsible for backend services'
-}
-
-.\src\res\team\main.ps1 @paramSplat
-```
-
-This creates a team with:
-
-- Default team settings inherited from project's default team
-- Automatic iteration path configuration
-- Area path created as `{ProjectName}\Area\backend-team`
-
-### Example 3: Create team with custom settings
-
-```powershell
-$customSettings = @{
-    bugsBehavior = 'AsRequirements'
-    workingDays  = @('monday', 'tuesday', 'wednesday', 'thursday', 'friday')
-}
-
-$paramSplat = @{
-    Organization = 'my-org'
-    ProjectId    = 'my-project'
-    TeamId       = 'frontend-team'
-    Description  = 'UI/UX Development Team'
-    Settings     = $customSettings
-}
-
-.\src\res\team\main.ps1 @paramSplat
-```
-
-### Example 4: Update an existing team's description
-
-```powershell
-$paramSplat = @{
-    Organization = 'my-org'
-    ProjectId    = 'my-project'
-    TeamId       = 'existing-team'
-    Description  = 'Updated team description with new responsibilities'
-}
-
-.\src\res\team\main.ps1 @paramSplat
-```
-
-> [!NOTE]  
-> Only changed properties will be updated.
-
-### Example 5: Remove a team (destructive operation)
-
-```powershell
-$paramSplat = @{
-    Organization = 'my-org'
-    ProjectId    = 'my-project'
-    TeamId       = 'deprecated-team'
-    Remove       = $true
-}
-
-.\src\res\team\main.ps1 @paramSplat
-```
-
-> [!WARNING]
-> Using `-Remove` and `-Force` will permanently delete the team. This action cannot be undone.
+    If the team already exists, it updates the properties as needed.
 
 ## Parameters
 
-### Required parameters
+| Parameter | Type | Required | Default | Description |
+| :-- | :-- | :-- | :-- | :-- |
+| `Organization` | `String` | Yes | `-` | Mandatory. The name of the Azure DevOps organization where the project is located. |
+| `ProjectId` | `String` | Yes | `-` | Mandatory. The ID of the Azure DevOps project where the team will be created or updated |
+| `TeamId` | `String` | Yes | `-` | Mandatory. The id or name of the Azure DevOps team to create or update. |
+| `Description` | `String` | No | `-` | Optional. A description for the Azure DevOps team. |
+| `Force` | `SwitchParameter` | No | `-` | No description provided. |
+| `GroupMembership` | `Object[]` | No | `-` | No description provided. |
+| `Name` | `String` | No | `-` | Optional. The display name of the Azure DevOps team. |
+| `Remove` | `SwitchParameter` | No | `-` | No description provided. |
+| `RemoveDeployment` | `Object` | No | `-` | Optional. If specified, the team will be removed instead of created or updated.      > [!WARNING]     > Use with caution! Removing a team is irreversible and may affect team members and their access to project resources. |
+| `Settings` | `Hashtable` | No | `-` | Optional. A hashtable containing team settings to override the default settings. |
 
-| Parameter | Type | Description |
-| --- | --- | --- |
-| `Organization` | string | The name of the Azure DevOps organization where the team will be created or updated |
-| `ProjectId` | string | The ID of the Azure DevOps project where the team will be created or updated |
-| `TeamId` | string | The ID or name of the Azure DevOps team to create or update |
+## Examples
 
-### Optional parameters
+### Example 1
 
-| Parameter | Type | Default | Valid values | Description |
-| --- | --- | --- | --- | --- |
-| `Name` | string | Uses `TeamId` |  | The display name of the Azure DevOps team |
-| `Description` | string |  |  | A description for the Azure DevOps team |
-| `Settings` | hashtable | Inherits from default team | See below ¹ | A hashtable containing team settings to override defaults |
-| `Remove` | switch |  |  | If specified, removes the team instead of creating/updating it |
-| `Force` | switch |  |  | If specified, removes the team without user feedback for automated processes |
-
-¹ Default _Settings_ Configuration (inherited from project's default team):
+#### PowerShell
 
 ```powershell
-@{
-    bugsBehavior     = 'AsRequirements'  # or 'AsTasks', 'Off'
-    workingDays      = @(
-        'monday'
-        'tuesday'
-        'wednesday'
-        'thursday'
-        'friday'
-    )
-    backlogIteration = 'ProjectName'
-    defaultIteration = 'ProjectName\Iteration 1'
+$paramSplat = @{
+    Organization     = 'my-org'
+    ProjectId        = 'my-project'
+    TeamId           = 'my-other-team'
+    Name             = 'my-other-team-updated'
+    Description      = 'My team description'
 }
+
+..\src\res\team\main.ps1 @paramSplat -Verbose
 ```
+
+This example creates or updates a team named 'my-team' in the 'my-project' project within the 'my-org' organization, setting its name and description.
 
 ## Outputs
 
-| Scenario | Return Type | Description |
-| --- | --- | --- |
-| Team created/updated successfully | PSCustomObject | Returns the Azure DevOps team object with all properties including id, name, description, and projectId |
-| Team removed successfully | PSCustomObject | Returns object with `Removed = $true` and `Status = Message` |
-| Team doesn't exist (when removing) | PSCustomObject | Returns object with `Removed = $false` and `Status = Message` |
+Returns: `object`
+
+## Support
+
+### CommonParameters
+
+This cmdlet supports the common parameters: `-Debug`, `-ErrorAction`, `-ErrorVariable`,  
+`-InformationAction`, `-InformationVariable`, `-OutBuffer`, `-OutVariable`, `-PipelineVariable`,  
+`-ProgressAction`, `-Verbose`, `-WarningAction`, and `-WarningVariable`. For more information, see  
+[about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
+
+## Dependencies
+
+This script requires the following PowerShell modules:
+
+- `Az.Accounts`
+- `Azure.DevOps.PSModule`
+
+## Related Scripts
+
+- [deploy](deploy.ps1)
+- [tests/e2e/default](tests/e2e/default/main.tests.ps1)
+- [tests/e2e/remove](tests/e2e/remove/main.tests.ps1)
+- [tests/e2e/update](tests/e2e/update/main.tests.ps1)
+
 
 ## Notes
 
