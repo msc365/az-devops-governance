@@ -60,7 +60,7 @@ param (
     [Parameter()]
     [switch]$Rollback,
 
-    [Parameter(Mandatory)]
+    [Parameter()]
     [switch]$Force
 
 )

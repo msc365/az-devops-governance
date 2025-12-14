@@ -22,10 +22,10 @@ This script creates new Azure Role Assignments or removes existing ones based on
 
 | Parameter | Type | Required | Default | Description |
 | :-- | :-- | :-- | :-- | :-- |
-| `Force` | `Switch` | Yes | - | Optional. If specified during rollback, the script will not prompt for confirmation before removing the role assignment. |
 | `ObjectId` | `String` | Yes | - | Required. The Object ID of the principal (user, group, or service principal) to assign the role to. |
 | `roleDefinitionName` | `String` | Yes | - | Required. The name of the role definition to assign (e.g., 'Owner', 'Contributor', 'Reader', 'CustomRole'). |
 | `scope` | `String` | Yes | - | Required. The scope at which the role assignment applies (e.g., subscription, resource group, resource). |
+| `Force` | `Switch` | No | - | Optional. If specified during rollback, the script will not prompt for confirmation before removing the role assignment. |
 | `Rollback` | `Switch` | No | - | Optional. If specified, the script will remove the role assignment instead of creating it. |
 
 ## Examples
