@@ -148,6 +148,7 @@ This script requires the following PowerShell modules:
 
 ### Shared
 
+- [resource-group](../shared/resource-group/main.ps1)
 - [role-assignment](../shared/role-assignment/main.ps1)
 
 ### Tests

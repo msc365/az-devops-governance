@@ -676,7 +676,7 @@ function Set-ResourcesSection {
 
     $hasModules = $moduleScripts.Count -gt 0
 
-    # Check for shared resources
+    # Check for shared resources in main script
     $pattern = "['\`"](\.\.\\shared\\[^'\`"]+)['\`"]"
     $matchesFound = [regex]::Matches($scriptContent, $pattern)
 
@@ -690,6 +690,33 @@ function Set-ResourcesSection {
 
             if (-not $sharedResources.ContainsKey($resourceName)) {
                 $sharedResources[$resourceName] = $resourcePath
+            }
+        }
+    }
+
+    # Also check module files for shared resource references
+    if ($hasModules) {
+        foreach ($moduleScript in $moduleScripts) {
+            $moduleFullPath = Join-Path -Path $scriptDir -ChildPath ($moduleScript.Path -replace '/', '\')
+            if (Test-Path -Path $moduleFullPath) {
+                $moduleContent = Get-Content -Path $moduleFullPath -Raw
+                # Pattern for deeper paths like ..\..\shared\
+                $deepPattern = "['\`"](\.\.\\\.\.\\shared\\[^'\`"]+)['\`"]"
+                $deepMatches = [regex]::Matches($moduleContent, $deepPattern)
+
+                foreach ($match in $deepMatches) {
+                    $sharedPath = $match.Groups[1].Value
+                    $normalizedPath = $sharedPath -replace '\\', '/'
+
+                    if ($normalizedPath -match 'shared/([^/]+)/') {
+                        $resourceName = $Matches[1]
+                        $resourcePath = "../shared/$resourceName/main.ps1"
+
+                        if (-not $sharedResources.ContainsKey($resourceName)) {
+                            $sharedResources[$resourceName] = $resourcePath
+                        }
+                    }
+                }
             }
         }
     }
