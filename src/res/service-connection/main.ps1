@@ -217,7 +217,7 @@ process {
             Verbose            = $VerbosePreference
         }
 
-        $ra = & (Join-Path -Path $PSScriptRoot -ChildPath '..\shared\modules\role-assignment\main.ps1') @raSplat
+        $ra = & (Join-Path -Path $PSScriptRoot -ChildPath '..\shared\role-assignment\main.ps1') @raSplat
 
         #endregion
 

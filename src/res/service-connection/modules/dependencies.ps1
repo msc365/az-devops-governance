@@ -89,7 +89,7 @@ process {
             Verbose  = $VerbosePreference
         }
 
-        $rg = & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\shared\modules\resource-group\main.ps1') @rgSplat
+        $rg = & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\shared\resource-group\main.ps1') @rgSplat
 
         # Managed Identity #
         $msiSplat = @{

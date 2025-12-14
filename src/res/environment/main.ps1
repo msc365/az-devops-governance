@@ -262,7 +262,7 @@ process {
                 WhatIf   = $WhatIfPreference
             }
 
-            $rg = & (Join-Path -Path $PSScriptRoot -ChildPath '..\shared\modules\nested_resourceGroup.ps1') @rgSplat
+            $rg = & (Join-Path -Path $PSScriptRoot -ChildPath '..\shared\nested_resourceGroup.ps1') @rgSplat
 
         } else {
             Write-Verbose ("Null. 'PARAMETER /ResourceGroup'")
