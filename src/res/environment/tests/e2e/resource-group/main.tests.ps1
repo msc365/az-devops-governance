@@ -26,7 +26,7 @@ $params = @{
 
 $rootPath = (Get-Item $PSScriptRoot).Parent.Parent.Parent.FullName
 
-$subscriptionId = (Get-AdoContext).Subscription.Id
+$subscriptionId = (Get-AzContext).Subscription.Id
 $params['SubscriptionId'] = $subscriptionId
 
 # ============== #
