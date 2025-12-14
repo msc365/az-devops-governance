@@ -419,4 +419,5 @@ FodyWeavers.xsd
 
 # Local files
 .local/
+*.local.json
 .release/

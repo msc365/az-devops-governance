@@ -1,12 +1,12 @@
 {
     "$schema": "../../../../schemas/connection.schema.json",
-    "organization": "msc365",
+    "organization": "my-org",
     "projectId": "my-project",
     "serviceEndpointName": "rg-my-project-tst-weu",
-    "scope": "/subscriptions/a8919718-a1aa-41b6-9146-139e67bc7ad2",
+    "scope": "/subscriptions/00000000-0000-0000-0000-000000000000",
     "managedServiceIdentity": {
         "name": "id-my-project-tst-weu",
-        "subscriptionId": "a8919718-a1aa-41b6-9146-139e67bc7ad2",
+        "subscriptionId": "00000000-0000-0000-0000-000000000000",
         "resourceGroupName": "rg-my-project-tst-weu",
         "location": "westeurope",
         "tags": {
@@ -19,7 +19,7 @@
         },
         "roleAssignment": {
             "roleDefinitionName": "Headless Owner (DevOps CI/CD)",
-            "scope": "/subscriptions/a8919718-a1aa-41b6-9146-139e67bc7ad2/resourceGroups/rg-my-project-tst-weu"
+            "scope": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-my-project-tst-weu"
         }
     }
 }

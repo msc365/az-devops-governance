@@ -7,7 +7,7 @@
     "resourceGroup": {
         "name": "rg-my-project-sbx-weu",
         "location": "westeurope",
-        "subscriptionId": "a8919718-a1aa-41b6-9146-139e67bc7ad2",
+        "subscriptionId": "00000000-0000-0000-0000-000000000000",
         "tags": {
             "public": "false",
             "service": "my-project",
