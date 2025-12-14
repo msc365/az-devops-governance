@@ -1,0 +1,92 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://raw.githubusercontent.com/msc365/az-devops-governance/main/schemas/connection.schema.json",
+    "type": "object",
+    "required": [
+        "organization",
+        "projectId",
+        "serviceEndpointName",
+        "scope",
+        "managedServiceIdentity"
+    ],
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "JSON Schema reference"
+        },
+        "organization": {
+            "type": "string",
+            "description": "The Azure DevOps organization name"
+        },
+        "projectId": {
+            "type": "string",
+            "description": "The Azure DevOps project identifier"
+        },
+        "serviceEndpointName": {
+            "type": "string",
+            "description": "The name of the service endpoint/connection"
+        },
+        "scope": {
+            "type": "string",
+            "description": "The Azure resource scope for the service connection",
+            "pattern": "^/subscriptions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(/resourceGroups/[^/]+)?$"
+        },
+        "managedServiceIdentity": {
+            "type": "object",
+            "required": [
+                "name",
+                "subscriptionId",
+                "resourceGroupName",
+                "location",
+                "roleAssignment"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The name of the managed service identity"
+                },
+                "subscriptionId": {
+                    "type": "string",
+                    "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+                    "description": "The subscription ID (must be a valid GUID)"
+                },
+                "resourceGroupName": {
+                    "type": "string",
+                    "description": "The name of the resource group containing the managed identity"
+                },
+                "location": {
+                    "type": "string",
+                    "description": "The Azure region/location for the managed identity"
+                },
+                "tags": {
+                    "type": "object",
+                    "description": "Tags to apply to the managed identity",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "roleAssignment": {
+                    "type": "object",
+                    "required": [
+                        "roleDefinitionName",
+                        "scope"
+                    ],
+                    "properties": {
+                        "roleDefinitionName": {
+                            "type": "string",
+                            "description": "The name of the role definition to assign"
+                        },
+                        "scope": {
+                            "type": "string",
+                            "description": "The scope at which to assign the role",
+                            "pattern": "^/subscriptions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(/resourceGroups/[^/]+)?$"
+                        }
+                    },
+                    "additionalProperties": false
+                }
+            },
+            "additionalProperties": false
+        }
+    },
+    "additionalProperties": false
+}
