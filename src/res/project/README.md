@@ -31,11 +31,11 @@ It allows you to set project properties such as name, description, process templ
 | `DefaultTeam` | `String` | No | - | Mandatory. The name of the default team for the project. |
 | `Description` | `String` | No | - | Mandatory. A description for the Azure DevOps project. |
 | `Features` | `Hashtable` | No | `@{` <br /> `'Boards'='enabled'` <br /> `'Repos'='enabled'` <br /> `'Pipelines'='enabled'` <br /> `'TestPlans'='disabled'` <br /> `'Artifacts'='enabled'` <br /> `}` | Mandatory. A hashtable defining the feature states for the project. Valid features are 'Boards', 'Repos', 'Pipelines', 'TestPlans', and 'Artifacts' with states 'enabled' or 'disabled'. |
-| `Force` | `SwitchParameter` | No | - | Optional. If specified along with Remove, the project will be removed without prompting for confirmation. |
+| `Force` | `Switch` | No | - | Optional. If specified along with Remove, the project will be removed without prompting for confirmation. |
 | `Name` | `String` | No | - | Mandatory. The name of the Azure DevOps project to create or update. |
 | `Organization` | `String` | No | - | Mandatory. The name of the Azure DevOps organization where the project will be created or updated. |
 | `Process` | `String` | No | `'Agile'` | Mandatory. The process template to use for the project. Valid values are 'Agile', 'Scrum', 'CMMI', and 'Basic'. |
-| `Remove` | `SwitchParameter` | No | - | Optional. If specified, the project will be removed instead of created or updated. WARNING! Use with caution! If the project is removed, all associated resources will also be deleted. |
+| `Remove` | `Switch` | No | - | Optional. If specified, the project will be removed instead of created or updated. WARNING! Use with caution! If the project is removed, all associated resources will also be deleted. |
 | `SourceControl` | `String` | No | `'Git'` | Mandatory. The type of source control to use for the project. Valid values are 'Git' and 'Tfvc'. |
 | `Visibility` | `String` | No | `'Private'` | Mandatory. The visibility of the project. Valid values are 'Private' and 'Public'. |
 

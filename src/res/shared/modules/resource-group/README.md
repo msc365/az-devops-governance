@@ -23,11 +23,11 @@ This script creates a new Azure Resource Group or updates an existing one with s
 
 | Parameter | Type | Required | Default | Description |
 | :-- | :-- | :-- | :-- | :-- |
-| `Name` | `String` | Yes | `-` | Required. The name of the Resource Group. |
-| `Force` | `SwitchParameter` | No | `-` | Optional. Skip confirmation prompt and proceed with operations immediately. |
+| `Name` | `String` | Yes | - | Required. The name of the Resource Group. |
+| `Force` | `Switch` | No | - | Optional. Skip confirmation prompt and proceed with operations immediately. |
 | `Location` | `String` | No | `'westeurope'` | Optional. The Azure region where the Resource Group will be created. Defaults to 'westeurope'. |
-| `Rollback` | `SwitchParameter` | No | `-` | Optional. If specified, the script will not delete or modify the Resource Group. |
-| `Tags` | `Object` | No | `-` | Optional. A hashtable of tags to assign to the Resource Group. |
+| `Rollback` | `Switch` | No | - | Optional. If specified, the script will not delete or modify the Resource Group. |
+| `Tags` | `Object` | No | - | Optional. A hashtable of tags to assign to the Resource Group. |
 
 ## Examples
 

@@ -47,11 +47,11 @@
 .PARAMETER Settings
     Optional. A hashtable containing team settings to override the default settings.
 
-.PARAMETER RemoveDeployment
-    Optional. If specified, the team will be removed instead of created or updated.
+.PARAMETER Remove
+    Optional. If specified, the team will be removed instead of created or updated. <br /> <b> WARNING! </b> <br /> Use with caution! Removing a team is irreversible and may affect team members and their access to project resources.
 
-    > [!WARNING]
-    > Use with caution! Removing a team is irreversible and may affect team members and their access to project resources.
+.PARAMETER Force
+    Optional. If specified, the removal of the team will proceed without user confirmation.
 
 .EXAMPLE
     $paramSplat = @{
@@ -67,9 +67,8 @@
     This example creates or updates a team named 'my-team' in the 'my-project' project within the 'my-org' organization, setting its name and description.
 
 .NOTES
-    Requires Azure PowerShell module Az.Accounts and Azure.DevOps.PSModule.
-
-    Ensure you are logged in to Azure using Connect-AzAccount before running this script.
+    - Requires Azure PowerShell module Az.Accounts and Azure.DevOps.PSModule.
+    - Ensure you are logged in to Azure using Connect-AzAccount before running this script.
 #>
 [CmdletBinding()]
 [OutputType([object])]

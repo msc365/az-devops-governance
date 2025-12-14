@@ -304,7 +304,11 @@ function Set-ParametersSection {
 
     foreach ($param in $sortedParams) {
         $required = if ($param.Required) { 'Yes' } else { 'No' }
-        $type = if ($param.Type) { $param.Type } else { 'Object' }
+        $type = if ($param.Type) {
+            if ($param.Type -eq 'SwitchParameter') { 'Switch' } else { $param.Type }
+        } else {
+            'Object'
+        }
 
         # Format default value - handle hashtables specially
         if ($param.Default) {

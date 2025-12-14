@@ -21,20 +21,20 @@ Creates or updates an Azure Environment within a specified subscription.
 ## Description
 
 This PowerShell script creates or updates an Azure Environment within a specified subscription.
-    It provides comprehensive environment management capabilities including configuration of resource groups and their properties.
+It provides comprehensive environment management capabilities including configuration of resource groups and their properties.
 
 ## Parameters
 
 | Parameter | Type | Required | Default | Description |
 | :-- | :-- | :-- | :-- | :-- |
-| `Name` | `String` | Yes | `-` | Mandatory. The name of the environment to create or update. |
-| `Organization` | `String` | Yes | `-` | No description provided. |
-| `ProjectId` | `String` | Yes | `-` | No description provided. |
-| `Description` | `String` | No | `-` | Optional. A description for the environment. |
-| `Force` | `SwitchParameter` | No | `-` | Optional. A switch to force removal without confirmation. |
-| `Remove` | `SwitchParameter` | No | `-` | Optional. A switch indicating whether to remove the specified environment. |
-| `ResourceGroup` | `Object` | No | `-` | Optional. An optional hashtable defining the resource group properties: Name, Location, Tags. |
-| `SubscriptionId` | `Object` | No | `-` | Mandatory. The Azure Subscription ID where the environment will be created or updated. |
+| `Name` | `String` | Yes | - | Mandatory. The name of the environment to create or update. |
+| `Organization` | `String` | Yes | - | No description provided. |
+| `ProjectId` | `String` | Yes | - | No description provided. |
+| `Description` | `String` | No | - | Optional. A description for the environment. |
+| `Force` | `Switch` | No | - | Optional. A switch to force removal without confirmation. |
+| `Remove` | `Switch` | No | - | Optional. A switch indicating whether to remove the specified environment. |
+| `ResourceGroup` | `Object` | No | - | Optional. An optional hashtable defining the resource group properties: Name, Location, Tags. |
+| `SubscriptionId` | `Object` | No | - | Mandatory. The Azure Subscription ID where the environment will be created or updated. |
 
 ## Examples
 

@@ -22,22 +22,21 @@ Create or update an Azure DevOps Team within a specified project.
 
 This script creates or updates an Azure DevOps Team within a specified project. It allows you to set team properties such as name and description.
 
-    If the team already exists, it updates the properties as needed.
+If the team already exists, it updates the properties as needed.
 
 ## Parameters
 
 | Parameter | Type | Required | Default | Description |
 | :-- | :-- | :-- | :-- | :-- |
-| `Organization` | `String` | Yes | `-` | Mandatory. The name of the Azure DevOps organization where the project is located. |
-| `ProjectId` | `String` | Yes | `-` | Mandatory. The ID of the Azure DevOps project where the team will be created or updated |
-| `TeamId` | `String` | Yes | `-` | Mandatory. The id or name of the Azure DevOps team to create or update. |
-| `Description` | `String` | No | `-` | Optional. A description for the Azure DevOps team. |
-| `Force` | `SwitchParameter` | No | `-` | No description provided. |
-| `GroupMembership` | `Object[]` | No | `-` | No description provided. |
-| `Name` | `String` | No | `-` | Optional. The display name of the Azure DevOps team. |
-| `Remove` | `SwitchParameter` | No | `-` | No description provided. |
-| `RemoveDeployment` | `Object` | No | `-` | Optional. If specified, the team will be removed instead of created or updated.      > [!WARNING]     > Use with caution! Removing a team is irreversible and may affect team members and their access to project resources. |
-| `Settings` | `Hashtable` | No | `-` | Optional. A hashtable containing team settings to override the default settings. |
+| `Organization` | `String` | Yes | - | Mandatory. The name of the Azure DevOps organization where the project is located. |
+| `ProjectId` | `String` | Yes | - | Mandatory. The ID of the Azure DevOps project where the team will be created or updated |
+| `TeamId` | `String` | Yes | - | Mandatory. The id or name of the Azure DevOps team to create or update. |
+| `Description` | `String` | No | - | Optional. A description for the Azure DevOps team. |
+| `Force` | `Switch` | No | - | Optional. If specified, the removal of the team will proceed without user confirmation. |
+| `GroupMembership` | `Object[]` | No | - | No description provided. |
+| `Name` | `String` | No | - | Optional. The display name of the Azure DevOps team. |
+| `Remove` | `Switch` | No | - | Optional. If specified, the team will be removed instead of created or updated. <br /> <b> WARNING! </b> <br /> Use with caution! Removing a team is irreversible and may affect team members and their access to project resources. |
+| `Settings` | `Hashtable` | No | - | Optional. A hashtable containing team settings to override the default settings. |
 
 ## Examples
 

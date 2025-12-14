@@ -31,8 +31,8 @@ It also creates the necessary role assignments for the MSI to access Azure resou
 | `ProjectId` | `String` | Yes | - | Required. The Azure DevOps project ID or Name where the service connection will be created. |
 | `Scope` | `String` | Yes | - | Required. The scope for the service connection (e.g., /subscriptions/00000000-0000-0000-0000-000000000000). |
 | `ServiceEndpointName` | `String` | Yes | - | Required. The name of the service connection to be created. |
-| `Force` | `SwitchParameter` | No | - | Optional. Switch to force deletion without confirmation during rollback. |
-| `Rollback` | `SwitchParameter` | No | - | Optional. Switch to indicate if the operation should rollback (delete) the service connection and related resources. |
+| `Force` | `Switch` | No | - | Optional. Switch to force deletion without confirmation during rollback. |
+| `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (delete) the service connection and related resources. |
 
 ## Examples
 
