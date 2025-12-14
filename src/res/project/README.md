@@ -20,31 +20,22 @@ Create or update an Azure DevOps Project with specified settings.
 
 ## Description
 
-This script creates or updates an Azure DevOps Project within a specified organization. It allows you to set project properties such as name, description, process template, source control type, visibility, and feature states.
+This script creates or updates an Azure DevOps Project within a specified organization.
 
-    If the project already exists, it updates the properties and feature states as needed.
-
-    Warning: The process template and source control type can only be set during project creation.
+It allows you to set project properties such as name, description, process template, source control type, visibility, and feature states.
 
 ## Parameters
 
 | Parameter | Type | Required | Default | Description |
 | :-- | :-- | :-- | :-- | :-- |
-| `DefaultTeam` | `String` | No | `-` | Mandatory. The name of the default team for the project. |
-| `Description` | `String` | No | `-` | Mandatory. A description for the Azure DevOps project. |
-| `Features` | `Hashtable` | No | `@{
-        'Boards'    = 'enabled'
-        'Repos'     = 'enabled'
-        'Pipelines' = 'enabled'
-        'TestPlans' = 'disabled'
-        'Artifacts' = 'enabled'
-    }` | Mandatory. A hashtable defining the feature states for the project. Valid features are 'Boards', 'Repos', 'Pipelines', 'TestPlans', and 'Artifacts' with states 'enabled' or 'disabled'. |
-| `Force` | `SwitchParameter` | No | `-` | No description provided. |
-| `Name` | `String` | No | `-` | Mandatory. The name of the Azure DevOps project to create or update. |
-| `Organization` | `String` | No | `-` | Mandatory. The name of the Azure DevOps organization where the project will be created or updated. |
+| `DefaultTeam` | `String` | No | - | Mandatory. The name of the default team for the project. |
+| `Description` | `String` | No | - | Mandatory. A description for the Azure DevOps project. |
+| `Features` | `Hashtable` | No | `@{` <br /> `'Boards'='enabled'` <br /> `'Repos'='enabled'` <br /> `'Pipelines'='enabled'` <br /> `'TestPlans'='disabled'` <br /> `'Artifacts'='enabled'` <br /> `}` | Mandatory. A hashtable defining the feature states for the project. Valid features are 'Boards', 'Repos', 'Pipelines', 'TestPlans', and 'Artifacts' with states 'enabled' or 'disabled'. |
+| `Force` | `SwitchParameter` | No | - | Optional. If specified along with Remove, the project will be removed without prompting for confirmation. |
+| `Name` | `String` | No | - | Mandatory. The name of the Azure DevOps project to create or update. |
+| `Organization` | `String` | No | - | Mandatory. The name of the Azure DevOps organization where the project will be created or updated. |
 | `Process` | `String` | No | `'Agile'` | Mandatory. The process template to use for the project. Valid values are 'Agile', 'Scrum', 'CMMI', and 'Basic'. |
-| `Remove` | `SwitchParameter` | No | `-` | No description provided. |
-| `RemoveDeployment` | `Object` | No | `-` | Optional. If specified, the project will be removed instead of created or updated.      > [!WARNING]     > Use with caution! If the project is removed, all associated resources will also be deleted. |
+| `Remove` | `SwitchParameter` | No | - | Optional. If specified, the project will be removed instead of created or updated. WARNING! Use with caution! If the project is removed, all associated resources will also be deleted. |
 | `SourceControl` | `String` | No | `'Git'` | Mandatory. The type of source control to use for the project. Valid values are 'Git' and 'Tfvc'. |
 | `Visibility` | `String` | No | `'Private'` | Mandatory. The visibility of the project. Valid values are 'Private' and 'Public'. |
 
@@ -87,8 +78,8 @@ Returns: `object`
 
 This cmdlet supports the common parameters: `-Debug`, `-ErrorAction`, `-ErrorVariable`,  
 `-InformationAction`, `-InformationVariable`, `-OutBuffer`, `-OutVariable`, `-PipelineVariable`,  
-`-ProgressAction`, `-Verbose`, `-WarningAction`, and `-WarningVariable`. For more information, see  
-[about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
+`-ProgressAction`, `-Verbose`, `-WarningAction`, and `-WarningVariable`.  
+For more information, see [about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## Dependencies
 
@@ -107,8 +98,6 @@ This script requires the following PowerShell modules:
 
 ## Notes
 
-- The script uses `CmdletBinding()` and supports common parameters (`-Verbose`, `-Debug`, etc.)
-- All operations are logged with `Write-Verbose` for debugging
+- Ensure you are logged in to Azure using Connect-AzAccount before running this script.
 - The script automatically imports the `Azure.DevOps.PSModule` if not already loaded
 - Automatic connection to Azure DevOps organization if not already connected
-- Project refresh operations occur after modifications to ensure data consistency

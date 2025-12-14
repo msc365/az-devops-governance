@@ -20,19 +20,19 @@ Deploys an Azure DevOps Service Connection with Managed Service Identity and Rol
 ## Description
 
 This script deploys an Azure DevOps Service Connection using a Managed Service Identity (MSI) for authentication.
-    It also creates the necessary role assignments for the MSI to access Azure resources.
+It also creates the necessary role assignments for the MSI to access Azure resources.
 
 ## Parameters
 
 | Parameter | Type | Required | Default | Description |
 | :-- | :-- | :-- | :-- | :-- |
-| `ManagedServiceIdentity` | `Object` | Yes | `-` | Required. An object containing details of the Managed Service Identity to be used. |
-| `Organization` | `String` | Yes | `-` | Required. The Azure DevOps organization name. |
-| `ProjectId` | `String` | Yes | `-` | Required. The Azure DevOps project ID or Name where the service connection will be created. |
-| `Scope` | `String` | Yes | `-` | Required. The scope for the service connection (e.g., /subscriptions/00000000-0000-0000-0000-000000000000). |
-| `ServiceEndpointName` | `String` | Yes | `-` | Required. The name of the service connection to be created. |
-| `Force` | `SwitchParameter` | No | `-` | Optional. Switch to force deletion without confirmation during rollback. |
-| `Rollback` | `SwitchParameter` | No | `-` | Optional. Switch to indicate if the operation should rollback (delete) the service connection and related resources. |
+| `ManagedServiceIdentity` | `Object` | Yes | - | Required. An object containing details of the Managed Service Identity to be used. |
+| `Organization` | `String` | Yes | - | Required. The Azure DevOps organization name. |
+| `ProjectId` | `String` | Yes | - | Required. The Azure DevOps project ID or Name where the service connection will be created. |
+| `Scope` | `String` | Yes | - | Required. The scope for the service connection (e.g., /subscriptions/00000000-0000-0000-0000-000000000000). |
+| `ServiceEndpointName` | `String` | Yes | - | Required. The name of the service connection to be created. |
+| `Force` | `SwitchParameter` | No | - | Optional. Switch to force deletion without confirmation during rollback. |
+| `Rollback` | `SwitchParameter` | No | - | Optional. Switch to indicate if the operation should rollback (delete) the service connection and related resources. |
 
 ## Examples
 
@@ -119,8 +119,8 @@ Returns: `pscustomobject`
 
 This cmdlet supports the common parameters: `-Debug`, `-ErrorAction`, `-ErrorVariable`,  
 `-InformationAction`, `-InformationVariable`, `-OutBuffer`, `-OutVariable`, `-PipelineVariable`,  
-`-ProgressAction`, `-Verbose`, `-WarningAction`, and `-WarningVariable`. For more information, see  
-[about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
+`-ProgressAction`, `-Verbose`, `-WarningAction`, and `-WarningVariable`.  
+For more information, see [about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
 
 ### SupportsShouldProcess
 

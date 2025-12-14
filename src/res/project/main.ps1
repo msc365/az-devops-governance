@@ -25,11 +25,9 @@
     Create or update an Azure DevOps Project with specified settings.
 
 .DESCRIPTION
-    This script creates or updates an Azure DevOps Project within a specified organization. It allows you to set project properties such as name, description, process template, source control type, visibility, and feature states.
+    This script creates or updates an Azure DevOps Project within a specified organization.
 
-    If the project already exists, it updates the properties and feature states as needed.
-
-    Warning: The process template and source control type can only be set during project creation.
+    It allows you to set project properties such as name, description, process template, source control type, visibility, and feature states.
 
 .PARAMETER Organization
     Mandatory. The name of the Azure DevOps organization where the project will be created or updated.
@@ -55,11 +53,11 @@
 .PARAMETER Features
     Mandatory. A hashtable defining the feature states for the project. Valid features are 'Boards', 'Repos', 'Pipelines', 'TestPlans', and 'Artifacts' with states 'enabled' or 'disabled'.
 
-.PARAMETER RemoveDeployment
-    Optional. If specified, the project will be removed instead of created or updated.
+.PARAMETER Remove
+    Optional. If specified, the project will be removed instead of created or updated. WARNING! Use with caution! If the project is removed, all associated resources will also be deleted.
 
-    > [!WARNING]
-    > Use with caution! If the project is removed, all associated resources will also be deleted.
+.PARAMETER Force
+    Optional. If specified along with Remove, the project will be removed without prompting for confirmation.
 
 .EXAMPLE
     $paramSplat = @{
@@ -84,8 +82,6 @@
     This example deploys or updates a project named 'my-project' in the 'my-org' organization with the specified parameters.
 
 .NOTES
-    Requires Azure PowerShell module Az.Accounts and Azure.DevOps.PSModule.
-
     Ensure you are logged in to Azure using Connect-AzAccount before running this script.
 #>
 [CmdletBinding()]
@@ -116,13 +112,7 @@ param (
     [string]$Visibility = 'Private',
 
     [Parameter(Mandatory = $false)]
-    [hashtable]$Features = @{
-        'Boards'    = 'enabled'
-        'Repos'     = 'enabled'
-        'Pipelines' = 'enabled'
-        'TestPlans' = 'disabled'
-        'Artifacts' = 'enabled'
-    },
+    [hashtable]$Features = @{'Boards' = 'enabled'; 'Repos' = 'enabled'; 'Pipelines' = 'enabled'; 'TestPlans' = 'disabled'; 'Artifacts' = 'enabled' },
 
     [Parameter()]
     [switch]$Remove,

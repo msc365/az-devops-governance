@@ -67,8 +67,8 @@ Returns: `pscustomobject`
 
 This cmdlet supports the common parameters: `-Debug`, `-ErrorAction`, `-ErrorVariable`,  
 `-InformationAction`, `-InformationVariable`, `-OutBuffer`, `-OutVariable`, `-PipelineVariable`,  
-`-ProgressAction`, `-Verbose`, `-WarningAction`, and `-WarningVariable`. For more information, see  
-[about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
+`-ProgressAction`, `-Verbose`, `-WarningAction`, and `-WarningVariable`.  
+For more information, see [about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
 
 ## Dependencies
 

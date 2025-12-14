@@ -2,6 +2,7 @@
 <!-- omit from toc -->
 # Role Assignment `[res\shared\modules\role-assignment\main.ps1]`
 
+
 Create Azure Role Assignments.
 
 <!-- omit from toc -->
@@ -44,8 +45,7 @@ $roleAssignmentParams = @{
 .\main.ps1 @roleAssignmentParams
 ```
 
-Creates a Contributor role assignment for the specified ObjectId at the given resource group scope.
-
+Creates a Contributor role assignment for the specified ObjectId at the given resource group scope.
 
 ### Example 2
 
@@ -75,8 +75,8 @@ Returns: `pscustomobject`
 
 This cmdlet supports the common parameters: `-Debug`, `-ErrorAction`, `-ErrorVariable`,  
 `-InformationAction`, `-InformationVariable`, `-OutBuffer`, `-OutVariable`, `-PipelineVariable`,  
-`-ProgressAction`, `-Verbose`, `-WarningAction`, and `-WarningVariable`. For more information, see  
-[about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
+`-ProgressAction`, `-Verbose`, `-WarningAction`, and `-WarningVariable`.  
+For more information, see [about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
 
 ### SupportsShouldProcess
 

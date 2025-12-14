@@ -2,6 +2,7 @@
 <!-- omit from toc -->
 # Resource Group `[res\shared\modules\resource-group\main.ps1]`
 
+
 Create or update an Azure Resource Group.
 
 <!-- omit from toc -->
@@ -47,8 +48,7 @@ $rgParams = @{
 .\main.ps1 @rgParams
 ```
 
-Creates or updates the Resource Group 'rg-my-resource-group' in the 'westeurope' region with the specified tags.
-
+Creates or updates the Resource Group 'rg-my-resource-group' in the 'westeurope' region with the specified tags.
 
 ## Outputs
 
@@ -60,8 +60,8 @@ Returns: `pscustomobject`
 
 This cmdlet supports the common parameters: `-Debug`, `-ErrorAction`, `-ErrorVariable`,  
 `-InformationAction`, `-InformationVariable`, `-OutBuffer`, `-OutVariable`, `-PipelineVariable`,  
-`-ProgressAction`, `-Verbose`, `-WarningAction`, and `-WarningVariable`. For more information, see  
-[about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
+`-ProgressAction`, `-Verbose`, `-WarningAction`, and `-WarningVariable`.  
+For more information, see [about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
 
 ### SupportsShouldProcess
 
