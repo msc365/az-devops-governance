@@ -16,6 +16,7 @@ Deploys an Azure DevOps Service Connection with Managed Service Identity and Rol
 - [Support](#support)
 - [Dependencies](#dependencies)
 - [Resources](#resources)
+- [Notes](#notes)
 
 ## Description
 
@@ -49,7 +50,8 @@ $deploySplat = @{
 .\deploy.ps1 @deploySplat -Verbose
 ```
 
-Deploys the service connection using the specified template and parameters.
+Deploys the service connection using the specified template and parameters.
+
 
 ### Example 2
 
@@ -64,7 +66,8 @@ $customSplat = @{
 .\deploy.ps1 @customSplat -Verbose
 ```
 
-Deploys the service connection using the specified template and custom parameters.
+Deploys the service connection using the specified template and custom parameters.
+
 
 ### Example 3
 
@@ -79,7 +82,8 @@ $rollbackSplat = @{
 .\deploy.ps1 @rollbackSplat -Rollback -Force -Verbose
 ```
 
-Rolls back (deletes) the service connection and related resources without confirmation.
+Rolls back (deletes) the service connection and related resources without confirmation.
+
 
 ### Example 4
 
@@ -156,3 +160,10 @@ This script requires the following PowerShell modules:
 - [default](tests/e2e/default)
 - [rollback](tests/e2e/rollback)
 
+## Notes
+
+- Operations are idempotent (safe to run multiple times).
+- Ensure you are logged in to Azure using Connect-AzAccount before running this script.
+- Automatically imports the `Azure.DevOps.PSModule` if not already loaded.
+- Automatic connection to Azure DevOps organization.
+- User confirmation is required for deletion unless `-Force` is specified.

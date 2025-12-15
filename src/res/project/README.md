@@ -66,7 +66,8 @@ $paramSplat = @{
 .\src\res\project\main.ps1 @paramSplat
 ```
 
-This example deploys or updates a project named 'my-project' in the 'my-org' organization with the specified parameters.
+This example deploys or updates a project named 'my-project' in the 'my-org' organization with the specified parameters.
+
 
 ## Outputs
 
@@ -101,6 +102,8 @@ This script requires the following PowerShell modules:
 
 ## Notes
 
+- Operations are idempotent (safe to run multiple times).
 - Ensure you are logged in to Azure using Connect-AzAccount before running this script.
-- The script automatically imports the `Azure.DevOps.PSModule` if not already loaded
-- Automatic connection to Azure DevOps organization if not already connected
+- Automatically imports the `Azure.DevOps.PSModule` if not already loaded.
+- Automatic connection to Azure DevOps organization.
+- User confirmation is required for deletion unless `-Force` is specified.

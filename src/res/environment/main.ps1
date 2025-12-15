@@ -59,11 +59,6 @@
     .\main.ps1 @params
 
     Creates or updates the 'my-environment' environment in the specified subscription with the given resource group configuration.
-
-.NOTES
-    Requires Azure PowerShell module Az.Accounts and Azure.DevOps.PSModule.
-
-    Ensure you are logged in to Azure using Connect-AzAccount before running this script.
 #>
 [CmdletBinding()]
 [OutputType([pscustomobject])]

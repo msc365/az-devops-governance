@@ -80,9 +80,6 @@
     .\src\res\project\main.ps1 @paramSplat
 
     This example deploys or updates a project named 'my-project' in the 'my-org' organization with the specified parameters.
-
-.NOTES
-    Ensure you are logged in to Azure using Connect-AzAccount before running this script.
 #>
 [CmdletBinding()]
 [OutputType([object])]

@@ -15,6 +15,7 @@ Create Azure Role Assignments.
 - [Outputs](#outputs)
 - [Support](#support)
 - [Dependencies](#dependencies)
+- [Notes](#notes)
 
 ## Description
 
@@ -47,7 +48,8 @@ $roleAssignmentParams = @{
 .\main.ps1 @roleAssignmentParams
 ```
 
-Creates a Contributor role assignment for the specified ObjectId at the given resource group scope.
+Creates a Contributor role assignment for the specified ObjectId at the given resource group scope.
+
 
 ### Example 2
 
@@ -94,3 +96,7 @@ This script requires the following PowerShell modules:
 - `Az.Accounts`
 - `Az.Resources`
 
+## Notes
+
+- Operations are idempotent (safe to run multiple times).
+- User confirmation is required for deletion unless `-Force` is specified.

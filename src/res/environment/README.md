@@ -55,7 +55,8 @@ $params = @{
 .\main.ps1 @params
 ```
 
-Creates or updates the 'my-environment' environment in the specified subscription with the given resource group configuration.
+Creates or updates the 'my-environment' environment in the specified subscription with the given resource group configuration.
+
 
 ## Outputs
 
@@ -92,15 +93,8 @@ This script requires the following PowerShell modules:
 
 ## Notes
 
-- The script uses `CmdletBinding()` and supports common parameters (`-Verbose`, `-Debug`, `-WhatIf`, etc.)
-- All operations are logged with `Write-Verbose` for debugging
-- The script automatically checks for Azure context before proceeding when ResourceGroup is specified
-- If no Azure context is found (when needed), an error is thrown
-- The script connects to Azure DevOps organization if not already connected
-- Context switching is handled automatically when targeting different Azure subscriptions
-- The original Azure subscription context is restored after operations complete
-- Both Azure DevOps environment and Azure resource group operations are idempotent (safe to run multiple times)
-- Environment name and description are compared and updated only when differences are detected
-- Resource group tags are compared and updated only when differences are detected
-- User confirmation is required for deletion unless `-Force` is specified
-- Requires both `Az.Accounts`, `Az.Resources`, and `Azure.DevOps.PSModule` modules
+- Operations are idempotent (safe to run multiple times).
+- Ensure you are logged in to Azure using Connect-AzAccount before running this script.
+- Automatically imports the `Azure.DevOps.PSModule` if not already loaded.
+- Automatic connection to Azure DevOps organization.
+- User confirmation is required for deletion unless `-Force` is specified.

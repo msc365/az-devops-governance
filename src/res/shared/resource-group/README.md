@@ -50,7 +50,8 @@ $rgParams = @{
 .\main.ps1 @rgParams
 ```
 
-Creates or updates the Resource Group 'rg-my-resource-group' in the 'westeurope' region with the specified tags.
+Creates or updates the Resource Group 'rg-my-resource-group' in the 'westeurope' region with the specified tags.
+
 
 ## Outputs
 
@@ -82,4 +83,6 @@ This script requires the following PowerShell modules:
 
 ## Notes
 
-Does not perform actual resource group deletion despite the Remove-AzResourceGroup reference due to the current implementation focusing on creation and updating tags only.
+- Operations are idempotent (safe to run multiple times).
+- User confirmation is required for deletion unless `-Force` is specified.
+- Does not perform actual resource group deletion due to the current implementation focusing on creation and updating tags only.

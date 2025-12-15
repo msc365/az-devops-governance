@@ -54,10 +54,6 @@
     .\main.ps1 @rgParams
 
     Creates or updates the Resource Group 'rg-my-resource-group' in the 'westeurope' region with the specified tags.
-
-.NOTES
-    Does not perform actual resource group deletion despite the Remove-AzResourceGroup reference due to
-    the current implementation focusing on creation and updating tags only.
 #>
 [CmdletBinding(SupportsShouldProcess)]
 [OutputType([pscustomobject])]
