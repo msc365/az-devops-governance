@@ -27,14 +27,14 @@ It provides comprehensive environment management capabilities including configur
 
 | Parameter | Type | Required | Default | Description |
 | :-- | :-- | :-- | :-- | :-- |
-| `Name` | `String` | Yes | - | Mandatory. The name of the environment to create or update. |
+| `Name` | `String` | Yes | - | Required.  The name of the environment to create or update. |
 | `Organization` | `String` | Yes | - | No description provided. |
 | `ProjectId` | `String` | Yes | - | No description provided. |
 | `Description` | `String` | No | - | Optional. A description for the environment. |
 | `Force` | `Switch` | No | - | Optional. A switch to force removal without confirmation. |
 | `Remove` | `Switch` | No | - | Optional. A switch indicating whether to remove the specified environment. |
 | `ResourceGroup` | `Object` | No | - | Optional. An optional hashtable defining the resource group properties: Name, Location, Tags. |
-| `SubscriptionId` | `Object` | No | - | Mandatory. The Azure Subscription ID where the environment will be created or updated. |
+| `SubscriptionId` | `Object` | No | - | Required.  The Azure Subscription ID where the environment will be created or updated. |
 
 ## Examples
 

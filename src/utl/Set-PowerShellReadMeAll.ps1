@@ -9,7 +9,7 @@
     all PowerShell scripts in a project have up-to-date documentation.
 
 .PARAMETER Path
-    Mandatory. The root path to search for PowerShell scripts.
+    Required.  The root path to search for PowerShell scripts.
 
 .PARAMETER ScriptFilter
     Optional. The file name pattern to search for. Defaults to 'main.ps1'.

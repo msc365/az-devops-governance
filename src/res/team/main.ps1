@@ -30,13 +30,13 @@
     If the team already exists, it updates the properties as needed.
 
 .PARAMETER Organization
-    Mandatory. The name of the Azure DevOps organization where the project is located.
+    Required.  The name of the Azure DevOps organization where the project is located.
 
 .PARAMETER ProjectId
-    Mandatory. The ID of the Azure DevOps project where the team will be created or updated
+    Required.  The ID of the Azure DevOps project where the team will be created or updated
 
 .PARAMETER TeamId
-    Mandatory. The id or name of the Azure DevOps team to create or update.
+    Required.  The id or name of the Azure DevOps team to create or update.
 
 .PARAMETER Name
     Optional. The display name of the Azure DevOps team.

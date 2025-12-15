@@ -28,9 +28,9 @@ If the team already exists, it updates the properties as needed.
 
 | Parameter | Type | Required | Default | Description |
 | :-- | :-- | :-- | :-- | :-- |
-| `Organization` | `String` | Yes | - | Mandatory. The name of the Azure DevOps organization where the project is located. |
-| `ProjectId` | `String` | Yes | - | Mandatory. The ID of the Azure DevOps project where the team will be created or updated |
-| `TeamId` | `String` | Yes | - | Mandatory. The id or name of the Azure DevOps team to create or update. |
+| `Organization` | `String` | Yes | - | Required.  The name of the Azure DevOps organization where the project is located. |
+| `ProjectId` | `String` | Yes | - | Required.  The ID of the Azure DevOps project where the team will be created or updated |
+| `TeamId` | `String` | Yes | - | Required.  The id or name of the Azure DevOps team to create or update. |
 | `Description` | `String` | No | - | Optional. A description for the Azure DevOps team. |
 | `Force` | `Switch` | No | - | Optional. If specified, the removal of the team will proceed without user confirmation. |
 | `GroupMembership` | `Object[]` | No | - | No description provided. |
@@ -56,7 +56,8 @@ $paramSplat = @{
 ..\src\res\team\main.ps1 @paramSplat -Verbose
 ```
 
-This example creates or updates a team named 'my-team' in the 'my-project' project within the 'my-org' organization, setting its name and description.
+This example creates or updates a team named 'my-team' in the 'my-project' project within the 'my-org' organization, setting its name and description.
+
 
 ## Outputs
 

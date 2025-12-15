@@ -29,13 +29,13 @@
     It provides comprehensive environment management capabilities including configuration of resource groups and their properties.
 
 .PARAMETER Name
-    Mandatory. The name of the environment to create or update.
+    Required.  The name of the environment to create or update.
 
 .PARAMETER Description
     Optional. A description for the environment.
 
 .PARAMETER SubscriptionId
-    Mandatory. The Azure Subscription ID where the environment will be created or updated.
+    Required.  The Azure Subscription ID where the environment will be created or updated.
 
 .PARAMETER ResourceGroup
     Optional. An optional hashtable defining the resource group properties: Name, Location, Tags.
