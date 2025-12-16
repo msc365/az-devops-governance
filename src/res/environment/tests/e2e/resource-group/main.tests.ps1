@@ -1,17 +1,30 @@
-﻿# ========== #
-# Parameters #
-# ========== #
+﻿<#
+.SYNOPSIS
+    Resource Group end-to-end tests for Azure DevOps environment resource.
+
+.DESCRIPTION
+    This script executes end-to-end tests for the default Azure DevOps environment
+    resource configuration.
+
+.NOTES
+    File Name      : main.tests.ps1
+    Prerequisite   : Azure PowerShell modules and authenticated Azure context
+#>
+
+#region PARAMETERS
 
 $params = @{
-    Name          = 'my-project-tst'
-    Description   = 'Test environment for my-project'
+    Organization  = 'e2egov-org'
+    ProjectId     = 'e2egov-prjHb72x9'
+    Name          = 'env-prjHb72x9-tst'
+    Description   = 'Default e2e governance description'
     ResourceGroup = @{
-        Name           = 'rg-my-project-tst-weu'
-        Location       = 'westeurope'
+        Name           = 'rg-e2egov-prjHb72x9-tst-neu'
+        Location       = 'northeurope'
         SubscriptionId = '00000000-0000-0000-0000-000000000000'
         Tags           = @{
             public      = 'false'
-            service     = 'my-project'
+            service     = 'e2egov'
             environment = 'prd'
             security    = 'rbac'
             iac         = 'bicep'
@@ -20,17 +33,19 @@ $params = @{
     }
 }
 
-# ========= #
-# Variables #
-# ========= #
+# endregion
+
+#region INITIALIZE
 
 $rootPath = (Get-Item $PSScriptRoot).Parent.Parent.Parent.FullName
 
 $subscriptionId = (Get-AzContext).Subscription.Id
-$params['SubscriptionId'] = $subscriptionId
+$params['ResourceGroup']['SubscriptionId'] = $subscriptionId
 
-# ============== #
-# Test Execution #
-# ============== #
+#endregion
 
-& (Join-Path $rootPath -ChildPath 'main.ps1') @params
+#region TEST EXECUTION
+
+& (Join-Path $rootPath -ChildPath 'main.ps1') @params -Verbose
+
+#endregion

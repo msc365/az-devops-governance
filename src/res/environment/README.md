@@ -4,7 +4,7 @@
 
 ![Version](https://img.shields.io/badge/script--version-0.1.0-blue) [![License](https://img.shields.io/badge/license-MIT-purple)](https://github.com/msc365/az-devops-governance/blob/main/LICENSE)
 
-Creates or updates an Azure Environment within a specified subscription.
+Creates or updates an Azure DevOps Environment.
 
 <!-- omit from toc -->
 ## Navigation
@@ -20,21 +20,22 @@ Creates or updates an Azure Environment within a specified subscription.
 
 ## Description
 
-This PowerShell script creates or updates an Azure Environment within a specified subscription.
-It provides comprehensive environment management capabilities including configuration of resource groups and their properties.
+This PowerShell script creates or updates an Azure DevOps Environment.
+
+It provides comprehensive environment management capabilities including configuration of an optional resource group
+and its properties as a scoped environment.
 
 ## Parameters
 
 | Parameter | Type | Required | Default | Description |
 | :-- | :-- | :-- | :-- | :-- |
-| `Name` | `String` | Yes | - | Required.  The name of the environment to create or update. |
+| `Name` | `String` | Yes | - | Required. The name of the environment to create or update. |
 | `Organization` | `String` | Yes | - | No description provided. |
 | `ProjectId` | `String` | Yes | - | No description provided. |
 | `Description` | `String` | No | - | Optional. A description for the environment. |
-| `Force` | `Switch` | No | - | Optional. A switch to force removal without confirmation. |
-| `Remove` | `Switch` | No | - | Optional. A switch indicating whether to remove the specified environment. |
-| `ResourceGroup` | `Object` | No | - | Optional. An optional hashtable defining the resource group properties: Name, Location, Tags. |
-| `SubscriptionId` | `Object` | No | - | Required.  The Azure Subscription ID where the environment will be created or updated. |
+| `Force` | `Switch` | No | - | Optional. Switch to force deletion without confirmation during rollback. |
+| `ResourceGroup` | `Object` | No | - | Optional. An optional object defining the resource group properties: `Name`, `Location`, `SubscriptionId`, `Tags`. |
+| `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (delete) the environment and related resources. <br /> <b> WARNING! </b> <br /> Use with caution! Removing an environment is irreversible and may affect teams relying on it. |
 
 ## Examples
 
@@ -43,20 +44,67 @@ It provides comprehensive environment management capabilities including configur
 #### PowerShell
 
 ```powershell
-$params = @{
-    Name           = 'my-environment'
-    SubscriptionId = '00000000-0000-0000-0000-000000000000'
-    ResourceGroup  = @{
-        Name     = 'rg-my-environment'
-        Location = 'westeurope'
-        Tags     = @{ environment = 'dev' }
-    }
+$deploySplat = @{
+    TemplateFile          = 'main.ps1'
+    TemplateParameterFile = 'params\main.parameters.json'
 }
-.\main.ps1 @params
+
+.\deploy.ps1 @deploySplat -Verbose
 ```
 
-Creates or updates the 'my-environment' environment in the specified subscription with the given resource group configuration.
+Deploys the environment using the specified template and parameters.
 
+### Example 2
+
+#### PowerShell
+
+```powershell
+$customSplat = @{
+    TemplateFile          = 'main.ps1'
+    TemplateParameterFile = 'params\custom.parameters.json'
+}
+
+.\deploy.ps1 @customSplat -Verbose
+```
+
+Deploys the environment using the specified template and custom parameters.
+
+### Example 3
+
+#### PowerShell
+
+```powershell
+$rollbackSplat = @{
+    TemplateFile          = 'main.ps1'
+    TemplateParameterFile = 'params\main.parameters.json'
+}
+
+.\deploy.ps1 @rollbackSplat -Rollback -Force -Verbose
+```
+
+Rolls back (deletes) the environment and related resources without confirmation.
+
+### Example 4
+
+#### PowerShell
+
+```powershell
+$paramSplat = @{
+    Organization   = 'e2egov-org'
+    ProjectId      = 'e2egov-prjHb72x9'
+    Name           = 'env-prjHb72x9-tst'
+    Description    = 'Default e2e governance description'
+    ResourceGroup  = @{
+        Name           = 'rg-e2egov-prjHb72x9-tst-neu'
+        Location       = 'northeurope'
+        SubscriptionId = '00000000-0000-0000-0000-000000000000'
+        Tags           = @{ environment = 'tst'; service = 'e2egov' }
+    }
+}
+.\main.ps1 @paramSplat -Verbose
+```
+
+Deploys a new environment using the specified parameters in code.
 
 ## Outputs
 
@@ -71,23 +119,34 @@ This cmdlet supports the common parameters: `-Debug`, `-ErrorAction`, `-ErrorVar
 `-ProgressAction`, `-Verbose`, `-WarningAction`, and `-WarningVariable`.  
 For more information, see [about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
 
+### SupportsShouldProcess
+
+This script supports the `-WhatIf` and `-Confirm` parameters for safe execution:
+
+- **`-WhatIf`**: Shows what would happen if the script runs without actually making any changes.
+- **`-Confirm`**: Prompts for confirmation before performing each action.
+
 ## Dependencies
 
 This script requires the following PowerShell modules:
 
 - `Az.Accounts`
+- `Az.Resources`
 - `Azure.DevOps.PSModule`
 
 ## Resources
 
 - [deploy](deploy.ps1)
 
+### Shared
+
+- [resource-group](../shared/resource-group)
+
 ### Tests
 
 - [default](tests/e2e/default)
-- [remove-all](tests/e2e/remove-all)
-- [remove](tests/e2e/remove)
 - [resource-group](tests/e2e/resource-group)
+- [rollback](tests/e2e/rollback)
 - [update](tests/e2e/update)
 
 

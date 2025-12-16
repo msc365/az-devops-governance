@@ -1,6 +1,6 @@
 ﻿<#
 .SYNOPSIS
-    Create end-to-end tests for Azure DevOps environment resource.
+    Rollback end-to-end tests for Azure DevOps environment resource.
 
 .DESCRIPTION
     This script executes end-to-end tests for the default Azure DevOps environment
@@ -16,8 +16,9 @@
 $params = @{
     Organization = 'e2egov-org'
     ProjectId    = 'e2egov-prjHb72x9'
-    Name         = 'env-prjHb72x9-dev'
-    Description  = 'Default e2e governance description'
+    Name         = 'env-prjHb72x9-tst'
+    Rollback     = $true
+    Force        = $true
 }
 
 # endregion

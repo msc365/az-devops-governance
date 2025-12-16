@@ -1,16 +1,16 @@
 {
     "$schema": "../../../../schemas/environment.schema.json",
-    "organization": "msc365",
-    "projectId": "my-project",
-    "name": "my-project-sbx",
-    "description": "My project sandbox environment",
+    "organization": "{organization}",
+    "projectId": "{prefix}-prj{uniqueId}",
+    "name": "env-{prefix}-prj{uniqueId}",
+    "description": "Default e2e governance description",
     "resourceGroup": {
-        "name": "rg-my-project-sbx-weu",
-        "location": "westeurope",
+        "name": "rg-{prefix}-prj{uniqueId}-sbx-neu",
+        "location": "northeurope",
         "subscriptionId": "00000000-0000-0000-0000-000000000000",
         "tags": {
             "public": "false",
-            "service": "my-project",
+            "service": "{prefix}",
             "environment": "sbx",
             "security": "rbac",
             "iac": "bicep",
