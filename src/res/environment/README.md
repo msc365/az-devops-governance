@@ -106,6 +106,7 @@ $paramSplat = @{
 
 Deploys a new environment including the configuration of an optional resource group
 and its properties as a (least privileged) scoped environment using the specified parameters in code.
+See [Service Connection](../service-connection) deployment for creating a service connection with least privileged access to the resource group.
 
 ## Outputs
 
