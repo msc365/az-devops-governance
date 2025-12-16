@@ -164,7 +164,7 @@ This script requires the following PowerShell modules:
 - User confirmation is required for deletion unless `-Force` is specified.
 
 > [!IMPORTANT]
-> Rollback does not perform actual Resource group deletion. Resource groups may contain shared resources that are not part of this implementation but could be deployed by other systems or requirements over time. Deleting the Resource group could impact other services and operations relying on those resources.
+> **Rollback does not perform actual Resource group deletion**. Resource groups may contain shared resources that are not part of this implementation but could be deployed by other systems or requirements over time. Deleting the Resource group could impact other services and operations relying on those resources.
 
 > [!TIP]
-> To simplify deployments or enforce least privilege, this script can deploy a resource group to represent an environment. In practice, it is recommended to use a separate subscription for each environment.
+> To simplify deployments or enforce least privilege, this script can **deploy a resource group** to represent an environment. In practice, it is recommended to use a separate subscription for each environment.
