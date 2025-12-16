@@ -30,8 +30,8 @@ and its properties as a scoped environment.
 | Parameter | Type | Required | Default | Description |
 | :-- | :-- | :-- | :-- | :-- |
 | `Name` | `String` | Yes | - | Required. The name of the environment to create or update. |
-| `Organization` | `String` | Yes | - | No description provided. |
-| `ProjectId` | `String` | Yes | - | No description provided. |
+| `Organization` | `String` | Yes | - | Required. The Azure DevOps organization name. |
+| `ProjectId` | `String` | Yes | - | Required. The Azure DevOps project ID or Name where the environment will be created. |
 | `Description` | `String` | No | - | Optional. A description for the environment. |
 | `Force` | `Switch` | No | - | Optional. Switch to force deletion without confirmation during rollback. |
 | `ResourceGroup` | `Object` | No | - | Optional. An optional object defining the resource group properties: `Name`, `Location`, `SubscriptionId`, `Tags`. |

@@ -30,6 +30,12 @@
     It provides comprehensive environment management capabilities including configuration of an optional resource group
     and its properties as a scoped environment.
 
+.PARAMETER Organization
+    Required. The Azure DevOps organization name.
+
+.PARAMETER ProjectId
+    Required. The Azure DevOps project ID or Name where the environment will be created.
+
 .PARAMETER Name
     Required. The name of the environment to create or update.
 
