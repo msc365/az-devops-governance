@@ -117,7 +117,7 @@ function Get-ScriptMetadata {
                 # Add parameter not documented in help
                 $metadata.Parameters += @{
                     Name        = $paramName
-                    Description = 'No description provided.'
+                    Description = '{{ Fill in the Description }}'
                     Type        = $param.StaticType.Name
                     Required    = ($param.Attributes.NamedArguments |
                             Where-Object { $_.ArgumentName -eq 'Mandatory' -and $_.Argument.Value -eq $true } |
