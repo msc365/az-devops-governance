@@ -1,5 +1,5 @@
 {
-    "$schema": "https://raw.githubusercontent.com/msc365/az-devops-governance/main/schemas/abbreviations.schema.json",
+    "$schema": "../../schemas/abbreviations.schema.json",
     "azure": {
         "automationAccounts": "aa",
         "azureFirewallPolicies": "afwp",
