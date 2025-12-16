@@ -45,7 +45,7 @@
 .PARAMETER Force
     Optional. Switch to force deletion without confirmation during rollback.
 
-    .EXAMPLE
+.EXAMPLE
     $deploySplat = @{
         TemplateFile          = 'main.ps1'
         TemplateParameterFile = 'params\main.parameters.json'
@@ -65,8 +65,7 @@
 
     Deploys the environment using the specified template and custom parameters.
 
-    .EXAMPLE
-
+.EXAMPLE
     $rollbackSplat = @{
         TemplateFile          = 'main.ps1'
         TemplateParameterFile = 'params\main.parameters.json'
