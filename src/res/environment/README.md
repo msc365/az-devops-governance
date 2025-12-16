@@ -34,8 +34,8 @@ and its properties as a scoped environment.
 | `ProjectId` | `String` | Yes | - | Required. The Azure DevOps project ID or Name where the environment will be created. |
 | `Description` | `String` | No | - | Optional. A description for the environment. |
 | `Force` | `Switch` | No | - | Optional. Switch to force deletion without confirmation during rollback. |
-| `ResourceGroup` | `Object` | No | - | Optional. An optional object defining the resource group properties: `Name`, `Location`, `SubscriptionId`, `Tags`. |
-| `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (delete) the environment and related resources. <br /> <b> WARNING! </b> <br /> Use with caution! Removing an environment is irreversible and may affect teams relying on it. |
+| `ResourceGroup` | `Object` | No | - | Optional. An optional object defining the resource group properties: `Name`, `Location`, `SubscriptionId`, `Tags`. <br /> See [Notes](#notes) for more information. |
+| `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (delete) the environment and related resources. <br /> <b> WARNING! </b> <br /> Use with caution! Removing an environment is irreversible and may affect teams relying on it. See [Notes](#notes) for more information. |
 
 ## Examples
 
@@ -154,11 +154,14 @@ This script requires the following PowerShell modules:
 
 ## Notes
 
-> [!NOTE]
-> To scope a least privileged deployment, this reference implementation uses an optional resource group to represent an environment. In practice, it is recommended that you use a different subscription for each environment.
-
 - Operations are idempotent (safe to run multiple times).
 - Ensure you are logged in to Azure using Connect-AzAccount before running this script.
 - Automatically imports the `Azure.DevOps.PSModule` if not already loaded.
 - Automatic connection to Azure DevOps organization.
 - User confirmation is required for deletion unless `-Force` is specified.
+
+> [!IMPORTANT]
+> Rollback does not perform actual Resource group deletion. Resource groups may contain shared resources that are not part of this implementation but could be deployed by other systems or requirements over time. Deleting the Resource group could impact other services and operations relying on those resources.
+
+> [!TIP]
+> To simplify deployments or enforce least privilege, this script can deploy a resource group to represent an environment. In practice, it is recommended to use a separate subscription for each environment.

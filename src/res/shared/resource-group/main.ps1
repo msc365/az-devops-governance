@@ -30,30 +30,30 @@
     Required. The name of the Resource Group.
 
 .PARAMETER Location
-    Optional. The Azure region where the Resource Group will be created. Defaults to 'westeurope'.
+    Required. The Azure region where the Resource Group will be created e.g.: 'westeurope', 'northeurope'.
 
 .PARAMETER Tags
     Optional. A hashtable of tags to assign to the Resource Group.
 
 .PARAMETER Rollback
-    Optional. If specified, the script will not delete or modify the Resource Group.
+    See [Notes](#notes) for detailed information.
 
 .PARAMETER Force
     Optional. Skip confirmation prompt and proceed with operations immediately.
 
 .EXAMPLE
     $rgParams = @{
-        Name     = 'rg-my-resource-group'
-        Location = 'westeurope'
+        Name     = 'rg-e2egov-prjHb72x9-tst-neu'
+        Location = 'northeurope'
         Tags     = @{
-            'environment' = 'prd'
+            'environment' = 'tst'
             'owner'       = 'e2egov'
         }
         Verbose  = $true
     }
     .\main.ps1 @rgParams
 
-    Creates or updates the Resource Group 'rg-my-resource-group' in the 'westeurope' region with the specified tags.
+    Creates or updates the Resource Group 'rg-e2egov-prjHb72x9-tst-neu' in the 'northeurope' region with the specified tags.
 #>
 [CmdletBinding(SupportsShouldProcess)]
 [OutputType([pscustomobject])]
@@ -61,8 +61,8 @@ param (
     [Parameter(Mandatory)]
     [string]$Name,
 
-    [Parameter(Mandatory = $false)]
-    [string]$Location = 'westeurope',
+    [Parameter(Mandatory)]
+    [string]$Location,
 
     [Parameter(Mandatory = $false)]
     [object]$Tags,
@@ -96,7 +96,7 @@ process {
 
         if (-not $Rollback.IsPresent) {
             if ($null -eq $rg) {
-                if ($PSCmdlet.ShouldProcess("Call module 'Az.Resources' operation.", 'New-AzResourceGroup')) {
+                if ($PSCmdlet.ShouldProcess(('{0}' -f $Name), 'Create')) {
                     $rgSplat = @{
                         Name     = $Name
                         Location = $Location
@@ -121,7 +121,7 @@ process {
 
                 # Update tags if they differ
                 if ($tagsDiff) {
-                    if ($PSCmdlet.ShouldProcess("Call module 'Az.Resources' operation.", 'Set-AzResourceGroup')) {
+                    if ($PSCmdlet.ShouldProcess(('{0}' -f $Name), 'Update')) {
                         $rgSplat = @{
                             Name    = $Name
                             Tags    = $Tags
@@ -131,7 +131,7 @@ process {
                         $rg = Set-AzResourceGroup @rgSplat -ErrorAction Stop
                     }
                 } else {
-                    Write-Verbose ("Exists. '/resourceGroup/{0}'" -f $rg.ResourceGroupName)
+                    Write-Verbose ("Exists. '/resourceGroup/{0}'" -f $Name)
                 }
             }
         }
@@ -141,12 +141,12 @@ process {
         #region ROLLBACK
 
         if ($Rollback.IsPresent) {
-            if ($null -eq $rg) {
-                Write-Verbose ("Doesn't exist. '/resourceGroup/{0}'" -f $Name)
-            } else {
-                if ($PSCmdlet.ShouldProcess("None 'Az.Resources' operation.", 'Remove-AzResourceGroup')) {
-                    Write-Verbose ("None. Will not remove '/resourceGroup/{0}'" -f $rg.ResourceGroupName)
+            if ($null -ne $rg) {
+                if ($PSCmdlet.ShouldProcess(('{0}' -f $Name), 'None')) {
+                    Write-Verbose ("Not deleted. '/resourceGroup/{0}'" -f $Name)
                 }
+            } else {
+                Write-Verbose ("Doesn't exist. '/resourceGroup/{0}'" -f $Name)
             }
         }
 

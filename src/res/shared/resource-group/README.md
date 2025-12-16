@@ -25,10 +25,10 @@ This script creates a new Azure Resource Group or updates an existing one with s
 
 | Parameter | Type | Required | Default | Description |
 | :-- | :-- | :-- | :-- | :-- |
+| `Location` | `String` | Yes | - | Required. The Azure region where the Resource Group will be created e.g.: 'westeurope', 'northeurope'. |
 | `Name` | `String` | Yes | - | Required. The name of the Resource Group. |
 | `Force` | `Switch` | No | - | Optional. Skip confirmation prompt and proceed with operations immediately. |
-| `Location` | `String` | No | `'westeurope'` | Optional. The Azure region where the Resource Group will be created. Defaults to 'westeurope'. |
-| `Rollback` | `Switch` | No | - | Optional. If specified, the script will not delete or modify the Resource Group. |
+| `Rollback` | `Switch` | No | - | See [Notes](#notes) for detailed information. |
 | `Tags` | `Object` | No | - | Optional. A hashtable of tags to assign to the Resource Group. |
 
 ## Examples
@@ -39,10 +39,10 @@ This script creates a new Azure Resource Group or updates an existing one with s
 
 ```powershell
 $rgParams = @{
-    Name     = 'rg-my-resource-group'
-    Location = 'westeurope'
+    Name     = 'rg-e2egov-prjHb72x9-tst-neu'
+    Location = 'northeurope'
     Tags     = @{
-        'environment' = 'prd'
+        'environment' = 'tst'
         'owner'       = 'e2egov'
     }
     Verbose  = $true
@@ -50,8 +50,7 @@ $rgParams = @{
 .\main.ps1 @rgParams
 ```
 
-Creates or updates the Resource Group 'rg-my-resource-group' in the 'westeurope' region with the specified tags.
-
+Creates or updates the Resource Group 'rg-e2egov-prjHb72x9-tst-neu' in the 'northeurope' region with the specified tags.
 
 ## Outputs
 
@@ -85,4 +84,6 @@ This script requires the following PowerShell modules:
 
 - Operations are idempotent (safe to run multiple times).
 - User confirmation is required for deletion unless `-Force` is specified.
-- Does not perform actual resource group deletion due to the current implementation focusing on creation and updating tags only.
+
+> [!IMPORTANT]
+> Rollback does not perform actual Resource group deletion. Resource groups may contain shared resources that are not part of this implementation but could be deployed by other systems or requirements over time. Deleting the Resource group could impact other services and operations relying on those resources.

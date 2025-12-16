@@ -43,10 +43,10 @@
     Optional. A description for the environment.
 
 .PARAMETER ResourceGroup
-    Optional. An optional object defining the resource group properties: `Name`, `Location`, `SubscriptionId`, `Tags`.
+    Optional. An optional object defining the resource group properties: `Name`, `Location`, `SubscriptionId`, `Tags`. <br /> See [Notes](#notes) for more information.
 
 .PARAMETER Rollback
-    Optional. Switch to indicate if the operation should rollback (delete) the environment and related resources. <br /> <b> WARNING! </b> <br /> Use with caution! Removing an environment is irreversible and may affect teams relying on it.
+    Optional. Switch to indicate if the operation should rollback (delete) the environment and related resources. <br /> <b> WARNING! </b> <br /> Use with caution! Removing an environment is irreversible and may affect teams relying on it. See [Notes](#notes) for more information.
 
 .PARAMETER Force
     Optional. Switch to force deletion without confirmation during rollback.

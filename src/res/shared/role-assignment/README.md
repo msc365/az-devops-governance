@@ -4,7 +4,7 @@
 
 ![Version](https://img.shields.io/badge/script--version-0.1.0-blue) [![License](https://img.shields.io/badge/license-MIT-purple)](https://github.com/msc365/az-devops-governance/blob/main/LICENSE)
 
-Create Azure Role Assignments.
+Create or rolls back an Azure Role Assignment.
 
 <!-- omit from toc -->
 ## Navigation
@@ -48,8 +48,7 @@ $roleAssignmentParams = @{
 .\main.ps1 @roleAssignmentParams
 ```
 
-Creates a Contributor role assignment for the specified ObjectId at the given resource group scope.
-
+Creates a Contributor role assignment for the specified ObjectId at the given resource group scope.
 
 ### Example 2
 
@@ -95,6 +94,7 @@ This script requires the following PowerShell modules:
 
 - `Az.Accounts`
 - `Az.Resources`
+
 
 ## Notes
 

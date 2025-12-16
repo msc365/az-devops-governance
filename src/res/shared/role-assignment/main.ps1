@@ -21,7 +21,7 @@
 #>
 <#
 .SYNOPSIS
-    Create Azure Role Assignments.
+    Create or rolls back an Azure Role Assignment.
 
 .DESCRIPTION
     This script creates new Azure Role Assignments or removes existing ones based on the provided parameters.
@@ -73,17 +73,16 @@ param (
     [string]$ObjectId,
 
     [Parameter(Mandatory)]
-    [string]$roleDefinitionName,
+    [string]$RoleDefinitionName,
 
     [Parameter(Mandatory)]
-    [string]$scope,
+    [string]$Scope,
 
     [Parameter()]
     [switch]$Rollback,
 
     [Parameter()]
     [switch]$Force
-
 )
 
 begin {
@@ -102,7 +101,7 @@ process {
         # Role Assignment
         $ra = Get-AzRoleAssignment -Scope $Scope | Where-Object {
             $_.ObjectId -eq $ObjectId -and
-            $_.RoleDefinitionName -eq $roleDefinitionName
+            $_.RoleDefinitionName -eq $RoleDefinitionName
         }
 
         #endregion
@@ -111,12 +110,12 @@ process {
 
         if (-not $Rollback.IsPresent) {
             if ($null -eq $ra) {
-                if ($PSCmdlet.ShouldProcess("Call module 'Az.Resources'.", 'New-AzRoleAssignment')) {
+                if ($PSCmdlet.ShouldProcess(("'{0}/{1}'" -f $RoleDefinitionName, $ObjectId), 'Create')) {
 
                     $raSplat = @{
                         ObjectId           = $ObjectId
-                        RoleDefinitionName = $roleDefinitionName
-                        Scope              = $scope
+                        RoleDefinitionName = $RoleDefinitionName
+                        Scope              = $Scope
                         Verbose            = $VerbosePreference
                     }
 
@@ -133,7 +132,7 @@ process {
 
         if ($Rollback.IsPresent) {
             if ($null -ne $ra) {
-                if ($PSCmdlet.ShouldProcess("Call module 'Az.Resources'.", 'Remove-AzRoleAssignment')) {
+                if ($PSCmdlet.ShouldProcess(("'{0}/{1}'" -f $ra.RoleDefinitionName, $ra.DisplayName), 'Delete')) {
                     if (-not $Force.IsPresent) {
                         $prompt = @(
                             "This will delete '/roleAssignment/$($ra.RoleDefinitionName)/$($ra.DisplayName)'."
@@ -149,13 +148,11 @@ process {
                         }
                     }
 
-                    Write-Verbose ("Removing '/roleAssignment/{0}/{1}'..." -f $ra.RoleDefinitionName, $ra.DisplayName)
-
                     $ra = Remove-AzRoleAssignment -InputObject $ra -ErrorAction Stop
                     Write-Verbose ("Deleted. '/roleAssignment/{0}/{1}'" -f $ra.RoleDefinitionName, $ra.DisplayName)
                 }
             } else {
-                Write-Warning ("Doesn't exist. '/roleAssignment/{0}/{1}'" -f $roleDefinitionName, $ObjectId)
+                Write-Warning ("Doesn't exist. '/roleAssignment/{0}/{1}'" -f $RoleDefinitionName, $ObjectId)
             }
         }
 
