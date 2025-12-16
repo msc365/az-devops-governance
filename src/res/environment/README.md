@@ -52,8 +52,7 @@ $deploySplat = @{
 .\deploy.ps1 @deploySplat -Verbose
 ```
 
-Deploys the environment using the specified template and parameters.
-
+Deploys the environment using the specified template and parameters.
 
 ### Example 2
 
@@ -68,8 +67,7 @@ $customSplat = @{
 .\deploy.ps1 @customSplat -Verbose
 ```
 
-Deploys the environment using the specified template and custom parameters.
-
+Deploys the environment using the specified template and custom parameters.
 
 ### Example 3
 
@@ -84,8 +82,7 @@ $rollbackSplat = @{
 .\deploy.ps1 @rollbackSplat -Rollback -Force -Verbose
 ```
 
-Rolls back (deletes) the environment and related resources without confirmation.
-
+Rolls back (deletes) the environment and related resources without confirmation.
 
 ### Example 4
 
@@ -158,7 +155,7 @@ This script requires the following PowerShell modules:
 ## Notes
 
 > [!NOTE]
-> To scope a deployment, this reference implementation uses an optional resource group to represent an environment. In practice, it is recommended that you use a different subscription.
+> To scope a least privileged deployment, this reference implementation uses an optional resource group to represent an environment. In practice, it is recommended that you use a different subscription for each environment.
 
 - Operations are idempotent (safe to run multiple times).
 - Ensure you are logged in to Azure using Connect-AzAccount before running this script.
