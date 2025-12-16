@@ -9,6 +9,12 @@
             "type": "string",
             "description": "Reference to the JSON schema"
         },
+        "prefix": {
+            "type": "string",
+            "pattern": "^[a-z0-9]{1,10}$",
+            "maxLength": 10,
+            "description": "Prefix to be used in resource names (max 10 lowercase alphanumeric characters)"
+        },
         "azure": {
             "type": "object",
             "description": "Abbreviation mappings for Azure resources",
