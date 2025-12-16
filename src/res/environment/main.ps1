@@ -96,7 +96,8 @@
     }
     .\main.ps1 @paramSplat -Verbose
 
-    Deploys a new environment using the specified parameters in code.
+    Deploys a new environment including the configuration of an optional resource group
+    and its properties as a (least privileged) scoped environment using the specified parameters in code.
 #>
 [CmdletBinding(SupportsShouldProcess)]
 [OutputType([pscustomobject])]
