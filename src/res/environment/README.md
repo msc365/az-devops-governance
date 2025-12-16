@@ -34,7 +34,7 @@ and its properties as a scoped environment.
 | `ProjectId` | `String` | Yes | - | Required. The Azure DevOps project ID or Name where the environment will be created. |
 | `Description` | `String` | No | - | Optional. A description for the environment. |
 | `Force` | `Switch` | No | - | Optional. Switch to force deletion without confirmation during rollback. |
-| `ResourceGroup` | `Object` | No | - | Optional. An optional object defining the resource group properties: `Name`, `Location`, `SubscriptionId`, `Tags`. <br /> See [Notes](#notes) for more information. |
+| `ResourceGroup` | `Object` | No | - | Optional. An optional object defining the resource group properties: `Name`, `Location`, `SubscriptionId`, `Tags`. See [Notes](#notes) for more information. |
 | `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (delete) the environment and related resources. <br /> <b> WARNING! </b> <br /> Use with caution! Removing an environment is irreversible and may affect teams relying on it. See [Notes](#notes) for more information. |
 
 ## Examples
@@ -52,7 +52,8 @@ $deploySplat = @{
 .\deploy.ps1 @deploySplat -Verbose
 ```
 
-Deploys the environment using the specified template and parameters.
+Deploys the environment using the specified template and parameters.
+
 
 ### Example 2
 
@@ -67,7 +68,8 @@ $customSplat = @{
 .\deploy.ps1 @customSplat -Verbose
 ```
 
-Deploys the environment using the specified template and custom parameters.
+Deploys the environment using the specified template and custom parameters.
+
 
 ### Example 3
 
@@ -82,7 +84,8 @@ $rollbackSplat = @{
 .\deploy.ps1 @rollbackSplat -Rollback -Force -Verbose
 ```
 
-Rolls back (deletes) the environment and related resources without confirmation.
+Rolls back (deletes) the environment and related resources without confirmation.
+
 
 ### Example 4
 
