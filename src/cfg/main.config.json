@@ -1,0 +1,6 @@
+{
+    "$schema": "../../schemas/config.schema.json",
+    "uniqueId": "Hb72x9",
+    "prefix": "e2egov",
+    "organization": "e2egov-org"
+}
