@@ -54,7 +54,7 @@
     Optional. A hashtable defining the feature states for the project. Valid features are 'boards', 'repos', 'pipelines', 'testPlans', and 'artifacts' with states 'enabled' or 'disabled'.
 
 .PARAMETER Rollback
-    Optional. Switch to indicate if the operation should rollback (delete) the project and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing a project may affect teams relying on it. See [Notes](#notes) for more information.
+    Optional. Switch to indicate if the operation should rollback (soft delete) the project and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing a project may affect teams relying on it. See [Notes](#notes) for more information.
 
 .PARAMETER Force
     Optional. Switch to force soft deletion without confirmation during rollback.

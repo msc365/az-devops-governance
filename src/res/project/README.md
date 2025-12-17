@@ -35,7 +35,7 @@ It allows you to set project properties such as name, description, process templ
 | `Features` | `Hashtable` | No | - | Optional. A hashtable defining the feature states for the project. Valid features are 'boards', 'repos', 'pipelines', 'testPlans', and 'artifacts' with states 'enabled' or 'disabled'. |
 | `Force` | `Switch` | No | - | Optional. Switch to force soft deletion without confirmation during rollback. |
 | `Process` | `String` | No | - | Optional. The process template to use for the project. Valid values are 'Agile', 'Scrum', 'CMMI', and 'Basic'. Defaults to the organization's default process. |
-| `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (delete) the project and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing a project may affect teams relying on it. See [Notes](#notes) for more information. |
+| `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (soft delete) the project and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing a project may affect teams relying on it. See [Notes](#notes) for more information. |
 | `SourceControl` | `String` | No | - | Optional. The type of source control to use for the project. Valid values are 'Git' and 'Tfvc'. Defaults to 'Git'. |
 | `Visibility` | `String` | No | - | Optional. The visibility of the project. Valid values are 'Private' and 'Public'. Defaults to 'Private'. |
 
