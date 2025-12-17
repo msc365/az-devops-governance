@@ -1,12 +1,22 @@
-﻿# ========== #
-# Parameters #
-# ========== #
+﻿<#
+.SYNOPSIS
+    Create end-to-end tests for Azure DevOps project.
+
+.DESCRIPTION
+    This script executes end-to-end tests with all properties for the Azure DevOps project configuration.
+
+.NOTES
+    File Name      : main.tests.ps1
+    Prerequisite   : Azure PowerShell modules and authenticated Azure context
+#>
+
+#region PARAMETERS
 
 $params = @{
-    Organization  = 'my-org'
-    Name          = 'my-project'
-    DefaultTeam   = 'my-team'
-    Description   = 'My project description'
+    Organization  = 'e2egov-org'
+    Name          = 'e2egov-prjHb72x9'
+    Description   = 'Default e2e governance description'
+    DefaultTeam   = 'Default Team'
     Process       = 'Agile'
     SourceControl = 'Git'
     Visibility    = 'Private'
@@ -19,17 +29,16 @@ $params = @{
     }
 }
 
-# ========= #
-# Variables #
-# ========= #
+# endregion
+
+#region INITIALIZE
 
 $rootPath = (Get-Item $PSScriptRoot).Parent.Parent.Parent.FullName
 
-$organization = ((Get-AdoContext).Organization).Split('/')[-1]
-$params['Organization'] = $organization
+#endregion
 
-# ============== #
-# Test Execution #
-# ============== #
+#region TEST EXECUTION
 
-& (Join-Path $rootPath -ChildPath 'main.ps1') @params
+& (Join-Path $rootPath -ChildPath 'main.ps1') @params -Verbose | Format-List *
+
+#endregion

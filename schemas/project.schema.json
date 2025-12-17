@@ -1,0 +1,121 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://raw.githubusercontent.com/msc365/az-devops-governance/main/schemas/project.schema.json",
+    "oneOf": [
+        {
+            "$ref": "#/definitions/project"
+        },
+        {
+            "type": "array",
+            "items": {
+                "$ref": "#/definitions/project"
+            },
+            "minItems": 1
+        }
+    ],
+    "definitions": {
+        "project": {
+            "type": "object",
+            "required": [
+                "organization",
+                "name"
+            ],
+            "properties": {
+                "$schema": {
+                    "type": "string",
+                    "description": "JSON Schema reference"
+                },
+                "organization": {
+                    "type": "string",
+                    "description": "The Azure DevOps organization name"
+                },
+                "name": {
+                    "type": "string",
+                    "description": "The name of the project"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "The description of the project"
+                },
+                "defaultTeam": {
+                    "type": "string",
+                    "description": "The name of the default team"
+                },
+                "sourceControl": {
+                    "type": "string",
+                    "enum": [
+                        "Git",
+                        "Tfvc"
+                    ],
+                    "description": "The source control type (Git or Tfvc)"
+                },
+                "process": {
+                    "type": "string",
+                    "enum": [
+                        "Agile",
+                        "Scrum",
+                        "CMMI",
+                        "Basic"
+                    ],
+                    "description": "The process template (Agile, Scrum, CMMI, or Basic)"
+                },
+                "features": {
+                    "type": "object",
+                    "description": "Feature visibility settings for the project",
+                    "properties": {
+                        "testPlans": {
+                            "type": "string",
+                            "enum": [
+                                "enabled",
+                                "disabled"
+                            ],
+                            "description": "Test Plans feature visibility"
+                        },
+                        "artifacts": {
+                            "type": "string",
+                            "enum": [
+                                "enabled",
+                                "disabled"
+                            ],
+                            "description": "Artifacts feature visibility"
+                        },
+                        "pipelines": {
+                            "type": "string",
+                            "enum": [
+                                "enabled",
+                                "disabled"
+                            ],
+                            "description": "Pipelines feature visibility"
+                        },
+                        "repos": {
+                            "type": "string",
+                            "enum": [
+                                "enabled",
+                                "disabled"
+                            ],
+                            "description": "Repos feature visibility"
+                        },
+                        "boards": {
+                            "type": "string",
+                            "enum": [
+                                "enabled",
+                                "disabled"
+                            ],
+                            "description": "Boards feature visibility"
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "visibility": {
+                    "type": "string",
+                    "enum": [
+                        "Private",
+                        "Public"
+                    ],
+                    "description": "The visibility of the project (Private or Public)"
+                }
+            },
+            "additionalProperties": false
+        }
+    }
+}

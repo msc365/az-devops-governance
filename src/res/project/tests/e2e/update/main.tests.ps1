@@ -1,9 +1,9 @@
 ﻿<#
 .SYNOPSIS
-    Create end-to-end tests for Azure DevOps project.
+    Update end-to-end tests for Azure DevOps project.
 
 .DESCRIPTION
-    This script executes end-to-end tests with default properties for the Azure DevOps project configuration.
+    This script executes end-to-end tests with updated properties for the Azure DevOps project configuration.
 
 .NOTES
     File Name      : main.tests.ps1
@@ -15,6 +15,15 @@
 $params = @{
     Organization = 'e2egov-org'
     Name         = 'e2egov-prjHb72x9'
+    Description  = 'Updated e2e governance description'
+    DefaultTeam  = 'Updated Team'
+    Features     = @{
+        'Boards'    = 'enabled'
+        'Repos'     = 'disabled'
+        'Pipelines' = 'disabled'
+        'TestPlans' = 'disabled'
+        'Artifacts' = 'disabled'
+    }
 }
 
 # endregion

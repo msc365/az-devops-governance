@@ -1,8 +1,9 @@
 {
-    "organization": "msc365",
-    "name": "my-project",
-    "description": "My project description",
-    "defaultTeam": "My Default Team",
+    "$schema": "../../../../schemas/project.schema.json",
+    "organization": "{organization}",
+    "name": "{prefix}-prj{uniqueId}",
+    "description": "Default e2e governance description",
+    "defaultTeam": "Default Team",
     "sourceControl": "Git",
     "process": "Agile",
     "features": {
