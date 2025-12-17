@@ -18,11 +18,11 @@ $params = @{
     Description  = 'Updated e2e governance description'
     DefaultTeam  = 'Updated Team'
     Features     = @{
-        'Boards'    = 'enabled'
-        'Repos'     = 'disabled'
-        'Pipelines' = 'disabled'
-        'TestPlans' = 'disabled'
-        'Artifacts' = 'disabled'
+        'boards'    = 'enabled'
+        'repos'     = 'disabled'
+        'pipelines' = 'disabled'
+        'testPlans' = 'disabled'
+        'artifacts' = 'disabled'
     }
 }
 

@@ -7,11 +7,11 @@
     "sourceControl": "Git",
     "process": "Agile",
     "features": {
-        "testPlans": "disabled",
-        "artifacts": "enabled",
-        "pipelines": "enabled",
+        "boards": "enabled",
         "repos": "enabled",
-        "boards": "enabled"
+        "pipelines": "enabled",
+        "artifacts": "enabled",
+        "testPlans": "disabled"
     },
     "visibility": "Private"
 }

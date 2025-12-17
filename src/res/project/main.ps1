@@ -51,7 +51,7 @@
     Optional. The visibility of the project. Valid values are 'Private' and 'Public'. Defaults to 'Private'.
 
 .PARAMETER Features
-    Optional. A hashtable defining the feature states for the project. Valid features are 'Boards', 'Repos', 'Pipelines', 'TestPlans', and 'Artifacts' with states 'enabled' or 'disabled'.
+    Optional. A hashtable defining the feature states for the project. Valid features are 'boards', 'repos', 'pipelines', 'testPlans', and 'artifacts' with states 'enabled' or 'disabled'.
 
 .PARAMETER Rollback
     Optional. Switch to indicate if the operation should rollback (delete) the project and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing a project may affect teams relying on it. See [Notes](#notes) for more information.
@@ -99,11 +99,11 @@
         Process       = 'Agile'
         Visibility    = 'Private'
         Features      = @{
-            Boards    = 'enabled'
-            Repos     = 'enabled'
-            Pipelines = 'enabled'
-            Artifacts = 'enabled'
-            TestPlans = 'disabled'
+            boards    = 'enabled'
+            repos     = 'enabled'
+            pipelines = 'enabled'
+            artifacts = 'enabled'
+            testPlans = 'disabled'
         }
     }
 
@@ -139,6 +139,20 @@ param (
     [string]$Visibility,
 
     [Parameter(Mandatory = $false)]
+    [ValidateScript({
+            $validKeys = @('boards', 'repos', 'pipelines', 'artifacts', 'testPlans')
+            $validValues = @('enabled', 'disabled')
+
+            foreach ($key in $_.Keys) {
+                if ($key -notin $validKeys) {
+                    throw "Invalid key: '$key'. Valid keys: $($validKeys -join ', ')"
+                }
+                if ($_[$key] -notin $validValues) {
+                    throw "Invalid value '$key': '$($_[$key])'. Valid values: $($validValues -join ', ')"
+                }
+            }
+            return $true
+        })]
     [hashtable]$Features,
 
     [Parameter()]

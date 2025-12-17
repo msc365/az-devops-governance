@@ -21,11 +21,11 @@ $params = @{
     SourceControl = 'Git'
     Visibility    = 'Private'
     Features      = @{
-        'Boards'    = 'enabled'
-        'Repos'     = 'enabled'
-        'Pipelines' = 'enabled'
-        'TestPlans' = 'disabled'
-        'Artifacts' = 'enabled'
+        'boards'    = 'enabled'
+        'repos'     = 'enabled'
+        'pipelines' = 'enabled'
+        'testPlans' = 'disabled'
+        'artifacts' = 'enabled'
     }
 }
 
