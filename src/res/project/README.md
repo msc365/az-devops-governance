@@ -4,7 +4,7 @@
 
 ![Version](https://img.shields.io/badge/script--version-0.1.0-blue) [![License](https://img.shields.io/badge/license-MIT-purple)](https://github.com/msc365/az-devops-governance/blob/main/LICENSE)
 
-Create, update or delete an Azure DevOps Project with specified settings.
+Create, update or rollback an Azure DevOps Project with specified settings.
 
 <!-- omit from toc -->
 ## Navigation
@@ -20,7 +20,7 @@ Create, update or delete an Azure DevOps Project with specified settings.
 
 ## Description
 
-This script creates, updates or deletes an Azure DevOps Project within a specified organization.
+This script creates, updates or rolls back an Azure DevOps Project within a specified organization.
 
 It allows you to set project properties such as name, description, process template, source control type, visibility, and feature states.
 
@@ -33,7 +33,7 @@ It allows you to set project properties such as name, description, process templ
 | `DefaultTeam` | `String` | No | - | Optional. The name of the default team for the project. Defaults to '\<Project Name> Team'. |
 | `Description` | `String` | No | - | Optional. A description for the Azure DevOps project. |
 | `Features` | `Hashtable` | No | - | Optional. A hashtable defining the feature states for the project. Valid features are 'boards', 'repos', 'pipelines', 'testPlans', and 'artifacts' with states 'enabled' or 'disabled'. |
-| `Force` | `Switch` | No | - | Optional. Switch to force deletion without confirmation during rollback. |
+| `Force` | `Switch` | No | - | Optional. Switch to force soft deletion without confirmation during rollback. |
 | `Process` | `String` | No | - | Optional. The process template to use for the project. Valid values are 'Agile', 'Scrum', 'CMMI', and 'Basic'. Defaults to the organization's default process. |
 | `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (delete) the project and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing a project may affect teams relying on it. See [Notes](#notes) for more information. |
 | `SourceControl` | `String` | No | - | Optional. The type of source control to use for the project. Valid values are 'Git' and 'Tfvc'. Defaults to 'Git'. |

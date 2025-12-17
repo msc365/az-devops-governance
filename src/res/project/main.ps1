@@ -22,10 +22,10 @@
 #>
 <#
 .SYNOPSIS
-    Create, update or delete an Azure DevOps Project with specified settings.
+    Create, update or rollback an Azure DevOps Project with specified settings.
 
 .DESCRIPTION
-    This script creates, updates or deletes an Azure DevOps Project within a specified organization.
+    This script creates, updates or rolls back an Azure DevOps Project within a specified organization.
 
     It allows you to set project properties such as name, description, process template, source control type, visibility, and feature states.
 
@@ -57,7 +57,7 @@
     Optional. Switch to indicate if the operation should rollback (delete) the project and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing a project may affect teams relying on it. See [Notes](#notes) for more information.
 
 .PARAMETER Force
-    Optional. Switch to force deletion without confirmation during rollback.
+    Optional. Switch to force soft deletion without confirmation during rollback.
 
 .EXAMPLE
     $deploySplat = @{
