@@ -32,7 +32,7 @@ It allows you to set project properties such as name, description, process templ
 | `Organization` | `String` | Yes | - | Required. The name of the Azure DevOps organization where the project will be created or updated. |
 | `DefaultTeam` | `String` | No | - | Optional. The name of the default team for the project. Defaults to '\<Project Name> Team'. |
 | `Description` | `String` | No | - | Optional. A description for the Azure DevOps project. |
-| `Features` | `Hashtable` | No | - | Optional. A hashtable defining the feature states for the project. Valid features are 'Boards', 'Repos', 'Pipelines', 'TestPlans', and 'Artifacts' with states 'enabled' or 'disabled'. |
+| `Features` | `Hashtable` | No | - | Optional. A hashtable defining the feature states for the project. Valid features are 'boards', 'repos', 'pipelines', 'testPlans', and 'artifacts' with states 'enabled' or 'disabled'. |
 | `Force` | `Switch` | No | - | Optional. Switch to force deletion without confirmation during rollback. |
 | `Process` | `String` | No | - | Optional. The process template to use for the project. Valid values are 'Agile', 'Scrum', 'CMMI', and 'Basic'. Defaults to the organization's default process. |
 | `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (delete) the project and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing a project may affect teams relying on it. See [Notes](#notes) for more information. |
@@ -100,11 +100,11 @@ $paramSplat = @{
     Process       = 'Agile'
     Visibility    = 'Private'
     Features      = @{
-        Boards    = 'enabled'
-        Repos     = 'enabled'
-        Pipelines = 'enabled'
-        Artifacts = 'enabled'
-        TestPlans = 'disabled'
+        boards    = 'enabled'
+        repos     = 'enabled'
+        pipelines = 'enabled'
+        artifacts = 'enabled'
+        testPlans = 'disabled'
     }
 }
 
