@@ -21,10 +21,10 @@
 #>
 <#
 .SYNOPSIS
-    Create or rolls back an Azure Role Assignment.
+    Create or rollback an Azure Role Assignment.
 
 .DESCRIPTION
-    This script creates new Azure Role Assignments or removes existing ones based on the provided parameters.
+    This script creates or rolls back an Azure Role Assignment based on the provided parameters.
 
 .PARAMETER ObjectId
     Required. The Object ID of the principal (user, group, or service principal) to assign the role to.

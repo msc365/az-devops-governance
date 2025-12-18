@@ -4,7 +4,7 @@
 
 ![Version](https://img.shields.io/badge/script--version-0.1.0-blue) [![License](https://img.shields.io/badge/license-MIT-purple)](https://github.com/msc365/az-devops-governance/blob/main/LICENSE)
 
-Create or rolls back an Azure Role Assignment.
+Create or rollback an Azure Role Assignment.
 
 <!-- omit from toc -->
 ## Navigation
@@ -19,7 +19,7 @@ Create or rolls back an Azure Role Assignment.
 
 ## Description
 
-This script creates new Azure Role Assignments or removes existing ones based on the provided parameters.
+This script creates or rolls back an Azure Role Assignment based on the provided parameters.
 
 ## Parameters
 
