@@ -34,9 +34,6 @@ process {
         # Replace placeholders in parameters using utility function
         $paramsAsJson = Set-PlaceholderValue -ParamsJson $paramsAsJson -ConfigJson $configAsJson
 
-        Write-Verbose 'Using params:'
-        Write-Verbose $paramsAsJson
-
         # Convert JSON string to Hashtable
         $params = $paramsAsJson | ConvertFrom-Json -AsHashtable
 
@@ -44,6 +41,9 @@ process {
         if ($params.ContainsKey('$schema')) {
             $params.Remove('$schema') | Out-Null
         }
+
+        Write-Verbose 'Using params:'
+        Write-Verbose ($params | ConvertTo-Json -Depth 5)
 
         # Execute the deployment template with parameters
         $params += @{
