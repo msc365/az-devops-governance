@@ -96,7 +96,7 @@ process {
 
         if (-not $Rollback.IsPresent) {
             if ($null -eq $rg) {
-                if ($PSCmdlet.ShouldProcess(('{0}' -f $Name), 'Create')) {
+                if ($PSCmdlet.ShouldProcess(('resourceGroup/{0}' -f $Name), 'Create')) {
                     $rgSplat = @{
                         Name     = $Name
                         Location = $Location
@@ -121,7 +121,7 @@ process {
 
                 # Update tags if they differ
                 if ($tagsDiff) {
-                    if ($PSCmdlet.ShouldProcess(('{0}' -f $Name), 'Update')) {
+                    if ($PSCmdlet.ShouldProcess(('resourceGroup/{0}' -f $Name), 'Update')) {
                         $rgSplat = @{
                             Name    = $Name
                             Tags    = $Tags
@@ -131,7 +131,7 @@ process {
                         $rg = Set-AzResourceGroup @rgSplat -ErrorAction Stop
                     }
                 } else {
-                    Write-Verbose ("Exists. '/resourceGroup/{0}'" -f $Name)
+                    Write-Verbose ("Exists. 'resourceGroup/{0}'" -f $Name)
                 }
             }
         }
@@ -142,11 +142,11 @@ process {
 
         if ($Rollback.IsPresent) {
             if ($null -ne $rg) {
-                if ($PSCmdlet.ShouldProcess(('{0}' -f $Name), 'None')) {
-                    Write-Verbose ("Not deleted. '/resourceGroup/{0}'" -f $Name)
+                if ($PSCmdlet.ShouldProcess(('resourceGroup/{0}' -f $Name), 'None')) {
+                    Write-Verbose ("Not deleted. 'resourceGroup/{0}'" -f $Name)
                 }
             } else {
-                Write-Verbose ("Doesn't exist. '/resourceGroup/{0}'" -f $Name)
+                Write-Verbose ("Doesn't exist. 'resourceGroup/{0}'" -f $Name)
             }
         }
 

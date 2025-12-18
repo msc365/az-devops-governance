@@ -110,7 +110,7 @@ process {
 
         if (-not $Rollback.IsPresent) {
             if ($null -eq $ra) {
-                if ($PSCmdlet.ShouldProcess(("'{0}/{1}'" -f $RoleDefinitionName, $ObjectId), 'Create')) {
+                if ($PSCmdlet.ShouldProcess(('roleAssignment/{0}/{1}' -f $RoleDefinitionName, $ObjectId), 'Create')) {
 
                     $raSplat = @{
                         ObjectId           = $ObjectId
@@ -122,7 +122,7 @@ process {
                     $ra = New-AzRoleAssignment @raSplat -ErrorAction Stop
                 }
             } else {
-                Write-Verbose ("Exists. '/roleAssignment/{0}/{1}'" -f $ra.RoleDefinitionName, $ra.DisplayName)
+                Write-Verbose ("Exists. 'roleAssignment/{0}/{1}'" -f $ra.RoleDefinitionName, $ra.DisplayName)
             }
         }
 
@@ -132,10 +132,10 @@ process {
 
         if ($Rollback.IsPresent) {
             if ($null -ne $ra) {
-                if ($PSCmdlet.ShouldProcess(("'{0}/{1}'" -f $ra.RoleDefinitionName, $ra.DisplayName), 'Delete')) {
+                if ($PSCmdlet.ShouldProcess(('roleAssignment/{0}/{1}' -f $ra.RoleDefinitionName, $ra.DisplayName), 'Delete')) {
                     if (-not $Force.IsPresent) {
                         $prompt = @(
-                            "This will delete '/roleAssignment/$($ra.RoleDefinitionName)/$($ra.DisplayName)'."
+                            "This will delete 'roleAssignment/$($ra.RoleDefinitionName)/$($ra.DisplayName)'."
                             "Do you want to continue? 'Yes [Y]' 'No [N]'"
                         ) -join "`n"
 
@@ -149,10 +149,10 @@ process {
                     }
 
                     $ra = Remove-AzRoleAssignment -InputObject $ra -ErrorAction Stop
-                    Write-Verbose ("Deleted. '/roleAssignment/{0}/{1}'" -f $ra.RoleDefinitionName, $ra.DisplayName)
+                    Write-Verbose ("Deleted. 'roleAssignment/{0}/{1}'" -f $ra.RoleDefinitionName, $ra.DisplayName)
                 }
             } else {
-                Write-Warning ("Doesn't exist. '/roleAssignment/{0}/{1}'" -f $RoleDefinitionName, $ObjectId)
+                Write-Warning ("Doesn't exist. 'roleAssignment/{0}/{1}'" -f $RoleDefinitionName, $ObjectId)
             }
         }
 
