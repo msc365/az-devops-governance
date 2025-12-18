@@ -44,7 +44,7 @@
     Required. An object containing details of the Managed Service Identity to be used.
 
 .PARAMETER Rollback
-    Optional. Switch to indicate if the operation should rollback (delete) the service connection and related resources.
+    Optional. Switch to indicate if the operation should rollback (delete) the environment and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing an environment is irreversible and may affect teams relying on it. See [Notes](#notes) for more information.
 
 .PARAMETER Force
     Optional. Switch to force deletion without confirmation during rollback.
@@ -82,13 +82,13 @@
 
 .EXAMPLE
     $paramSplat = @{
-        Organization           = 'my-org'
-        ProjectId              = 'my-project'
-        ServiceEndpointName    = 'sc-my-project'
+        Organization           = 'e2egov-org'
+        ProjectId              = 'e2egov-prjHb72x9'
+        ServiceEndpointName    = 'rg-e2egov-prjHb72x9-tst-weu'
         Scope                  = '/subscriptions/00000000-0000-0000-0000-000000000000'
         ManagedServiceIdentity = @{
-            name               = 'msi-my-project'
-            resourceGroupName  = 'rg-my-project'
+            name               = 'id-e2egov-prjHb72x9-tst'
+            resourceGroupName  = 'rg-e2egov-prjHb72x9-tst-weu'
             subscriptionId     = '00000000-0000-0000-0000-000000000000'
             location           = 'westeurope'
             tags               = @{ 'environment' = 'prd'; 'owner' = 'e2egov' }
@@ -148,7 +148,7 @@ begin {
     }
 
     # Connect to Azure DevOps Organization
-    Connect-AdoOrganization -Organization $Organization
+    Connect-AdoOrganization -Organization $Organization | Out-Null
 }
 
 process {
@@ -188,10 +188,9 @@ process {
             ProjectId    = $ProjectId
             EndPointName = $ServiceEndpointName
             Verbose      = $VerbosePreference
-            ErrorAction  = 'SilentlyContinue'
         }
 
-        $se = Get-AdoServiceEndpointByName @seSplat
+        $se = Get-AdoServiceEndpointByName @seSplat -ErrorAction SilentlyContinue
 
         # Federated Credential
         $ficName = 'fic-{0}' -f $ServiceEndpointName.Substring(3)
@@ -227,12 +226,13 @@ process {
 
             # Service Endpoint
             if ($null -eq $se) {
-                if ($PSCmdlet.ShouldProcess("Call module 'Azure.DevOps.PSModule' operation.", 'New-AdoServiceEndpoint')) {
+                if ($PSCmdlet.ShouldProcess(('serviceEndpoint/{0}' -f $ServiceEndpointName), 'Create')) {
 
                     $subSplat = @{
                         SubscriptionId = ($Scope -split '/')[2]
                         TenantId       = $dep.Identity.TenantId
                     }
+
                     $sub = Get-AzSubscription @subSplat -ErrorAction Stop
 
                     $data = [ordered]@{
@@ -277,16 +277,15 @@ process {
                     $se = New-AdoServiceEndpoint @seSplat -ErrorAction Stop
                 }
             } else {
-                Write-Verbose ("Exists. '/serviceEndpoint/{0}'" -f $se.Name)
+                Write-Verbose ("Exists. 'serviceEndpoint/{0}'" -f $se.Name)
             }
 
             # Federated Credential
             if ($null -eq $fic) {
-                if ($PSCmdlet.ShouldProcess("Call module 'Az.ManagedServiceIdentity' operation.", 'New-AzFederatedIdentityCredential')) {
+                if ($PSCmdlet.ShouldProcess(('federatedIdentityCredential/{0}' -f $ficName), 'Create')) {
 
                     if ($null -eq $se) {
-                        Write-Error ("ServiceEndpoint '{0}' not found! Cannot create 'federatedIdentityCredential'." -f $ServiceEndpointName)
-                        throw
+                        throw ("ServiceEndpoint '{0}' not found! Cannot create 'federatedIdentityCredential'." -f $ServiceEndpointName)
                     }
 
                     $ficSplat += @{
@@ -294,10 +293,10 @@ process {
                         Subject = $se.Authorization.Parameters.WorkloadIdentityFederationSubject
                     }
 
-                    $fic = New-AzFederatedIdentityCredential @ficSplat
+                    $fic = New-AzFederatedIdentityCredential @ficSplat -ErrorAction Stop
                 }
             } else {
-                Write-Verbose ("Exists. '/federatedIdentityCredential/{0}'" -f $fic.Name)
+                Write-Verbose ("Exists. 'federatedIdentityCredential/{0}'" -f $fic.Name)
             }
         }
         #endregion
@@ -307,7 +306,7 @@ process {
         if ($Rollback.IsPresent) {
             # Service Endpoint
             if ($null -ne $se) {
-                if ($PSCmdlet.ShouldProcess("Call module 'Azure.DevOps.PSModule' operation.", 'Remove-AdoServiceEndpoint')) {
+                if ($PSCmdlet.ShouldProcess(('{0}' -f $ServiceEndpointName), 'Delete')) {
                     if (-not $Force.IsPresent) {
                         $prompt = @(
                             "This will delete '/serviceEndpoint/$($se.Name)'."
@@ -335,10 +334,10 @@ process {
                         $attempt++
 
                         try {
-                            Write-Verbose ("Removing '/serviceEndpoint/{0}', attempt '{1}' of '{2}'..." -f $se.Name, $attempt, $maxAttempts)
+                            Write-Verbose ("Removing 'serviceEndpoint/{0}', attempt '{1}' of '{2}'..." -f $se.Name, $attempt, $maxAttempts)
 
                             Remove-AdoServiceEndpoint @seSplat | Out-Null
-                            Write-Verbose ("Deleted. '/serviceEndpoint/{0}'" -f $se.Name)
+                            Write-Verbose ("Deleted. 'serviceEndpoint/{0}'" -f $se.Name)
                             $success = $true
                         } catch {
                             Write-Warning ("Attempt '{0} of {1}' failed: {2}" -f $attempt, $maxAttempts, $_.Exception.Message)
@@ -353,7 +352,7 @@ process {
                     }
                 }
             } else {
-                Write-Warning ("Doesn't exist. '/serviceEndpoint/{0}'" -f $ServiceEndpointName)
+                Write-Warning ("Doesn't exist. 'serviceEndpoint/{0}'" -f $ServiceEndpointName)
             }
 
             return
@@ -371,7 +370,7 @@ process {
                 RoleAssignment  = ($ra | Select-Object -Property *)
             }
 
-            return $output | Format-List *
+            return $output
         }
 
         return $null

@@ -33,7 +33,7 @@ It also creates the necessary role assignments for the MSI to access Azure resou
 | `Scope` | `String` | Yes | - | Required. The scope for the service connection (e.g., /subscriptions/00000000-0000-0000-0000-000000000000). |
 | `ServiceEndpointName` | `String` | Yes | - | Required. The name of the service connection to be created. |
 | `Force` | `Switch` | No | - | Optional. Switch to force deletion without confirmation during rollback. |
-| `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (delete) the service connection and related resources. |
+| `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (delete) the environment and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing an environment is irreversible and may affect teams relying on it. See [Notes](#notes) for more information. |
 
 ## Examples
 
@@ -50,8 +50,7 @@ $deploySplat = @{
 .\deploy.ps1 @deploySplat -Verbose
 ```
 
-Deploys the service connection using the specified template and parameters.
-
+Deploys the service connection using the specified template and parameters.
 
 ### Example 2
 
@@ -66,8 +65,7 @@ $customSplat = @{
 .\deploy.ps1 @customSplat -Verbose
 ```
 
-Deploys the service connection using the specified template and custom parameters.
-
+Deploys the service connection using the specified template and custom parameters.
 
 ### Example 3
 
@@ -82,8 +80,7 @@ $rollbackSplat = @{
 .\deploy.ps1 @rollbackSplat -Rollback -Force -Verbose
 ```
 
-Rolls back (deletes) the service connection and related resources without confirmation.
-
+Rolls back (deletes) the service connection and related resources without confirmation.
 
 ### Example 4
 
@@ -91,13 +88,13 @@ Rolls back (deletes) the service connection and related resources without confir
 
 ```powershell
 $paramSplat = @{
-    Organization           = 'my-org'
-    ProjectId              = 'my-project'
-    ServiceEndpointName    = 'sc-my-project'
+    Organization           = 'e2egov-org'
+    ProjectId              = 'e2egov-prjHb72x9'
+    ServiceEndpointName    = 'rg-e2egov-prjHb72x9-tst-weu'
     Scope                  = '/subscriptions/00000000-0000-0000-0000-000000000000'
     ManagedServiceIdentity = @{
-        name               = 'msi-my-project'
-        resourceGroupName  = 'rg-my-project'
+        name               = 'id-e2egov-prjHb72x9-tst'
+        resourceGroupName  = 'rg-e2egov-prjHb72x9-tst-weu'
         subscriptionId     = '00000000-0000-0000-0000-000000000000'
         location           = 'westeurope'
         tags               = @{ 'environment' = 'prd'; 'owner' = 'e2egov' }
@@ -160,10 +157,13 @@ This script requires the following PowerShell modules:
 - [default](tests/e2e/default)
 - [rollback](tests/e2e/rollback)
 
+
 ## Notes
 
 - Operations are idempotent (safe to run multiple times).
 - Ensure you are logged in to Azure using Connect-AzAccount before running this script.
-- Automatically imports the `Azure.DevOps.PSModule` if not already loaded.
-- Automatic connection to Azure DevOps organization.
 - User confirmation is required for deletion unless `-Force` is specified.
+
+> [!IMPORTANT]
+> **Rollback does not perform actual Resource group deletion**. Resource groups may contain shared resources that are not part of this implementation but could be deployed by other systems or requirements over time. Deleting the Resource group could impact other services and operations relying on those resources.
+

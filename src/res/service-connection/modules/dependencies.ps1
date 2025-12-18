@@ -12,7 +12,7 @@
     Required. The name of the Resource Group to create.
 
 .PARAMETER Location
-    Optional. The Azure region where the resources will be created. Default is 'westeurope'.
+    Optional. The Azure region where the resources will be created (e.g., 'westeurope', 'northeurope').
 
 .PARAMETER Tags
     Optional. A hashtable of tags to assign to the resources. Default is an empty hashtable.
@@ -27,7 +27,14 @@
     Optional. If specified, the script will not prompt for confirmation during rollback.
 
 .EXAMPLE
-    .\dependencies.ps1 -IdentityName 'myIdentity' -ResourceGroupName 'myResourceGroup' -SubscriptionId 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+    $depSplat = @{
+        IdentityName      = 'id-e2egov-prjHb72x9-tst'
+        ResourceGroupName = 'rg-e2egov-prjHb72x9-tst-weu'
+        SubscriptionId    = '00000000-0000-0000-0000-000000000000'
+        Location          = 'westeurope'
+        Tags              = @{ environment = 'tst'; service = 'e2egov' }
+    }
+    .\dependencies.ps1 @depSplat
 
     Deploys the dependencies in the specified subscription.
 
@@ -44,7 +51,7 @@ param (
     [string]$ResourceGroupName,
 
     [Parameter(Mandatory = $false)]
-    [string]$Location = 'westeurope',
+    [string]$Location,
 
     [Parameter(Mandatory = $false)]
     [object]$Tags = @{},
@@ -72,11 +79,17 @@ process {
         # Variables #
         $ctx, $sub, $rg, $msi = $null
 
-        # Subscription Context #
-        $ctx = (Get-AzContext).Subscription
+        # Subscription Context
+        $ctx = Get-AzContext -ErrorAction Stop
 
-        if ($ctx.Id -ne $SubscriptionId) {
-            $sub = (Set-AzContext -SubscriptionId $SubscriptionId -WhatIf:$false).Subscription
+        if ($ctx.Subscription.Id -ne $SubscriptionId) {
+            $subSplat = @{
+                TenantId       = $ctx.Tenant.Id
+                SubscriptionId = $SubscriptionId
+                WhatIf         = $false
+            }
+
+            $sub = Set-AzContext @subSplat -ErrorAction Stop
         }
 
         # Resource Group #
@@ -108,7 +121,7 @@ process {
         # Managed Identity #
         if (-not $Rollback.IsPresent) {
             if ($null -eq $msi) {
-                if ($PSCmdlet.ShouldProcess("Call module 'Az.ManagedServiceIdentity' operation.", 'New-AzUserAssignedIdentity')) {
+                if ($PSCmdlet.ShouldProcess(('managedServiceIdentity/{0}' -f $IdentityName), 'Create')) {
 
                     $msiSplat += @{
                         Location = $Location
@@ -118,7 +131,7 @@ process {
                     $msi = New-AzUserAssignedIdentity @msiSplat
                 }
             } else {
-                Write-Verbose ("Exists. '/managedServiceIdentity/{0}'" -f $msi.Name)
+                Write-Verbose ("Exists. 'managedServiceIdentity/{0}'" -f $msi.Name)
             }
         }
 
@@ -128,7 +141,7 @@ process {
 
         if ($Rollback.IsPresent) {
             if ($null -ne $msi) {
-                if ($PSCmdlet.ShouldProcess("Call module 'Az.ManagedServiceIdentity' operation.", 'Remove-AzUserAssignedIdentity')) {
+                if ($PSCmdlet.ShouldProcess(('{0}' -f $IdentityName), 'Remove')) {
                     if (-not $Force.IsPresent) {
                         $prompt = @(
                             "This will delete '/managedServiceIdentity/$($IdentityName)'."
@@ -145,13 +158,13 @@ process {
                         }
                     }
 
-                    Write-Verbose ("Removing '/managedServiceIdentity/{0}' dependencies..." -f $msi.Name)
+                    Write-Verbose ("Removing 'managedServiceIdentity/{0}' dependencies..." -f $msi.Name)
 
                     $msi | Remove-AzUserAssignedIdentity | Out-Null
-                    Write-Verbose ("Deleted. '/managedServiceIdentity/{0}'" -f $IdentityName)
+                    Write-Verbose ("Deleted. 'managedServiceIdentity/{0}'" -f $IdentityName)
                 }
             } else {
-                Write-Warning ("Doesn't exist. '/managedServiceIdentity/{0}'" -f $IdentityName)
+                Write-Warning ("Doesn't exist. 'managedServiceIdentity/{0}'" -f $IdentityName)
             }
         }
 
@@ -174,7 +187,12 @@ process {
 
     finally {
         if ($null -ne $ctx -and $null -ne $sub) {
-            Set-AzContext -SubscriptionId $ctx.Id -Verbose:$false | Out-Null
+            $ctxSplat = @{
+                TenantId       = $ctx.Tenant.Id
+                SubscriptionId = $ctx.Subscription.Id
+                WhatIf         = $false
+            }
+            Set-AzContext @ctxSplat | Out-Null
         }
     }
 }

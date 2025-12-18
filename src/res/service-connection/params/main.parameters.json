@@ -1,17 +1,17 @@
 {
     "$schema": "../../../../schemas/connection.schema.json",
-    "organization": "my-org",
-    "projectId": "my-project",
-    "serviceEndpointName": "rg-my-project-tst-weu",
+    "organization": "{organization}",
+    "projectId": "{prefix}-prj{uniqueId}",
+    "serviceEndpointName": "rg-{prefix}-prj{uniqueId}-tst-weu",
     "scope": "/subscriptions/00000000-0000-0000-0000-000000000000",
     "managedServiceIdentity": {
-        "name": "id-my-project-tst-weu",
+        "name": "id-{prefix}-prj{uniqueId}-tst",
         "subscriptionId": "00000000-0000-0000-0000-000000000000",
-        "resourceGroupName": "rg-my-project-tst-weu",
+        "resourceGroupName": "rg-{prefix}-prj{uniqueId}-tst-weu",
         "location": "westeurope",
         "tags": {
             "public": "false",
-            "service": "my-project",
+            "service": "{prefix}",
             "environment": "tst",
             "security": "rbac",
             "iac": "bicep",
@@ -19,7 +19,7 @@
         },
         "roleAssignment": {
             "roleDefinitionName": "Headless Owner (DevOps CI/CD)",
-            "scope": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-my-project-tst-weu"
+            "scope": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-{prefix}-prj{uniqueId}-tst-weu"
         }
     }
 }
