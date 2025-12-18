@@ -3,8 +3,7 @@
     Update end-to-end tests for Azure DevOps environment resource.
 
 .DESCRIPTION
-    This script executes end-to-end tests for the default Azure DevOps environment
-    resource configuration.
+    This script executes end-to-end tests with updated properties for an Azure DevOps environment configuration.
 
 .NOTES
     File Name      : main.tests.ps1
@@ -19,7 +18,7 @@ $params = @{
     Name          = 'env-prjHb72x9-tst'
     Description   = 'Updated e2e governance description'
     ResourceGroup = @{
-        Name           = 'rg-e2egov-prjHb72x9-tst-neu'
+        Name           = 'rg-e2egov-prjHb72x9-tst-weu'
         Location       = 'westeurope'
         SubscriptionId = '00000000-0000-0000-0000-000000000000'
         Tags           = @{

@@ -5,8 +5,8 @@
     "name": "env-{prefix}-prj{uniqueId}",
     "description": "Default e2e governance description",
     "resourceGroup": {
-        "name": "rg-{prefix}-prj{uniqueId}-sbx-neu",
-        "location": "northeurope",
+        "name": "rg-{prefix}-prj{uniqueId}-sbx-weu",
+        "location": "westeurope",
         "subscriptionId": "00000000-0000-0000-0000-000000000000",
         "tags": {
             "public": "false",

@@ -22,10 +22,10 @@
 #>
 <#
 .SYNOPSIS
-    Creates or updates an Azure DevOps Environment.
+    Create, update or rollback an Azure DevOps Environment.
 
 .DESCRIPTION
-    This PowerShell script creates or updates an Azure DevOps Environment.
+    This PowerShell script creates, updates or rolls back an Azure DevOps Environment.
 
     It provides comprehensive environment management capabilities including configuration of an optional resource group
     and its properties as a scoped environment.
@@ -46,7 +46,7 @@
     Optional. An optional object defining the resource group properties: `Name`, `Location`, `SubscriptionId`, `Tags`. See [Notes](#notes) for more information.
 
 .PARAMETER Rollback
-    Optional. Switch to indicate if the operation should rollback (delete) the environment and related resources. <br /> <b> WARNING! </b> <br /> Use with caution! Removing an environment is irreversible and may affect teams relying on it. See [Notes](#notes) for more information.
+    Optional. Switch to indicate if the operation should rollback (delete) the environment and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing an environment is irreversible and may affect teams relying on it. See [Notes](#notes) for more information.
 
 .PARAMETER Force
     Optional. Switch to force deletion without confirmation during rollback.
@@ -88,8 +88,8 @@
         Name           = 'env-prjHb72x9-tst'
         Description    = 'Default e2e governance description'
         ResourceGroup  = @{
-            Name           = 'rg-e2egov-prjHb72x9-tst-neu'
-            Location       = 'northeurope'
+            Name           = 'rg-e2egov-prjHb72x9-tst-weu'
+            Location       = 'westeurope'
             SubscriptionId = '00000000-0000-0000-0000-000000000000'
             Tags           = @{ environment = 'tst'; service = 'e2egov' }
         }
@@ -145,7 +145,7 @@ begin {
     }
 
     # Connect to Azure DevOps Organization
-    Connect-AdoOrganization -Organization $Organization
+    Connect-AdoOrganization -Organization $Organization | Out-Null
 }
 
 process {
@@ -174,7 +174,8 @@ process {
 
         $env = Get-AdoEnvironmentList @envSplat -ErrorAction SilentlyContinue
 
-        if ($null -ne $ResourceGroup) {
+        if ($PSBoundParameters.ContainsKey('ResourceGroup') -and ($null -ne $ResourceGroup)) {
+
             # Subscription Context
             $ctx = Get-AzContext -ErrorAction Stop
 
@@ -211,16 +212,20 @@ process {
                 if ($PSCmdlet.ShouldProcess(('{0}' -f $Name), 'Create')) {
 
                     $envSplat = @{
-                        ProjectId   = $prj.Id
-                        Name        = $Name
-                        Description = $Description
-                        Verbose     = $VerbosePreference
+                        ProjectId = $prj.Id
+                        Name      = $Name
+                        Verbose   = $VerbosePreference
+                    }
+
+                    if ($PSBoundParameters.ContainsKey('Description')) {
+                        $envSplat['Description'] = $Description
                     }
 
                     $env = New-AdoEnvironment @envSplat
                 }
             } else {
-                if ($Description -ne $env.description) {
+                if ($PSBoundParameters.ContainsKey('Description') -and
+                    $Description -ne $env.description) {
 
                     if ($PSCmdlet.ShouldProcess(('{0}' -f $Name), 'Update')) {
                         $envSplat = @{

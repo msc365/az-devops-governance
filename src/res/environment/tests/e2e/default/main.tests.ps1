@@ -1,10 +1,9 @@
 ﻿<#
 .SYNOPSIS
-    Create end-to-end tests for Azure DevOps environment resource.
+    Create end-to-end tests for Azure DevOps environment.
 
 .DESCRIPTION
-    This script executes end-to-end tests for the default Azure DevOps environment
-    resource configuration.
+    This script executes end-to-end tests with default properties for an Azure DevOps environment configuration.
 
 .NOTES
     File Name      : main.tests.ps1

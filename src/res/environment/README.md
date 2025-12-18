@@ -4,7 +4,7 @@
 
 ![Version](https://img.shields.io/badge/script--version-0.1.0-blue) [![License](https://img.shields.io/badge/license-MIT-purple)](https://github.com/msc365/az-devops-governance/blob/main/LICENSE)
 
-Creates or updates an Azure DevOps Environment.
+Create, update or rollback an Azure DevOps Environment.
 
 <!-- omit from toc -->
 ## Navigation
@@ -20,7 +20,7 @@ Creates or updates an Azure DevOps Environment.
 
 ## Description
 
-This PowerShell script creates or updates an Azure DevOps Environment.
+This PowerShell script creates, updates or rolls back an Azure DevOps Environment.
 
 It provides comprehensive environment management capabilities including configuration of an optional resource group
 and its properties as a scoped environment.
@@ -35,7 +35,7 @@ and its properties as a scoped environment.
 | `Description` | `String` | No | - | Optional. A description for the environment. |
 | `Force` | `Switch` | No | - | Optional. Switch to force deletion without confirmation during rollback. |
 | `ResourceGroup` | `Object` | No | - | Optional. An optional object defining the resource group properties: `Name`, `Location`, `SubscriptionId`, `Tags`. See [Notes](#notes) for more information. |
-| `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (delete) the environment and related resources. <br /> <b> WARNING! </b> <br /> Use with caution! Removing an environment is irreversible and may affect teams relying on it. See [Notes](#notes) for more information. |
+| `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (delete) the environment and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing an environment is irreversible and may affect teams relying on it. See [Notes](#notes) for more information. |
 
 ## Examples
 
@@ -52,8 +52,7 @@ $deploySplat = @{
 .\deploy.ps1 @deploySplat -Verbose
 ```
 
-Deploys the environment using the specified template and parameters.
-
+Deploys the environment using the specified template and parameters.
 
 ### Example 2
 
@@ -68,8 +67,7 @@ $customSplat = @{
 .\deploy.ps1 @customSplat -Verbose
 ```
 
-Deploys the environment using the specified template and custom parameters.
-
+Deploys the environment using the specified template and custom parameters.
 
 ### Example 3
 
@@ -84,8 +82,7 @@ $rollbackSplat = @{
 .\deploy.ps1 @rollbackSplat -Rollback -Force -Verbose
 ```
 
-Rolls back (deletes) the environment and related resources without confirmation.
-
+Rolls back (deletes) the environment and related resources without confirmation.
 
 ### Example 4
 
@@ -98,8 +95,8 @@ $paramSplat = @{
     Name           = 'env-prjHb72x9-tst'
     Description    = 'Default e2e governance description'
     ResourceGroup  = @{
-        Name           = 'rg-e2egov-prjHb72x9-tst-neu'
-        Location       = 'northeurope'
+        Name           = 'rg-e2egov-prjHb72x9-tst-weu'
+        Location       = 'westeurope'
         SubscriptionId = '00000000-0000-0000-0000-000000000000'
         Tags           = @{ environment = 'tst'; service = 'e2egov' }
     }
@@ -149,8 +146,8 @@ This script requires the following PowerShell modules:
 
 ### Tests
 
+- [all](tests/e2e/all)
 - [default](tests/e2e/default)
-- [resource-group](tests/e2e/resource-group)
 - [rollback](tests/e2e/rollback)
 - [update](tests/e2e/update)
 
@@ -159,8 +156,6 @@ This script requires the following PowerShell modules:
 
 - Operations are idempotent (safe to run multiple times).
 - Ensure you are logged in to Azure using Connect-AzAccount before running this script.
-- Automatically imports the `Azure.DevOps.PSModule` if not already loaded.
-- Automatic connection to Azure DevOps organization.
 - User confirmation is required for deletion unless `-Force` is specified.
 
 > [!IMPORTANT]

@@ -1,10 +1,9 @@
 ﻿<#
 .SYNOPSIS
-    Rollback end-to-end tests for Azure DevOps environment resource.
+    Rollback end-to-end tests for Azure DevOps environment.
 
 .DESCRIPTION
-    This script executes end-to-end tests for the default Azure DevOps environment
-    resource configuration.
+    This script executes end-to-end tests with rollback properties for an Azure DevOps environment configuration.
 
 .NOTES
     File Name      : main.tests.ps1
