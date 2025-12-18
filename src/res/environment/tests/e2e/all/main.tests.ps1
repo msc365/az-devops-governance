@@ -15,7 +15,7 @@
 $params = @{
     Organization  = 'e2egov-org'
     ProjectId     = 'e2egov-prjHb72x9'
-    Name          = 'env-prjHb72x9-tst'
+    Name          = 'env-e2egov-prjHb72x9-tst'
     Description   = 'Default e2e governance description'
     ResourceGroup = @{
         Name           = 'rg-e2egov-prjHb72x9-tst-weu'
@@ -24,7 +24,7 @@ $params = @{
         Tags           = @{
             public      = 'false'
             service     = 'e2egov'
-            environment = 'prd'
+            environment = 'tst'
             security    = 'rbac'
             iac         = 'bicep'
             ci          = 'azure-pipelines'
@@ -45,6 +45,6 @@ $params['ResourceGroup']['SubscriptionId'] = $subscriptionId
 
 #region TEST EXECUTION
 
-& (Join-Path $rootPath -ChildPath 'main.ps1') @params -Verbose
+& (Join-Path $rootPath -ChildPath 'main.ps1') @params -Verbose | Format-List *
 
 #endregion

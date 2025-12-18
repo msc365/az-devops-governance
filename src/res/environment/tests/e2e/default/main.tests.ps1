@@ -15,7 +15,7 @@
 $params = @{
     Organization = 'e2egov-org'
     ProjectId    = 'e2egov-prjHb72x9'
-    Name         = 'env-prjHb72x9-dev'
+    Name         = 'env-e2egov-prjHb72x9-tst'
     Description  = 'Default e2e governance description'
 }
 
@@ -29,6 +29,6 @@ $rootPath = (Get-Item $PSScriptRoot).Parent.Parent.Parent.FullName
 
 #region TEST EXECUTION
 
-& (Join-Path $rootPath -ChildPath 'main.ps1') @params -Verbose
+& (Join-Path $rootPath -ChildPath 'main.ps1') @params -Verbose | Format-List *
 
 #endregion

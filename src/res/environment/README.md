@@ -92,7 +92,7 @@ Rolls back (deletes) the environment and related resources without confirmation.
 $paramSplat = @{
     Organization   = 'e2egov-org'
     ProjectId      = 'e2egov-prjHb72x9'
-    Name           = 'env-prjHb72x9-tst'
+    Name           = 'env-e2egov-prjHb72x9-tst'
     Description    = 'Default e2e governance description'
     ResourceGroup  = @{
         Name           = 'rg-e2egov-prjHb72x9-tst-weu'

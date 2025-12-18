@@ -85,7 +85,7 @@
     $paramSplat = @{
         Organization   = 'e2egov-org'
         ProjectId      = 'e2egov-prjHb72x9'
-        Name           = 'env-prjHb72x9-tst'
+        Name           = 'env-e2egov-prjHb72x9-tst'
         Description    = 'Default e2e governance description'
         ResourceGroup  = @{
             Name           = 'rg-e2egov-prjHb72x9-tst-weu'
@@ -209,7 +209,7 @@ process {
         if (-not $Rollback.IsPresent) {
             # Environment
             if ($null -eq $env) {
-                if ($PSCmdlet.ShouldProcess(('{0}' -f $Name), 'Create')) {
+                if ($PSCmdlet.ShouldProcess(('environment/{0}' -f $Name), 'Create')) {
 
                     $envSplat = @{
                         ProjectId = $prj.Id
@@ -239,7 +239,7 @@ process {
                         $env = Set-AdoEnvironment @envSplat
                     }
                 } else {
-                    Write-Verbose ("Exists. '/environment/{0}'" -f $Name)
+                    Write-Verbose ("Exists. 'environment/{0}'" -f $Name)
                 }
             }
         }
@@ -250,7 +250,7 @@ process {
 
         if ($Rollback.IsPresent) {
             if ($null -ne $env) {
-                if ($PSCmdlet.ShouldProcess(('{0}' -f $Name), 'Delete')) {
+                if ($PSCmdlet.ShouldProcess(('environment/{0}' -f $Name), 'Delete')) {
                     if (-not $Force.IsPresent) {
                         $prompt = @(
                             "This script will delete environment '$($Name)'."
@@ -275,10 +275,10 @@ process {
                     }
 
                     Remove-AdoEnvironment @envSplat | Out-Null
-                    Write-Verbose ("Deleted. '/environment/{0}'" -f $Name)
+                    Write-Verbose ("Deleted. 'environment/{0}'" -f $Name)
                 }
             } else {
-                Write-Warning ("Doesn't Exist. '/environment/{0}'" -f $Name)
+                Write-Warning ("Doesn't Exist. 'environment/{0}'" -f $Name)
             }
 
             return
@@ -304,7 +304,7 @@ process {
                 $output | Add-Member @addMemberSplat
             }
 
-            return $output | Format-List *
+            return $output
         }
 
         return $null

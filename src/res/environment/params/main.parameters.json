@@ -2,16 +2,16 @@
     "$schema": "../../../../schemas/environment.schema.json",
     "organization": "{organization}",
     "projectId": "{prefix}-prj{uniqueId}",
-    "name": "env-{prefix}-prj{uniqueId}",
+    "name": "env-{prefix}-prj{uniqueId}-tst",
     "description": "Default e2e governance description",
     "resourceGroup": {
-        "name": "rg-{prefix}-prj{uniqueId}-sbx-weu",
+        "name": "rg-{prefix}-prj{uniqueId}-txt-weu",
         "location": "westeurope",
         "subscriptionId": "00000000-0000-0000-0000-000000000000",
         "tags": {
             "public": "false",
             "service": "{prefix}",
-            "environment": "sbx",
+            "environment": "txt",
             "security": "rbac",
             "iac": "bicep",
             "ci": "azure-pipelines"

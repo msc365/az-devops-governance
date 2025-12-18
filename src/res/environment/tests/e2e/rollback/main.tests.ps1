@@ -15,7 +15,7 @@
 $params = @{
     Organization = 'e2egov-org'
     ProjectId    = 'e2egov-prjHb72x9'
-    Name         = 'env-prjHb72x9-tst'
+    Name         = 'env-e2egov-prjHb72x9-tst'
     Rollback     = $true
     Force        = $true
 }
