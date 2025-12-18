@@ -25,7 +25,7 @@ This script creates a new Azure Resource Group or updates an existing one with s
 
 | Parameter | Type | Required | Default | Description |
 | :-- | :-- | :-- | :-- | :-- |
-| `Location` | `String` | Yes | - | Required. The Azure region where the Resource Group will be created e.g.: 'westeurope', 'northeurope'. |
+| `Location` | `String` | Yes | - | Required. The Azure region where the Resource Group will be created e.g.: 'westeurope', 'westeurope'. |
 | `Name` | `String` | Yes | - | Required. The name of the Resource Group. |
 | `Force` | `Switch` | No | - | Optional. Skip confirmation prompt and proceed with operations immediately. |
 | `Rollback` | `Switch` | No | - | See [Notes](#notes) for detailed information. |
@@ -39,8 +39,8 @@ This script creates a new Azure Resource Group or updates an existing one with s
 
 ```powershell
 $rgParams = @{
-    Name     = 'rg-e2egov-prjHb72x9-tst-neu'
-    Location = 'northeurope'
+    Name     = 'rg-e2egov-prjHb72x9-tst-weu'
+    Location = 'westeurope'
     Tags     = @{
         'environment' = 'tst'
         'owner'       = 'e2egov'
@@ -50,7 +50,7 @@ $rgParams = @{
 .\main.ps1 @rgParams
 ```
 
-Creates or updates the Resource Group 'rg-e2egov-prjHb72x9-tst-neu' in the 'northeurope' region with the specified tags.
+Creates or updates the Resource Group 'rg-e2egov-prjHb72x9-tst-weu' in the 'westeurope' region with the specified tags.
 
 ## Outputs
 

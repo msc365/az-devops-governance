@@ -43,8 +43,8 @@
 
 .EXAMPLE
     $rgParams = @{
-        Name     = 'rg-e2egov-prjHb72x9-tst-neu'
-        Location = 'northeurope'
+        Name     = 'rg-e2egov-prjHb72x9-tst-weu'
+        Location = 'westeurope'
         Tags     = @{
             'environment' = 'tst'
             'owner'       = 'e2egov'
@@ -53,7 +53,7 @@
     }
     .\main.ps1 @rgParams
 
-    Creates or updates the Resource Group 'rg-e2egov-prjHb72x9-tst-neu' in the 'northeurope' region with the specified tags.
+    Creates or updates the Resource Group 'rg-e2egov-prjHb72x9-tst-weu' in the 'westeurope' region with the specified tags.
 #>
 [CmdletBinding(SupportsShouldProcess)]
 [OutputType([pscustomobject])]
