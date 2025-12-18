@@ -205,7 +205,7 @@ process {
 
         if (-not $Rollback.IsPresent) {
             if ($null -eq $prj) {
-                if ($PSCmdlet.ShouldProcess(('{0}' -f $Name), 'Create')) {
+                if ($PSCmdlet.ShouldProcess(('project/{0}' -f $Name), 'Create')) {
 
                     $prjSplat = @{
                         Name    = $Name
@@ -342,10 +342,10 @@ process {
                     }
 
                     Remove-AdoProject @prjSplat -ErrorAction Stop
-                    Write-Verbose ("Deleted. '/project/{0}'" -f $Name)
+                    Write-Verbose ("Deleted. 'project/{0}'" -f $Name)
                 }
             } else {
-                Write-Warning ("Doesn't Exist. '/project/{0}'" -f $Name)
+                Write-Warning ("Doesn't Exist. 'project/{0}'" -f $Name)
             }
 
             return
