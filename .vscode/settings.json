@@ -68,11 +68,13 @@
     "cSpell.words": [
         "COMPANYNAME",
         "EXTERNALMODULEDEPENDENCIES",
+        "Hashtable",
         "ICONURI",
         "LICENSEURI",
         "microsoftgraph",
         "PROJECTURI",
         "Runbook",
-        "Runbooks"
+        "Runbooks",
+        "Splatting"
     ]
 }
