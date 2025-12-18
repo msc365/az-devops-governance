@@ -30,7 +30,7 @@
     Required. The Object ID of the principal (user, group, or service principal) to assign the role to.
 
 .PARAMETER roleDefinitionName
-    Required. The name of the role definition to assign (e.g., 'Owner', 'Contributor', 'Reader', 'CustomRole').
+    Required. The name of the role definition to assign (e.g., 'Owner', 'Contributor', 'Reader', or custom like 'Headless Owner (DevOps CI/CD)').
 
 .PARAMETER scope
     Required. The scope at which the role assignment applies (e.g., subscription, resource group, resource).

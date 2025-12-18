@@ -26,7 +26,7 @@ This script creates or rolls back an Azure Role Assignment based on the provided
 | Parameter | Type | Required | Default | Description |
 | :-- | :-- | :-- | :-- | :-- |
 | `ObjectId` | `String` | Yes | - | Required. The Object ID of the principal (user, group, or service principal) to assign the role to. |
-| `roleDefinitionName` | `String` | Yes | - | Required. The name of the role definition to assign (e.g., 'Owner', 'Contributor', 'Reader', 'CustomRole'). |
+| `roleDefinitionName` | `String` | Yes | - | Required. The name of the role definition to assign (e.g., 'Owner', 'Contributor', 'Reader', or custom like 'Headless Owner (DevOps CI/CD)'). |
 | `scope` | `String` | Yes | - | Required. The scope at which the role assignment applies (e.g., subscription, resource group, resource). |
 | `Force` | `Switch` | No | - | Optional. If specified during rollback, the script will not prompt for confirmation before removing the role assignment. |
 | `Rollback` | `Switch` | No | - | Optional. If specified, the script will remove the role assignment instead of creating it. |
