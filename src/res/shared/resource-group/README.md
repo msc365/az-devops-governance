@@ -25,10 +25,10 @@ This script creates a new Azure Resource Group or updates an existing one with s
 
 | Parameter | Type | Required | Default | Description |
 | :-- | :-- | :-- | :-- | :-- |
-| `Location` | `String` | Yes | - | Required. The Azure region where the Resource Group will be created e.g.: 'westeurope', 'westeurope'. |
+| `Location` | `String` | Yes | - | Required. The Azure region where the Resource Group will be created e.g.: 'westeurope', 'northeurope'. |
 | `Name` | `String` | Yes | - | Required. The name of the Resource Group. |
-| `Force` | `Switch` | No | - | Optional. Skip confirmation prompt and proceed with operations immediately. |
-| `Rollback` | `Switch` | No | - | See [Notes](#notes) for detailed information. |
+| `Force` | `Switch` | No | - | Not implemented yet. |
+| `Rollback` | `Switch` | No | - | Not implemented yet. See [Notes](#notes) for detailed information. |
 | `Tags` | `Object` | No | - | Optional. A hashtable of tags to assign to the Resource Group. |
 
 ## Examples
@@ -83,7 +83,6 @@ This script requires the following PowerShell modules:
 ## Notes
 
 - Operations are idempotent (safe to run multiple times).
-- User confirmation is required for deletion unless `-Force` is specified.
 
 > [!IMPORTANT]
 > Rollback does not perform actual Resource group deletion. Resource groups may contain shared resources that are not part of this implementation but could be deployed by other systems or requirements over time. Deleting the Resource group could impact other services and operations relying on those resources.

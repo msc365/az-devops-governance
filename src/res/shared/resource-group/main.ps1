@@ -36,10 +36,10 @@
     Optional. A hashtable of tags to assign to the Resource Group.
 
 .PARAMETER Rollback
-    See [Notes](#notes) for detailed information.
+    Not implemented yet. See [Notes](#notes) for detailed information.
 
 .PARAMETER Force
-    Optional. Skip confirmation prompt and proceed with operations immediately.
+    Not implemented yet.
 
 .EXAMPLE
     $rgParams = @{
