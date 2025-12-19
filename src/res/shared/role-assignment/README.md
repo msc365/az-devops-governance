@@ -4,7 +4,7 @@
 
 ![Version](https://img.shields.io/badge/script--version-0.1.0-blue) [![License](https://img.shields.io/badge/license-MIT-purple)](https://github.com/msc365/az-devops-governance/blob/main/LICENSE)
 
-Create or rollback an Azure Role Assignment.
+Manage Azure Role Assignments with Desired State Configuration.
 
 <!-- omit from toc -->
 ## Navigation
@@ -19,17 +19,24 @@ Create or rollback an Azure Role Assignment.
 
 ## Description
 
-This script creates or rolls back an Azure Role Assignment based on the provided parameters.
+This script manages Azure Role Assignments using a desired state configuration approach.
+It compares the current state of role assignments against the desired state and:
+
+- Creates missing role assignments
+- Removes extra role assignments (when Enforce is enabled)
+- Keeps existing assignments that match the desired state
+
+This ensures idempotent deployments and prevents configuration drift.
 
 ## Parameters
 
 | Parameter | Type | Required | Default | Description |
 | :-- | :-- | :-- | :-- | :-- |
-| `ObjectId` | `String` | Yes | - | Required. The Object ID of the principal (user, group, or service principal) to assign the role to. |
-| `roleDefinitionName` | `String` | Yes | - | Required. The name of the role definition to assign e.g.: 'Owner', 'Contributor', 'Reader', or custom like 'Headless Owner (DevOps CI/CD)'. |
-| `scope` | `String` | Yes | - | Required. The scope at which the role assignment applies (e.g., subscription, resource group, resource). |
-| `Force` | `Switch` | No | - | Optional. If specified during rollback, the script will not prompt for confirmation before removing the role assignment. |
-| `Rollback` | `Switch` | No | - | Optional. If specified, the script will remove the role assignment instead of creating it. |
+| `ObjectId` | `String` | Yes | - | Required. The Object ID of the principal (user, group, or service principal) to manage role assignments for. |
+| `RoleAssignments` | `Array` | Yes | - | Required. An array of PSCustomObjects defining the desired role assignments. Each object should contain: `roleDefinitionName`, `scope` See [Examples](#examples) for more information. |
+| `EnforceDesiredState` | `Switch` | No | - | Optional. When specified, removes role assignments that exist but are not in the desired state. <br /> Without this flag, the script only ensures desired assignments exist (additive only). |
+| `Force` | `Switch` | No | - | Optional. Switch to force deletion without confirmation during rollback. |
+| `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (delete) the desired state. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing a role assignment is irreversible and may affect teams relying on it. |
 
 ## Examples
 
@@ -38,39 +45,49 @@ This script creates or rolls back an Azure Role Assignment based on the provided
 #### PowerShell
 
 ```powershell
-$roleAssignmentParams = @{
-    ObjectId           = '00000000-0000-0000-0000-000000000000'
-    roleDefinitionName = 'Contributor'
-    scope              = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MyResourceGroup'
-    Verbose            = $true
+$RoleAssignments = @(
+    @{
+        roleDefinitionName = 'Contributor'
+        scope              = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-e2egov-prjHb72x9-tst-weu'
+    },
+    @{
+        roleDefinitionName = 'Reader'
+        scope              = '/subscriptions/00000000-0000-0000-0000-000000000000'
+    }
+)
+
+$params = @{
+    ObjectId                = '00000000-0000-0000-0000-000000000000'
+    DesiredRoleAssignments  = $RoleAssignments
+    EnforceDesiredState     = $true
+    Verbose                 = $true
 }
 
-.\main.ps1 @roleAssignmentParams
+.\main2.ps1 @params
 ```
 
-Creates a Contributor role assignment for the specified ObjectId at the given resource group scope.
+Ensures the specified ObjectId has exactly the two role assignments defined, removing any others.
 
 ### Example 2
 
 #### PowerShell
 
 ```powershell
-$roleAssignmentParams = @{
-    ObjectId           = '00000000-0000-0000-0000-000000000000'
-    roleDefinitionName = 'Contributor'
-    scope              = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MyResourceGroup'
-    Rollback           = $true
-    Force              = $true
+$params = @{
+    ObjectId                = '00000000-0000-0000-0000-000000000000'
+    DesiredRoleAssignments  = $RoleAssignments
+    Rollback                = $true
+    Force                   = $true
 }
 
-.\main.ps1 @roleAssignmentParams
+.\main2.ps1 @params
 ```
 
-Removes the Contributor role assignment for the specified ObjectId at the given resource group scope without confirmation.
+Removes all role assignments defined in the desired state without confirmation.
 
 ## Outputs
 
-Returns: `pscustomobject`
+### `System.Collections.ArrayList`
 
 ## Support
 
@@ -100,3 +117,5 @@ This script requires the following PowerShell modules:
 
 - Operations are idempotent (safe to run multiple times).
 - User confirmation is required for deletion unless `-Force` is specified.
+- When `EnforceDesiredState` is not specified, only missing assignments are created (safe mode).
+- When `EnforceDesiredState` is specified, extra assignments are removed (full enforcement).
