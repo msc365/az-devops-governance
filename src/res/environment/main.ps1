@@ -101,7 +101,7 @@
     See [Service Connection](../service-connection) deployment for creating a service connection with least privileged access to the resource group.
 #>
 [CmdletBinding(SupportsShouldProcess)]
-[OutputType([pscustomobject])]
+[OutputType([PSCustomObject])]
 param (
     [Parameter(Mandatory)]
     [string]$Organization,
@@ -278,7 +278,7 @@ process {
                     Write-Verbose ("Deleted. 'environment/{0}'" -f $Name)
                 }
             } else {
-                Write-Warning ("Doesn't Exist. 'environment/{0}'" -f $Name)
+                Write-Warning ("Doesn't exist: 'environment/{0}'" -f $Name)
             }
 
             return
@@ -290,7 +290,7 @@ process {
 
         if (-not $WhatIfPreference) {
 
-            $output = [pscustomobject]@{
+            $output = [PSCustomObject]@{
                 Environment = ($env | Select-Object *) ?? $null
             }
 

@@ -110,7 +110,7 @@ See [Service Connection](../service-connection) deployment for creating a servic
 
 ## Outputs
 
-Returns: `pscustomobject`
+### `PSCustomObject`
 
 ## Support
 

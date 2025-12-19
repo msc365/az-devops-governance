@@ -112,7 +112,7 @@
     Deploys or updates a project in the specified Azure DevOps organization using the provided parameters in code.
 #>
 [CmdletBinding(SupportsShouldProcess)]
-[OutputType([pscustomobject])]
+[OutputType([PSCustomObject])]
 param (
     [Parameter(Mandatory)]
     [string]$Organization,
@@ -345,7 +345,7 @@ process {
                     Write-Verbose ("Deleted. 'project/{0}'" -f $Name)
                 }
             } else {
-                Write-Warning ("Doesn't Exist. 'project/{0}'" -f $Name)
+                Write-Warning ("Doesn't exist: 'project/{0}'" -f $Name)
             }
 
             return
@@ -364,7 +364,7 @@ process {
             # Get feature states whether updated or not
             $featureStates = Get-AdoFeatureState -ProjectId $prj.Id -ErrorAction Stop
 
-            $output = [pscustomobject]@{
+            $output = [PSCustomObject]@{
                 Project       = ($prj | Select-Object *) ?? $null
                 FeatureStates = ($featureStates.FeatureStates | Select-Object *) ?? $null
             }

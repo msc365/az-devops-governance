@@ -56,7 +56,7 @@
     Creates or updates the Resource Group 'rg-e2egov-prjHb72x9-tst-weu' in the 'westeurope' region with the specified tags.
 #>
 [CmdletBinding(SupportsShouldProcess)]
-[OutputType([pscustomobject])]
+[OutputType([PSCustomObject])]
 param (
     [Parameter(Mandatory)]
     [string]$Name,
@@ -146,7 +146,7 @@ process {
                     Write-Verbose ("Not deleted. 'resourceGroup/{0}'" -f $Name)
                 }
             } else {
-                Write-Verbose ("Doesn't exist. 'resourceGroup/{0}'" -f $Name)
+                Write-Verbose ("Doesn't exist: 'resourceGroup/{0}'" -f $Name)
             }
         }
 

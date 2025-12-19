@@ -115,7 +115,7 @@ Deploys or updates a project in the specified Azure DevOps organization using th
 
 ## Outputs
 
-Returns: `pscustomobject`
+### `PSCustomObject`
 
 ## Support
 

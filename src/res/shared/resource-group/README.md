@@ -54,7 +54,7 @@ Creates or updates the Resource Group 'rg-e2egov-prjHb72x9-tst-weu' in the 'west
 
 ## Outputs
 
-Returns: `pscustomobject`
+### `PSCustomObject`
 
 ## Support
 
