@@ -142,7 +142,7 @@ To get the best results from these README generators, follow these practices:
 3. **Use [OutputType] Attribute**: Specify the type your script returns
    ```powershell
    [CmdletBinding()]
-   [OutputType([pscustomobject])]
+   [OutputType([PSCustomObject])]
    param(...)
    ```
 

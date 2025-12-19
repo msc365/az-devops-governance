@@ -552,7 +552,7 @@ function Set-OutputsSection {
         # Try to detect OutputType attribute
         $scriptContent = Get-Content -Path $ScriptFilePath -Raw
         if ($scriptContent -match '\[OutputType\(\[(.+?)\]\)\]') {
-            $newContent += "Returns: ``$($matches[1])``"
+            $newContent += "### ``$($matches[1])``"
         } else {
             $newContent += '{{ Fill in the Outputs }}'
         }
