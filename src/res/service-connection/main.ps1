@@ -41,7 +41,7 @@
     Required. The scope for the service connection (e.g., /subscriptions/00000000-0000-0000-0000-000000000000).
 
 .PARAMETER ManagedServiceIdentity
-    Required. An object containing details of the Managed Service Identity to be used.
+    Required. An object containing details of the Managed Service Identity to be used. The object should contain: `name`, `resourceGroupName`, `subscriptionId`, `location`, `tags`, and `roleAssignments` (an array of role assignment definitions). See [Example 4](#example-4) for more information.
 
 .PARAMETER Rollback
     Optional. Switch to indicate if the operation should rollback (delete) the service connection and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing a service connection is irreversible and may affect teams relying on it. See [Notes](#notes) for more information.

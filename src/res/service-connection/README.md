@@ -27,7 +27,7 @@ It also creates the necessary role assignments for the MSI to access Azure resou
 
 | Parameter | Type | Required | Default | Description |
 | :-- | :-- | :-- | :-- | :-- |
-| `ManagedServiceIdentity` | `Object` | Yes | - | Required. An object containing details of the Managed Service Identity to be used. |
+| `ManagedServiceIdentity` | `Object` | Yes | - | Required. An object containing details of the Managed Service Identity to be used. The object should contain: `name`, `resourceGroupName`, `subscriptionId`, `location`, `tags`, and `roleAssignments` (an array of role assignment definitions). See [Example 4](#example-4) for more information. |
 | `Organization` | `String` | Yes | - | Required. The Azure DevOps organization name. |
 | `ProjectId` | `String` | Yes | - | Required. The Azure DevOps project ID or Name where the service connection will be created. |
 | `Scope` | `String` | Yes | - | Required. The scope for the service connection (e.g., /subscriptions/00000000-0000-0000-0000-000000000000). |
