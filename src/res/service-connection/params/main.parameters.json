@@ -17,9 +17,15 @@
             "iac": "bicep",
             "ci": "azure-pipelines"
         },
-        "roleAssignment": {
-            "roleDefinitionName": "Headless Owner (DevOps CI/CD)",
-            "scope": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-{prefix}-prj{uniqueId}-tst-weu"
-        }
+        "roleAssignments": [
+            {
+                "roleDefinitionName": "Reader",
+                "scope": "/subscriptions/00000000-0000-0000-0000-000000000000"
+            },
+            {
+                "roleDefinitionName": "Headless Owner (DevOps CI/CD)",
+                "scope": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-{prefix}-prj{uniqueId}-tst-weu"
+            }
+        ]
     }
 }

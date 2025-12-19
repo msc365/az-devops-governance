@@ -44,7 +44,7 @@
     Required. An object containing details of the Managed Service Identity to be used.
 
 .PARAMETER Rollback
-    Optional. Switch to indicate if the operation should rollback (delete) the environment and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing an environment is irreversible and may affect teams relying on it. See [Notes](#notes) for more information.
+    Optional. Switch to indicate if the operation should rollback (delete) the service connection and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing a service connection is irreversible and may affect teams relying on it. See [Notes](#notes) for more information.
 
 .PARAMETER Force
     Optional. Switch to force deletion without confirmation during rollback.
@@ -92,10 +92,16 @@
             subscriptionId     = '00000000-0000-0000-0000-000000000000'
             location           = 'westeurope'
             tags               = @{ 'environment' = 'prd'; 'owner' = 'e2egov' }
-            roleAssignment     = @{
-                roleDefinitionName = 'Contributor'
-                scope              = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-my-project'
-            }
+            roleAssignments     = @(
+                @{
+                    roleDefinitionName = 'Reader'
+                    scope              = '/subscriptions/00000000-0000-0000-0000-000000000000'
+                },
+                @{
+                    roleDefinitionName = 'Contributor'
+                    scope              = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-my-project'
+                }
+            )
         }
     }
 
@@ -104,7 +110,7 @@
     Deploys a service connection using the specified parameters in code.
 #>
 [CmdletBinding(SupportsShouldProcess)]
-[OutputType([pscustomobject])]
+[OutputType([PSCustomObject])]
 param (
     [Parameter(Mandatory)]
     [string]$Organization,
@@ -159,7 +165,7 @@ process {
         #region INITIALIZE
 
         # Variables
-        $prj, $dep, $se, $fic, $sync = $null
+        $prj, $dep, $se, $fic, $sync, $ras = $null
 
         # Project
         $prj = Get-AdoProject -ProjectId $ProjectId -ErrorAction SilentlyContinue
@@ -205,18 +211,18 @@ process {
 
         $fic = Get-AzFederatedIdentityCredential @ficSplat -ErrorAction SilentlyContinue
 
-        # Role Assignment
-        $raSplat = @{
-            ObjectId           = ($null -ne $dep.Identity) ? $dep.Identity.PrincipalId : '[Unknown]'
-            RoleDefinitionName = $ManagedServiceIdentity.roleAssignment.roleDefinitionName
-            Scope              = $ManagedServiceIdentity.roleAssignment.scope
-            Rollback           = $Rollback.IsPresent
-            Force              = $Force.IsPresent
-            WhatIf             = $WhatIfPreference
-            Verbose            = $VerbosePreference
+        # Role Assignments
+        $rasSplat = @{
+            ObjectId            = ($null -ne $dep.Identity) ? $dep.Identity.PrincipalId : '[Unknown]'
+            RoleAssignments     = $ManagedServiceIdentity.roleAssignments
+            EnforceDesiredState = $true
+            Rollback            = $Rollback.IsPresent
+            Force               = $Force.IsPresent
+            WhatIf              = $WhatIfPreference
+            Verbose             = $VerbosePreference
         }
 
-        $ra = & (Join-Path -Path $PSScriptRoot -ChildPath '..\shared\role-assignment\main.ps1') @raSplat
+        $ras = & (Join-Path -Path $PSScriptRoot -ChildPath '..\shared\role-assignment\main.ps1') @rasSplat
 
         #endregion
 
@@ -235,7 +241,7 @@ process {
 
                     $sub = Get-AzSubscription @subSplat -ErrorAction Stop
 
-                    $data = [ordered]@{
+                    $data = [Ordered]@{
                         creationMode     = 'Manual'
                         environment      = 'AzureCloud'
                         scopeLevel       = 'Subscription'
@@ -243,13 +249,13 @@ process {
                         subscriptionName = $sub.Name
                     }
 
-                    $sepConfig = [ordered]@{
+                    $sepConfig = [Ordered]@{
                         data                             = $data
                         name                             = $ServiceEndpointName
                         type                             = 'AzureRM'
                         url                              = 'https://management.azure.com/'
-                        authorization                    = [ordered]@{
-                            parameters = [ordered]@{
+                        authorization                    = [Ordered]@{
+                            parameters = [Ordered]@{
                                 serviceprincipalid = $dep.Identity.ClientId
                                 tenantid           = $dep.Identity.TenantId
                                 scope              = $Scope
@@ -259,9 +265,9 @@ process {
                         isShared                         = $false
                         isReady                          = $true
                         serviceEndpointProjectReferences = @(
-                            [ordered]@{
+                            [Ordered]@{
                                 name             = $ServiceEndpointName
-                                projectReference = [ordered]@{
+                                projectReference = [Ordered]@{
                                     id   = $prj.Id
                                     name = $prj.Name
                                 }
@@ -306,7 +312,7 @@ process {
         if ($Rollback.IsPresent) {
             # Service Endpoint
             if ($null -ne $se) {
-                if ($PSCmdlet.ShouldProcess(('{0}' -f $ServiceEndpointName), 'Delete')) {
+                if ($PSCmdlet.ShouldProcess(('serviceEndpoint/{0}' -f $ServiceEndpointName), 'Delete')) {
                     if (-not $Force.IsPresent) {
                         $prompt = @(
                             "This will delete '/serviceEndpoint/$($se.Name)'."
@@ -352,7 +358,7 @@ process {
                     }
                 }
             } else {
-                Write-Warning ("Doesn't exist. 'serviceEndpoint/{0}'" -f $ServiceEndpointName)
+                Write-Warning ("Doesn't exist: 'serviceEndpoint/{0}'" -f $ServiceEndpointName)
             }
 
             return
@@ -364,10 +370,10 @@ process {
 
         if (-not $WhatIfPreference) {
 
-            $output = [pscustomobject]@{
+            $output = [PSCustomObject]@{
                 ServiceEndpoint = ($se | Select-Object -Property *)
-                Identity        = ($dep.Identity | Select-Object -Property *)
-                RoleAssignment  = ($ra | Select-Object -Property *)
+                Identity        = ($dep.Identity | Select-Object -Property ClientId, Id, Name, PrincipalId, ResourceGroupName, TenantId, Type)
+                RoleAssignments = ($ras | ForEach-Object { $_ | Select-Object -Property ObjectId, DisplayName, RoleDefinitionName, Scope } )
             }
 
             return $output

@@ -38,7 +38,7 @@
                 "subscriptionId",
                 "resourceGroupName",
                 "location",
-                "roleAssignment"
+                "roleAssignments"
             ],
             "properties": {
                 "name": {
@@ -65,24 +65,29 @@
                         "type": "string"
                     }
                 },
-                "roleAssignment": {
-                    "type": "object",
-                    "required": [
-                        "roleDefinitionName",
-                        "scope"
-                    ],
-                    "properties": {
-                        "roleDefinitionName": {
-                            "type": "string",
-                            "description": "The name of the role definition to assign"
+                "roleAssignments": {
+                    "type": "array",
+                    "description": "Array of role assignments for the managed identity",
+                    "minItems": 1,
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "roleDefinitionName",
+                            "scope"
+                        ],
+                        "properties": {
+                            "roleDefinitionName": {
+                                "type": "string",
+                                "description": "The name of the role definition to assign"
+                            },
+                            "scope": {
+                                "type": "string",
+                                "description": "The scope at which to assign the role",
+                                "pattern": "^/subscriptions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(/resourceGroups/[^/]+)?$"
+                            }
                         },
-                        "scope": {
-                            "type": "string",
-                            "description": "The scope at which to assign the role",
-                            "pattern": "^/subscriptions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(/resourceGroups/[^/]+)?$"
-                        }
-                    },
-                    "additionalProperties": false
+                        "additionalProperties": false
+                    }
                 }
             },
             "additionalProperties": false

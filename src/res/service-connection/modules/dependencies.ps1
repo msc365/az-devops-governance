@@ -42,7 +42,7 @@
     Ensure you are logged in to Azure using Connect-AzAccount before running this script.
 #>
 [CmdletBinding(SupportsShouldProcess)]
-[OutputType([pscustomobject])]
+[OutputType([PSCustomObject])]
 param (
     [Parameter(Mandatory)]
     [string]$IdentityName,
@@ -164,7 +164,7 @@ process {
                     Write-Verbose ("Deleted. 'managedServiceIdentity/{0}'" -f $IdentityName)
                 }
             } else {
-                Write-Warning ("Doesn't exist. 'managedServiceIdentity/{0}'" -f $IdentityName)
+                Write-Warning ("Doesn't exist: 'managedServiceIdentity/{0}'" -f $IdentityName)
             }
         }
 
@@ -172,7 +172,7 @@ process {
 
         #region OUTPUTS
 
-        $output = [pscustomobject]@{
+        $output = [PSCustomObject]@{
             Identity      = ($msi | Select-Object *) ?? $null
             ResourceGroup = ($rg | Select-Object *) ?? $null
         }

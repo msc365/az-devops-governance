@@ -18,10 +18,16 @@ $params = @{
             iac         = 'bicep'
             ci          = 'azure-pipelines'
         }
-        roleAssignment    = @{
-            roleDefinitionName = 'Headless Owner (DevOps CI/CD)'
-            scope              = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-e2egov-prjHb72x9-tst-weu'
-        }
+        roleAssignments   = @(
+            @{
+                roleDefinitionName = 'Reader'
+                scope              = '/subscriptions/00000000-0000-0000-0000-000000000000'
+            }
+            @{
+                roleDefinitionName = 'Headless Owner (DevOps CI/CD)'
+                scope              = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-e2egov-prjHb72x9-tst-weu'
+            }
+        )
     }
 }
 
@@ -38,7 +44,8 @@ $subscriptionId = (Get-AzContext).Subscription.Id
 
 $params['Scope'] = "/subscriptions/$subscriptionId"
 $params['ManagedServiceIdentity']['SubscriptionId'] = $subscriptionId
-$params['ManagedServiceIdentity']['roleAssignment']['scope'] = "/subscriptions/$subscriptionId/resourceGroups/rg-e2egov-prjHb72x9-tst-weu"
+$params['ManagedServiceIdentity']['roleAssignments'][0]['scope'] = "/subscriptions/$subscriptionId"
+$params['ManagedServiceIdentity']['roleAssignments'][1]['scope'] = "/subscriptions/$subscriptionId/resourceGroups/rg-e2egov-prjHb72x9-tst-weu"
 
 #endregion
 

@@ -33,7 +33,7 @@ It also creates the necessary role assignments for the MSI to access Azure resou
 | `Scope` | `String` | Yes | - | Required. The scope for the service connection (e.g., /subscriptions/00000000-0000-0000-0000-000000000000). |
 | `ServiceEndpointName` | `String` | Yes | - | Required. The name of the service connection to be created. |
 | `Force` | `Switch` | No | - | Optional. Switch to force deletion without confirmation during rollback. |
-| `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (delete) the environment and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing an environment is irreversible and may affect teams relying on it. See [Notes](#notes) for more information. |
+| `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (delete) the service connection and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing a service connection is irreversible and may affect teams relying on it. See [Notes](#notes) for more information. |
 
 ## Examples
 
@@ -98,10 +98,16 @@ $paramSplat = @{
         subscriptionId     = '00000000-0000-0000-0000-000000000000'
         location           = 'westeurope'
         tags               = @{ 'environment' = 'prd'; 'owner' = 'e2egov' }
-        roleAssignment     = @{
-            roleDefinitionName = 'Contributor'
-            scope              = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-my-project'
-        }
+        roleAssignments     = @(
+            @{
+                roleDefinitionName = 'Reader'
+                scope              = '/subscriptions/00000000-0000-0000-0000-000000000000'
+            },
+            @{
+                roleDefinitionName = 'Contributor'
+                scope              = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-my-project'
+            }
+        )
     }
 }
 
@@ -112,7 +118,7 @@ Deploys a service connection using the specified parameters in code.
 
 ## Outputs
 
-Returns: `pscustomobject`
+### `PSCustomObject`
 
 ## Support
 
@@ -165,5 +171,7 @@ This script requires the following PowerShell modules:
 - User confirmation is required for deletion unless `-Force` is specified.
 
 > [!IMPORTANT]
-> **Rollback does not perform actual Resource group deletion**. Resource groups may contain shared resources that are not part of this implementation but could be deployed by other systems or requirements over time. Deleting the Resource group could impact other services and operations relying on those resources.
+> Removing a service connection is irreversible and may affect teams relying on it, use with caution!
 
+> [!NOTE]
+> When using `-WhatIf`, you may see role assignment operations displaying `..."roleAssignment/Reader/[Unknown]"`. This is expected behavior. Role assignments that depend on resources being created in the same execution will show `[Unknown]` during `-WhatIf` previews.
