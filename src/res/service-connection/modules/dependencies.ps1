@@ -131,7 +131,7 @@ process {
                     $msi = New-AzUserAssignedIdentity @msiSplat
                 }
             } else {
-                Write-Verbose ("Exists. 'managedServiceIdentity/{0}'" -f $msi.Name)
+                Write-Verbose ("Exists: 'managedServiceIdentity/{0}'" -f $msi.Name)
             }
         }
 
@@ -161,7 +161,7 @@ process {
                     Write-Verbose ("Removing 'managedServiceIdentity/{0}' dependencies..." -f $msi.Name)
 
                     $msi | Remove-AzUserAssignedIdentity | Out-Null
-                    Write-Verbose ("Deleted. 'managedServiceIdentity/{0}'" -f $IdentityName)
+                    Write-Verbose ("Deleted: 'managedServiceIdentity/{0}'" -f $IdentityName)
                 }
             } else {
                 Write-Warning ("Doesn't exist: 'managedServiceIdentity/{0}'" -f $IdentityName)

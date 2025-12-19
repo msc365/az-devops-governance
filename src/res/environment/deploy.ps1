@@ -17,7 +17,7 @@ param (
 )
 
 begin {
-    Write-Verbose ('[Enter]: .\{0}' -f $MyInvocation.MyCommand.Name)
+    Write-Verbose "[Enter]: .\$($MyInvocation.MyCommand.Name)"
 
     # Import utility functions
     . (Join-Path $PSScriptRoot -ChildPath '..\..\utl\Set-PlaceholderValue.ps1' -ErrorAction Stop)
@@ -61,5 +61,5 @@ process {
 }
 
 end {
-    Write-Verbose ('[Exit]: .\{0}' -f $MyInvocation.MyCommand.Name)
+    Write-Verbose "[Exit]: .\$($MyInvocation.MyCommand.Name)"
 }

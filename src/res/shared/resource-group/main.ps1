@@ -75,7 +75,7 @@ param (
 )
 
 begin {
-    Write-Verbose ('[Enter]: .\src\res\shared\resource-group\{0}' -f $MyInvocation.MyCommand.Name)
+    Write-Verbose "[Enter]: .\src\res\shared\resource-group\$($MyInvocation.MyCommand.Name)"
 }
 
 process {
@@ -96,7 +96,7 @@ process {
 
         if (-not $Rollback.IsPresent) {
             if ($null -eq $rg) {
-                if ($PSCmdlet.ShouldProcess(('resourceGroup/{0}' -f $Name), 'Create')) {
+                if ($PSCmdlet.ShouldProcess("resourceGroup/$($Name)", 'Create')) {
                     $rgSplat = @{
                         Name     = $Name
                         Location = $Location
@@ -121,7 +121,7 @@ process {
 
                 # Update tags if they differ
                 if ($tagsDiff) {
-                    if ($PSCmdlet.ShouldProcess(('resourceGroup/{0}' -f $Name), 'Update')) {
+                    if ($PSCmdlet.ShouldProcess("resourceGroup/$($Name)", 'Update')) {
                         $rgSplat = @{
                             Name    = $Name
                             Tags    = $Tags
@@ -131,7 +131,7 @@ process {
                         $rg = Set-AzResourceGroup @rgSplat -ErrorAction Stop
                     }
                 } else {
-                    Write-Verbose ("Exists. 'resourceGroup/{0}'" -f $Name)
+                    Write-Verbose "Exists: 'resourceGroup/$($Name)'"
                 }
             }
         }
@@ -142,11 +142,11 @@ process {
 
         if ($Rollback.IsPresent) {
             if ($null -ne $rg) {
-                if ($PSCmdlet.ShouldProcess(('resourceGroup/{0}' -f $Name), 'None')) {
-                    Write-Verbose ("Not deleted. 'resourceGroup/{0}'" -f $Name)
+                if ($PSCmdlet.ShouldProcess("resourceGroup/$($Name)", 'None')) {
+                    Write-Verbose "Not Deleted: 'resourceGroup/$($Name)'"
                 }
             } else {
-                Write-Verbose ("Doesn't exist: 'resourceGroup/{0}'" -f $Name)
+                Write-Verbose "Doesn't exist: 'resourceGroup/$($Name)'"
             }
         }
 
@@ -164,5 +164,5 @@ process {
 }
 
 end {
-    Write-Verbose ('[Exit]: .\src\res\shared\resource-group\{0}' -f $MyInvocation.MyCommand.Name)
+    Write-Verbose "[Exit]: .\src\res\shared\resource-group\$($MyInvocation.MyCommand.Name)"
 }

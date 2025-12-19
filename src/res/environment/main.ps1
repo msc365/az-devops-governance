@@ -126,7 +126,7 @@ param (
 )
 
 begin {
-    Write-Verbose ('[Enter]: .\src\res\environment\{0}' -f $MyInvocation.MyCommand.Name)
+    Write-Verbose "[Enter]: .\src\res\environment\$($MyInvocation.MyCommand.Name)"
 
     if ($null -eq (Get-AzContext)) {
         throw 'No Azure context found. Please login using Connect-AzAccount.'
@@ -162,7 +162,7 @@ process {
         $prj = Get-AdoProject -ProjectId $ProjectId -ErrorAction SilentlyContinue
 
         if ($null -eq $prj) {
-            throw ("Doesn't exists. '/projects/{0}' ." -f $ProjectId)
+            throw "Doesn't exist: '/projects/$($ProjectId)' ."
         }
 
         # Environment
@@ -209,7 +209,9 @@ process {
         if (-not $Rollback.IsPresent) {
             # Environment
             if ($null -eq $env) {
-                if ($PSCmdlet.ShouldProcess(('environment/{0}' -f $Name), 'Create')) {
+                if ($PSCmdlet.ShouldProcess("environment/$($Name)", 'Create')) {
+
+                    Write-Verbose "Creating environment: $($Name)"
 
                     $envSplat = @{
                         ProjectId = $prj.Id
@@ -221,13 +223,16 @@ process {
                         $envSplat['Description'] = $Description
                     }
 
+
                     $env = New-AdoEnvironment @envSplat
+
+                    Write-Verbose ("Created: 'environment/$($Name)'")
                 }
             } else {
                 if ($PSBoundParameters.ContainsKey('Description') -and
                     $Description -ne $env.description) {
 
-                    if ($PSCmdlet.ShouldProcess(('{0}' -f $Name), 'Update')) {
+                    if ($PSCmdlet.ShouldProcess("$($Name)", 'Update')) {
                         $envSplat = @{
                             ProjectId     = $prj.Id
                             EnvironmentId = $env.Id
@@ -239,7 +244,7 @@ process {
                         $env = Set-AdoEnvironment @envSplat
                     }
                 } else {
-                    Write-Verbose ("Exists. 'environment/{0}'" -f $Name)
+                    Write-Verbose "Exists: 'environment/$($Name)'"
                 }
             }
         }
@@ -250,7 +255,7 @@ process {
 
         if ($Rollback.IsPresent) {
             if ($null -ne $env) {
-                if ($PSCmdlet.ShouldProcess(('environment/{0}' -f $Name), 'Delete')) {
+                if ($PSCmdlet.ShouldProcess("environment/$($Name)", 'Delete')) {
                     if (-not $Force.IsPresent) {
                         $prompt = @(
                             "This script will delete environment '$($Name)'."
@@ -275,10 +280,10 @@ process {
                     }
 
                     Remove-AdoEnvironment @envSplat | Out-Null
-                    Write-Verbose ("Deleted. 'environment/{0}'" -f $Name)
+                    Write-Verbose "Deleted: 'environment/$($Name)'"
                 }
             } else {
-                Write-Warning ("Doesn't exist: 'environment/{0}'" -f $Name)
+                Write-Warning "Doesn't exist: 'environment/$($Name)'"
             }
 
             return
@@ -328,5 +333,5 @@ process {
 }
 
 end {
-    Write-Verbose ('[Exit]: .\src\res\environment\{0}' -f $MyInvocation.MyCommand.Name)
+    Write-Verbose "[Exit]: .\src\res\environment\$($MyInvocation.MyCommand.Name)"
 }

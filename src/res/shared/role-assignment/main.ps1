@@ -109,7 +109,7 @@ param (
 )
 
 begin {
-    Write-Verbose ('[Enter]: .\src\res\shared\role-assignment\{0}' -f $MyInvocation.MyCommand.Name)
+    Write-Verbose "[Enter]: .\src\res\shared\role-assignment\$($MyInvocation.MyCommand.Name)"
 }
 
 process {
@@ -186,7 +186,7 @@ process {
 
         if (-not $Rollback.IsPresent) {
             foreach ($assignment in $assignmentsToCreate) {
-                if ($PSCmdlet.ShouldProcess(('roleAssignment/{0}/{1}' -f $assignment.roleDefinitionName, $ObjectId), 'Create')) {
+                if ($PSCmdlet.ShouldProcess("roleAssignment/$($assignment.roleDefinitionName)/$($ObjectId)", 'Create')) {
 
                     Write-Verbose "Creating role assignment: $($assignment.roleDefinitionName) at $($assignment.scope)"
 
@@ -206,7 +206,7 @@ process {
 
             if ($EnforceDesiredState.IsPresent) {
                 foreach ($assignment in $assignmentsToRemove) {
-                    if ($PSCmdlet.ShouldProcess(('roleAssignment/{0}/{1}' -f $assignment.RoleDefinitionName, $assignment.DisplayName), 'Delete')) {
+                    if ($PSCmdlet.ShouldProcess("roleAssignment/$($assignment.RoleDefinitionName)/$($assignment.DisplayName)", 'Delete')) {
                         if (-not $Force.IsPresent) {
                             $prompt = @(
                                 "Enforcing desired state will delete 'roleAssignment/$($assignment.RoleDefinitionName)/$($assignment.DisplayName)'."
@@ -257,7 +257,7 @@ process {
                 }
 
                 if ($existing) {
-                    if ($PSCmdlet.ShouldProcess(('roleAssignment/{0}/{1}' -f $existing.RoleDefinitionName, $existing.DisplayName), 'Delete')) {
+                    if ($PSCmdlet.ShouldProcess("roleAssignment/$($existing.RoleDefinitionName)/$($existing.DisplayName)", 'Delete')) {
                         if (-not $Force.IsPresent) {
                             $prompt = @(
                                 "This will delete 'roleAssignment/$($existing.RoleDefinitionName)/$($existing.DisplayName)'."
@@ -280,7 +280,7 @@ process {
                         Write-Verbose "Deleted: 'roleAssignment/$($existing.RoleDefinitionName)/$($existing.DisplayName)'"
                     }
                 } else {
-                    Write-Warning ("Doesn't exist: 'roleAssignment/{0}' at scope '{1}'" -f $desired.roleDefinitionName, $desired.scope)
+                    Write-Warning "Doesn't exist: 'roleAssignment/$($desired.roleDefinitionName)' at scope '$($desired.scope)'"
                 }
             }
         }
@@ -300,5 +300,5 @@ process {
 }
 
 end {
-    Write-Verbose ('[Exit]: .\src\res\shared\role-assignment\{0}' -f $MyInvocation.MyCommand.Name)
+    Write-Verbose "[Exit]: .\src\res\shared\role-assignment\$($MyInvocation.MyCommand.Name)"
 }

@@ -163,7 +163,7 @@ param (
 )
 
 begin {
-    Write-Verbose ('[Enter]: .\src\res\project\{0}' -f $MyInvocation.MyCommand.Name)
+    Write-Verbose "[Enter]: .\src\res\project\$($MyInvocation.MyCommand.Name)"
 
     if ($null -eq (Get-AzContext)) {
         throw 'No Azure context found. Please login using Connect-AzAccount.'
@@ -205,7 +205,7 @@ process {
 
         if (-not $Rollback.IsPresent) {
             if ($null -eq $prj) {
-                if ($PSCmdlet.ShouldProcess(('project/{0}' -f $Name), 'Create')) {
+                if ($PSCmdlet.ShouldProcess("project/$($Name)", 'Create')) {
 
                     $prjSplat = @{
                         Name    = $Name
@@ -238,7 +238,7 @@ process {
                 }
 
                 if ($PSBoundParameters.ContainsKey('Description') -and ($prj.Description -ne $Description)) {
-                    if ($PSCmdlet.ShouldProcess(("Property='Description' Value='{0}...'" -f $Description.Substring(0, [Math]::Min($Description.Length, 16))), 'Update')) {
+                    if ($PSCmdlet.ShouldProcess("Property='Description' Value='$($Description.Substring(0, [Math]::Min($Description.Length, 16)))...'", 'Update')) {
 
                         $prjSplat['Description'] = $Description
                         $set = $true
@@ -246,7 +246,7 @@ process {
                 }
 
                 if ($PSBoundParameters.ContainsKey('Visibility') -and ($prj.Visibility -ne $Visibility)) {
-                    if ($PSCmdlet.ShouldProcess(("Property='Visibility' Value='{0}'" -f $Visibility), 'Update')) {
+                    if ($PSCmdlet.ShouldProcess("Property='Visibility' Value='$($Visibility)'", 'Update')) {
 
                         $prjSplat['Visibility'] = $Visibility
                         $set = $true
@@ -259,7 +259,7 @@ process {
                 }
 
                 if ($PSBoundParameters.ContainsKey('DefaultTeam') -and $prj.DefaultTeam.Name -ne $DefaultTeam) {
-                    if ($PSCmdlet.ShouldProcess(("Property='DefaultTeam' Value='{0}'" -f $DefaultTeam), 'Update')) {
+                    if ($PSCmdlet.ShouldProcess("Property='DefaultTeam' Value='$($DefaultTeam)'", 'Update')) {
 
                         $teamSplat = @{
                             ProjectId = $prj.Id
@@ -296,7 +296,7 @@ process {
 
                             # Only update if different
                             if ($Features[$featureName] -ne $featureState) {
-                                if ($PSCmdlet.ShouldProcess(("Feature='{0}' Value='{1}'" -f $featureName, $Features[$featureName]), 'Update')) {
+                                if ($PSCmdlet.ShouldProcess("Feature='$($featureName)' Value='$($Features[$featureName])'", 'Update')) {
                                     $featureSplat = @{
                                         ProjectId    = $prj.Id
                                         Feature      = $featureName
@@ -318,7 +318,7 @@ process {
 
         if ($Rollback.IsPresent) {
             if ($null -ne $prj) {
-                if ($PSCmdlet.ShouldProcess(('{0}' -f $Name), 'Delete')) {
+                if ($PSCmdlet.ShouldProcess("$($Name)", 'Delete')) {
                     if (-not $Force.IsPresent) {
                         $prompt = @(
                             "This script will delete project '$($Name)'."
@@ -342,10 +342,10 @@ process {
                     }
 
                     Remove-AdoProject @prjSplat -ErrorAction Stop
-                    Write-Verbose ("Deleted. 'project/{0}'" -f $Name)
+                    Write-Verbose "Deleted: 'project/$($Name)'"
                 }
             } else {
-                Write-Warning ("Doesn't exist: 'project/{0}'" -f $Name)
+                Write-Warning "Doesn't exist: 'project/$($Name)'"
             }
 
             return
@@ -382,5 +382,5 @@ process {
 }
 
 end {
-    Write-Verbose ('[Exit]: .\{0}' -f $MyInvocation.MyCommand.Name)
+    Write-Verbose "[Exit]: .\$($MyInvocation.MyCommand.Name)"
 }

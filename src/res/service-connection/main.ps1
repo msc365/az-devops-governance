@@ -135,7 +135,7 @@ param (
 )
 
 begin {
-    Write-Verbose ('[Enter]: .\src\res\service-connection\{0}' -f $MyInvocation.MyCommand.Name)
+    Write-Verbose "[Enter]: .\src\res\service-connection\$($MyInvocation.MyCommand.Name)"
 
     if ($null -eq (Get-AzContext)) {
         throw 'No Azure context found. Please login using Connect-AzAccount.'
@@ -171,7 +171,7 @@ process {
         $prj = Get-AdoProject -ProjectId $ProjectId -ErrorAction SilentlyContinue
 
         if ($null -eq $prj) {
-            throw ("Doesn't exists. '/projects/{0}' ." -f $ProjectId)
+            throw "Doesn't exist: '/projects/$($ProjectId)' ."
         }
 
         # Dependencies
@@ -199,7 +199,7 @@ process {
         $se = Get-AdoServiceEndpointByName @seSplat -ErrorAction SilentlyContinue
 
         # Federated Credential
-        $ficName = 'fic-{0}' -f $ServiceEndpointName.Substring(3)
+        $ficName = "fic-$($ServiceEndpointName.Substring(3))"
 
         $ficSplat = @{
             Name              = $ficName
@@ -232,7 +232,7 @@ process {
 
             # Service Endpoint
             if ($null -eq $se) {
-                if ($PSCmdlet.ShouldProcess(('serviceEndpoint/{0}' -f $ServiceEndpointName), 'Create')) {
+                if ($PSCmdlet.ShouldProcess("serviceEndpoint/$($ServiceEndpointName)", 'Create')) {
 
                     $subSplat = @{
                         SubscriptionId = ($Scope -split '/')[2]
@@ -283,15 +283,15 @@ process {
                     $se = New-AdoServiceEndpoint @seSplat -ErrorAction Stop
                 }
             } else {
-                Write-Verbose ("Exists. 'serviceEndpoint/{0}'" -f $se.Name)
+                Write-Verbose "Exists: 'serviceEndpoint/$($se.Name)'"
             }
 
             # Federated Credential
             if ($null -eq $fic) {
-                if ($PSCmdlet.ShouldProcess(('federatedIdentityCredential/{0}' -f $ficName), 'Create')) {
+                if ($PSCmdlet.ShouldProcess("federatedIdentityCredential/$($ficName)", 'Create')) {
 
                     if ($null -eq $se) {
-                        throw ("ServiceEndpoint '{0}' not found! Cannot create 'federatedIdentityCredential'." -f $ServiceEndpointName)
+                        throw "ServiceEndpoint '$($ServiceEndpointName)' not found! Cannot create 'federatedIdentityCredential'."
                     }
 
                     $ficSplat += @{
@@ -302,7 +302,7 @@ process {
                     $fic = New-AzFederatedIdentityCredential @ficSplat -ErrorAction Stop
                 }
             } else {
-                Write-Verbose ("Exists. 'federatedIdentityCredential/{0}'" -f $fic.Name)
+                Write-Verbose "Exists: 'federatedIdentityCredential/$($fic.Name)'"
             }
         }
         #endregion
@@ -312,7 +312,7 @@ process {
         if ($Rollback.IsPresent) {
             # Service Endpoint
             if ($null -ne $se) {
-                if ($PSCmdlet.ShouldProcess(('serviceEndpoint/{0}' -f $ServiceEndpointName), 'Delete')) {
+                if ($PSCmdlet.ShouldProcess("serviceEndpoint/$($ServiceEndpointName)", 'Delete')) {
                     if (-not $Force.IsPresent) {
                         $prompt = @(
                             "This will delete '/serviceEndpoint/$($se.Name)'."
@@ -340,16 +340,16 @@ process {
                         $attempt++
 
                         try {
-                            Write-Verbose ("Removing 'serviceEndpoint/{0}', attempt '{1}' of '{2}'..." -f $se.Name, $attempt, $maxAttempts)
+                            Write-Verbose "Removing 'serviceEndpoint/$($se.Name)', attempt '$($attempt)' of '$($maxAttempts)'..."
 
                             Remove-AdoServiceEndpoint @seSplat | Out-Null
-                            Write-Verbose ("Deleted. 'serviceEndpoint/{0}'" -f $se.Name)
+                            Write-Verbose "Deleted: 'serviceEndpoint/$($se.Name)'"
                             $success = $true
                         } catch {
-                            Write-Warning ("Attempt '{0} of {1}' failed: {2}" -f $attempt, $maxAttempts, $_.Exception.Message)
+                            Write-Warning "Attempt '$($attempt) of $($maxAttempts)' failed: $($_.Exception.Message)"
 
                             if ($attempt -lt $maxAttempts) {
-                                Write-Information ('Retrying in {0} seconds...' -f $waitSeconds) -InformationAction Continue
+                                Write-Information "Retrying in $($waitSeconds) seconds..." -InformationAction Continue
                                 Start-Sleep -Seconds $waitSeconds
                             } else {
                                 throw $_
@@ -358,7 +358,7 @@ process {
                     }
                 }
             } else {
-                Write-Warning ("Doesn't exist: 'serviceEndpoint/{0}'" -f $ServiceEndpointName)
+                Write-Warning "Doesn't exist: 'serviceEndpoint/$($ServiceEndpointName)'"
             }
 
             return
@@ -389,5 +389,5 @@ process {
 }
 
 end {
-    Write-Verbose ('[Exit]: .\src\res\service-connection\{0}' -f $MyInvocation.MyCommand.Name)
+    Write-Verbose "[Exit]: .\src\res\service-connection\$($MyInvocation.MyCommand.Name)"
 }
