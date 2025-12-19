@@ -50,7 +50,8 @@ $deploySplat = @{
 .\deploy.ps1 @deploySplat -Verbose
 ```
 
-Deploys the service connection using the specified template and parameters.
+Deploys the service connection using the specified template and parameters.
+
 
 ### Example 2
 
@@ -65,7 +66,8 @@ $customSplat = @{
 .\deploy.ps1 @customSplat -Verbose
 ```
 
-Deploys the service connection using the specified template and custom parameters.
+Deploys the service connection using the specified template and custom parameters.
+
 
 ### Example 3
 
@@ -80,7 +82,8 @@ $rollbackSplat = @{
 .\deploy.ps1 @rollbackSplat -Rollback -Force -Verbose
 ```
 
-Rolls back (deletes) the service connection and related resources without confirmation.
+Rolls back (deletes) the service connection and related resources without confirmation.
+
 
 ### Example 4
 
@@ -97,7 +100,7 @@ $paramSplat = @{
         resourceGroupName  = 'rg-e2egov-prjHb72x9-tst-weu'
         subscriptionId     = '00000000-0000-0000-0000-000000000000'
         location           = 'westeurope'
-        tags               = @{ 'environment' = 'prd'; 'owner' = 'e2egov' }
+        tags               = @{ 'environment' = 'tst'; 'owner' = 'e2egov' }
         roleAssignments     = @(
             @{
                 roleDefinitionName = 'Reader'

@@ -91,7 +91,7 @@
             resourceGroupName  = 'rg-e2egov-prjHb72x9-tst-weu'
             subscriptionId     = '00000000-0000-0000-0000-000000000000'
             location           = 'westeurope'
-            tags               = @{ 'environment' = 'prd'; 'owner' = 'e2egov' }
+            tags               = @{ 'environment' = 'tst'; 'owner' = 'e2egov' }
             roleAssignments     = @(
                 @{
                     roleDefinitionName = 'Reader'
