@@ -22,106 +22,126 @@
 #>
 <#
 .SYNOPSIS
-    Create or update an Azure DevOps Team within a specified project.
+    Create, update or rollback an Azure DevOps Team within a specified project.
 
 .DESCRIPTION
-    This script creates or updates an Azure DevOps Team within a specified project. It allows you to set team properties such as name and description.
+    This script creates, updates or rolls back an Azure DevOps Team within a specified project. It allows you to set team properties such as name, description and team settings.
 
-    If the team already exists, it updates the properties as needed.
-
-.PARAMETER Organization
-    Required.  The name of the Azure DevOps organization where the project is located.
+    If the team already exists, it updates the properties and settings as needed.
 
 .PARAMETER ProjectId
-    Required.  The ID of the Azure DevOps project where the team will be created or updated
+    Required. The Azure DevOps project ID or Name where the environment will be created.
 
 .PARAMETER TeamId
-    Required.  The id or name of the Azure DevOps team to create or update.
-
-.PARAMETER Name
-    Optional. The display name of the Azure DevOps team.
+    Optional. The ID or Name of the Azure DevOps team to create, update or rollback.
 
 .PARAMETER Description
     Optional. A description for the Azure DevOps team.
 
-.PARAMETER Settings
+.PARAMETER TeamSettings
     Optional. A hashtable containing team settings to override the default settings.
 
-.PARAMETER Remove
-    Optional. If specified, the team will be removed instead of created or updated. <br /> <b> WARNING! </b> <br /> Use with caution! Removing a team is irreversible and may affect team members and their access to project resources.
+.PARAMETER Rollback
+    Optional. Switch to indicate if the operation should rollback (delete) the team and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing a team is irreversible and may affect teams relying on it. See [Notes](#notes) for more information.
 
 .PARAMETER Force
-    Optional. If specified, the removal of the team will proceed without user confirmation.
+    Optional. Switch to force deletion without confirmation during rollback.
+
+    .EXAMPLE
+    $deploySplat = @{
+        TemplateFile          = 'main.ps1'
+        TemplateParameterFile = 'params\main.parameters.json'
+    }
+
+    .\deploy.ps1 @deploySplat -Verbose
+
+    Deploys the team using the specified template and parameters.
+
+.EXAMPLE
+    $customSplat = @{
+        TemplateFile          = 'main.ps1'
+        TemplateParameterFile = 'params\custom.parameters.json'
+    }
+
+    .\deploy.ps1 @customSplat -Verbose
+
+    Deploys the team using the specified template and custom parameters.
+
+.EXAMPLE
+    $rollbackSplat = @{
+        TemplateFile          = 'main.ps1'
+        TemplateParameterFile = 'params\main.parameters.json'
+    }
+
+    .\deploy.ps1 @rollbackSplat -Rollback -Force -Verbose
+
+    Rolls back (deletes) the team and related resources without confirmation.
 
 .EXAMPLE
     $paramSplat = @{
-        Organization     = 'my-org'
-        ProjectId        = 'my-project'
-        TeamId           = 'my-other-team'
-        Name             = 'my-other-team-updated'
-        Description      = 'My team description'
+        ProjectId = 'e2egov-prjHb72x9'
+        TeamId = 'Other Team'
+        TeamSettings = @{
+            BugsBehavior = "asRequirements"
+            WorkingDays = @(
+                "monday",
+                "tuesday",
+                "wednesday"
+            )
+        }
+        Description = 'Other Team Description'
     }
 
-    ..\src\res\team\main.ps1 @paramSplat -Verbose
+    .\src\res\team\main.ps1 @paramSplat -Verbose
 
-    This example creates or updates a team named 'my-team' in the 'my-project' project within the 'my-org' organization, setting its name and description.
+    Deploys or updates a team in the specified Azure DevOps project using the provided parameters in code.
 
 .NOTES
     - Requires Azure PowerShell module Az.Accounts and Azure.DevOps.PSModule.
     - Ensure you are logged in to Azure using Connect-AzAccount before running this script.
 #>
-[CmdletBinding()]
-[OutputType([object])]
+[CmdletBinding(SupportsShouldProcess)]
+[OutputType([PSCustomObject])]
 param (
-    [Parameter(Mandatory)]
-    [string]$Organization,
-
     [Parameter(Mandatory)]
     [string]$ProjectId,
 
     [Parameter(Mandatory)]
     [string]$TeamId,
 
-    [Parameter()]
-    [string]$Name,
-
-    [Parameter()]
+    [Parameter(Mandatory = $false)]
     [string]$Description,
 
-    [Parameter()]
-    [hashtable]$Settings,
+    [Parameter(Mandatory = $false)]
+    [object]$TeamSettings,
 
-    [Parameter()]
+    [Parameter(Mandatory = $false)]
     [object[]]$GroupMembership,
 
     [Parameter()]
-    [switch]$Remove,
+    [switch]$Rollback,
 
     [Parameter()]
     [switch]$Force
 )
 
 begin {
+    Write-Verbose "[Enter]: .\src\res\team\$($MyInvocation.MyCommand.Name)"
 
     if ($null -eq (Get-AzContext)) {
-        Write-Error 'No Azure context found. Please login using Connect-AzAccount.'
-        return
+        throw 'No Azure context found. Please login using Connect-AzAccount.'
     }
 
-    # Import required modules
+    # Define required modules
     $modules = @(
-        'Az.Accounts'
         'Azure.DevOps.PSModule'
     )
+
+    # Import required modules
     $modules | ForEach-Object {
-        if (-not (Get-Module $_) -or (Get-Module $_ -ListAvailable)) {
+        if (-not (Get-Module -Name $_)) {
             Import-Module $_ -Force -Verbose:$false -ErrorAction Stop
         }
-    }
-
-    # Connect to Azure DevOps Organization
-    if ($null -eq (Get-AdoContext)) {
-        Connect-AdoOrganization -Organization $Organization -Verbose:$VerbosePreference
     }
 }
 
@@ -130,212 +150,270 @@ process {
         $ErrorActionPreference = 'Stop'
         $Error.Clear()
 
-        # Initialize variables
-        $project, $team, $area = $null
+        #region INITIALIZE
 
-        #region Project
+        # Variables
+        $status = 'NoChange'
+        $prj, $team, $settings, $area, $set, $get = $null
 
-        # Check if project exists
-        Write-Verbose ("Checking if project '{0}' exists in organization '{1}'..." -f $ProjectId, $Organization)
-        $project = Get-AdoProject -ProjectId $ProjectId -Verbose:$VerbosePreference
+        # Project
+        $prj = Get-AdoProject -ProjectId $ProjectId -ErrorAction SilentlyContinue
 
-        if ($null -eq $project) {
-            throw ("Project '{0}' does not exist in organization '{1}'." -f $ProjectId, $Organization)
-        } else {
-            Write-Verbose ("Project '{0}' exists." -f $project.name)
+        if ($null -eq $prj) {
+            throw "NotFound: 'project\$($ProjectId)'"
         }
 
-        #endregion Project
+        # Team
+        $team = Get-AdoTeam -ProjectId $prj.Id -TeamId $TeamId -Verbose:$VerbosePreference
 
-        #region Team Removal
+        # Root Area path
+        $rootAreaSplat = @{
+            ProjectId     = $prj.Id
+            StructureType = 'Areas'
+            Depth         = 2
+        }
 
-        if ($Remove.IsPresent -and -not $Force.IsPresent) {
-            # Prompt user to confirm
-            $prompt = @(
-                "This script will delete team $($TeamId). All data and related configuration will be lost."
-                "Do you want to continue? 'Yes [Y]' 'No [N]'"
-            ) -join "`n"
+        $rootArea = Get-AdoClassificationNode @rootAreaSplat -ErrorAction Stop
 
-            $result = Read-Host -Prompt $prompt
-            $result = $result.ToLower()
-
-            if ($result -ne 'y' -and $result -ne 'yes') {
-                Write-Warning "Removing team '$($TeamId)' cancelled by user"
-                return
+        if ($rootArea.HasChildren) {
+            $area = $rootArea.Children | Where-Object {
+                $_.Name -eq $TeamId
             }
         }
 
-        # Remove team if specified
-        if ($Remove.IsPresent) {
-            Write-Verbose ("Removing team '{0}' from project '{1}'..." -f $TeamId, $project.name)
+        #endregion
 
-            $team = Get-AdoTeam -ProjectId $project.id -TeamId $TeamId -Verbose:$VerbosePreference
+        #region DEPLOYMENTS
+
+        if (-not $Rollback.IsPresent) {
+            # Team
+            if ($null -eq $team) {
+                if ($PSCmdlet.ShouldProcess("team\$($TeamId)", 'Create')) {
+
+                    Write-Debug "Creating: team\$($TeamId)"
+
+                    $teamSplat = @{
+                        ProjectId = $prj.Id
+                        Name      = $TeamId
+                        Verbose   = $VerbosePreference
+                    }
+
+                    if ($PSBoundParameters.ContainsKey('Description')) {
+                        $teamSplat['Description'] = $Description
+                    }
+
+                    $team = New-AdoTeam @teamSplat -ErrorAction Stop
+                    $status = 'Succeeded'
+
+                    Write-Verbose ("Created: 'team\$($TeamId)'")
+                }
+            } else {
+                Write-Verbose "NoChange: team\$($team.Name)"
+            }
 
             if ($null -ne $team) {
-                Remove-AdoTeam -ProjectId $project.id -TeamId $TeamId -Verbose:$VerbosePreference | Out-Null
+                $set = $false
 
-                Write-Verbose ("Team '{0}' has been removed." -f $TeamId)
-                return [pscustomobject]@{
-                    Removed = $true
-                    Message = 'Team has been removed.'
+                $teamSplat = @{
+                    ProjectId = $prj.Id
+                    TeamId    = $team.Id
+                    Name      = $team.Name
+                    Verbose   = $VerbosePreference
                 }
-            }
 
-            Write-Verbose ("Team '{0}' does not exist. No action taken." -f $TeamId)
-            return [pscustomobject]@{
-                Removed = $false
-                Message = 'Team does not exist. No action taken.'
+                if ($PSBoundParameters.ContainsKey('Description') -and ($team.Description -ne $Description)) {
+                    if ($PSCmdlet.ShouldProcess("team\Description\$($Description)", 'Update')) {
+
+                        $teamSplat['Description'] = $Description
+                        $set = $true
+                    }
+                }
+
+                if ($set) {
+                    Write-Debug "Updating: team\$($team.Name)"
+
+                    Set-AdoTeam @teamSplat -ErrorAction Stop | Out-Null
+                    $get = $true
+                    $status = 'Succeeded'
+
+                    Write-Verbose "Updated: team\$($team.Name)"
+                }
+
+                # Team settings
+                $settingsSplat = @{
+                    Project      = $prj
+                    Team         = $team
+                    TeamSettings = $TeamSettings ?? @{}
+                    WhatIf       = $WhatIfPreference
+                    Verbose      = $VerbosePreference
+                }
+
+                $settings = & (Join-Path -Path $PSScriptRoot -ChildPath 'modules\nested_teamSettings.ps1') @settingsSplat
+
+                if ($null -ne $settings -and $settings.Status -eq 'Succeeded') {
+                    $status = 'Succeeded'
+                    $get = $true
+                }
+
+                # Iteration Paths
+                $ipsSplat = @{
+                    Project = $prj
+                    Team    = $team
+                    WhatIf  = $WhatIfPreference
+                    Verbose = $VerbosePreference
+                }
+
+                & (Join-Path -Path $PSScriptRoot -ChildPath 'modules\nested_iterationPaths.ps1') @ipsSplat | Out-Null
+
+                # Root Area path
+                if ($null -eq $area) {
+                    if ($PSCmdlet.ShouldProcess("project\areaPath\$($team.Name)", 'Create')) {
+
+                        Write-Debug "Creating: project\areaPath\$($team.Name)"
+
+                        $areaSplat = @{
+                            ProjectId     = $prj.Id
+                            Name          = $team.Name
+                            StructureType = 'Areas'
+                            Verbose       = $VerbosePreference
+                        }
+
+                        $area = New-AdoClassificationNode @areaSplat -ErrorAction Stop
+
+                        Write-Verbose "Created: project\areaPath\$($area.Name)"
+                    }
+                } else {
+                    Write-Verbose "NoChange: project\areaPath\$($area.Name)"
+                }
+
+                # Team Area path
+                $apsSplat = @{
+                    Project = $prj
+                    Team    = $team
+                    WhatIf  = $WhatIfPreference
+                    Verbose = $VerbosePreference
+                }
+
+                & (Join-Path -Path $PSScriptRoot -ChildPath 'modules\nested_areaPaths.ps1') @apsSplat | Out-Null
             }
         }
 
-        #endregion Team Removal
+        #endregion
 
-        #region Team
+        #region ROLLBACK
 
-        Write-Verbose ("Checking if team '{0}' exists in project '{1}'..." -f $TeamId, $project.name)
-        $team = Get-AdoTeam -ProjectId $project.id -TeamId $TeamId -Verbose:$VerbosePreference
+        if ($Rollback.IsPresent) {
+            # Project area path
+            if ($null -ne $area) {
+                if ($PSCmdlet.ShouldProcess("project\areaPath\$($area.Name)", 'Remove')) {
+                    if (-not $Force.IsPresent) {
+                        $prompt = @(
+                            "This script will delete area path '$($area.Name)' and all of its children."
+                            'This action cannot be undone and the area path cannot be restored.'
+                            "Do you want to continue? 'Yes [Y]' 'No [N]'"
+                        ) -join "`n"
 
-        if ($null -eq $team) {
-            Write-Verbose ("Team '{0}' does not exist. Creating new team..." -f $TeamId)
+                        $result = Read-Host -Prompt $prompt
+                        $result = $result.ToLower()
 
-            $newSplat = @{
-                ProjectId   = $project.id
-                Name        = $TeamId
-                Description = $Description
-            }
-            $team = New-AdoTeam @newSplat -Verbose:$VerbosePreference
+                        if ($result -ne 'y' -and $result -ne 'yes') {
+                            Write-Warning 'Operation cancelled by user'
+                            return
+                        }
+                    }
 
-        } else {
-            Write-Verbose ("Team '{0}' exists." -f $TeamId)
-            Write-Verbose ("Checking if team '{0}' properties need to be updated..." -f $TeamId)
+                    Write-Debug "Removing: 'project\areaPath\$($area.Name)\ReclassifyId\$($rootArea.Id)'"
 
-            if (-not ([System.String]::IsNullOrEmpty($Name) -and $team.name -ne $Name) -or $team.description -ne $Description) {
-                Write-Verbose ("Updating team '{0}' properties..." -f $TeamId)
+                    $areaSplat = @{
+                        ProjectId     = $prj.Id
+                        StructureType = 'Areas'
+                        Path          = $area.Name
+                        ReclassifyId  = $rootArea.Id
+                        Verbose       = $VerbosePreference
+                    }
 
-                $updateSplat = @{
-                    ProjectId   = $project.id
-                    TeamId      = $TeamId
-                    Name        = (-not [System.String]::IsNullOrEmpty($Name) ? $Name : $TeamId)
-                    Description = $Description
+                    Remove-AdoClassificationNode @areaSplat -ErrorAction Stop | Out-Null
+                    $status = 'Removed'
+
+                    Write-Verbose "Removed: 'project\areaPath\$($area.Name)\ReclassifyId\$($rootArea.Id)'"
                 }
-
-                $team = Set-AdoTeam @updateSplat -Verbose:$VerbosePreference
-
             } else {
-                Write-Verbose ("Team '{0}' is up to date." -f $TeamId)
+                $status = 'NotFound'
+                Write-Warning "NotFound: 'project\areaPath\$($TeamId)'"
             }
-        }
 
-        #endregion Team
+            # Team
+            if ($null -ne $team) {
+                if ($PSCmdlet.ShouldProcess("team\$($team.Name)", 'Remove')) {
+                    if (-not $Force.IsPresent) {
+                        $prompt = @(
+                            "This script will delete team '$($team.Name)'."
+                            'All related resources like dashboards, backlogs and boards will be lost.'
+                            "Do you want to continue? 'Yes [Y]' 'No [N]'"
+                        ) -join "`n"
 
-        #region Team Settings
+                        $result = Read-Host -Prompt $prompt
+                        $result = $result.ToLower()
 
-        Write-Verbose ("Getting default team settings for project '{0}'..." -f $project.name)
-        $defaultSettings = Get-AdoTeamSettings -ProjectId $project.id -TeamId $project.defaultTeam.id -Verbose:$VerbosePreference
+                        if ($result -ne 'y' -and $result -ne 'yes') {
+                            Write-Warning 'Operation cancelled by user'
+                            return
+                        }
+                    }
 
-        if ($null -ne $Settings) {
-            Write-Verbose ("Overriding default team settings with provided team settings for '{0}'..." -f $team.name)
-            foreach ($key in $Settings.Keys) {
-                if ($defaultSettings.PSObject.Properties.Name -contains $key) {
-                    $defaultSettings.$key = $Settings[$key]
+                    Write-Debug "Removing: 'team\$($team.Name)'"
+
+                    $teamSplat = @{
+                        ProjectId = $prj.Id
+                        TeamId    = $team.Id
+                        Verbose   = $VerbosePreference
+                    }
+
+                    Remove-AdoTeam @teamSplat | Out-Null
+                    $status = 'Removed'
+
+                    Write-Verbose "Removed: 'team\$($team.Name)'"
                 }
+            } else {
+                $status = 'NotFound'
+                Write-Warning "NotFound: 'team\$($TeamId)'"
             }
-        }
 
-        # Create new object with default team values
-        $teamSettings = [TeamSettingsPatch]::new(
-            @{
-                backlogIteration      = $defaultSettings.backlogIteration.id
-                backlogVisibilities   = $defaultSettings.backlogVisibilities
-                bugsBehavior          = $defaultSettings.bugsBehavior
-                defaultIteration      = $defaultSettings.defaultIteration.id
-                defaultIterationMacro = $defaultSettings.defaultIterationMacro
-                workingDays           = $defaultSettings.workingDays
-            })
-
-        # Convert to hashtable for Set-AdoTeamSettings input
-        $settingSplat = $teamSettings.AsHashtable()
-
-        # Remove defaultIteration or defaultIterationMacro to avoid conflicts
-        if ($null -ne $settingSplat['defaultIterationMacro']) {
-            $settingSplat.Remove('defaultIteration')
-        } else {
-            $settingSplat.Remove('defaultIterationMacro')
-        }
-
-        Write-Verbose ("Applying team settings to team '{0}' in project '{1}'..." -f $team.name, $project.name)
-        Set-AdoTeamSettings -ProjectId $project.id -TeamId $team.name -TeamSettings $settingSplat | Out-Null
-
-        #endregion Team Settings
-
-        #region Iteration Paths
-
-        Write-Verbose ("Checking if team '{0}' has iteration paths configured..." -f $team.name)
-        $teamIteration = Get-AdoTeamIterationList -ProjectId $project.id -TeamId $team.name -Verbose:$VerbosePreference
-
-        if ($null -eq $teamIteration -or $teamIteration.count -eq 0) {
-            Write-Verbose ("No iterations found for team '{0}'. Copy project iterations..." -f $team.name)
-
-            $projectIteration = Get-AdoTeamIterationList -ProjectId $project.id -Verbose:$VerbosePreference
-
-            if ($projectIteration.count -gt 0) {
-
-                $projectIteration.value | ForEach-Object -Process {
-                    Write-Verbose ("Adding iteration '{0}' to team '{1}'..." -f $_.path, $team.name)
-
-                    Set-AdoTeamIteration -ProjectId $project.id -TeamId $team.name -IterationId $_.id | Out-Null
+            if (-not $WhatIfPreference -and $status -ne 'NotFound') {
+                $output = [PSCustomObject]@{
+                    ProjectId = $prj.Id
+                    TeamId    = $team.Id ?? $TeamId
+                    Status    = $status
                 }
+
+                return $output
             }
-        } else {
-            Write-Verbose ("Team '{0}' already has iteration paths configured. No changes made." -f $team.name)
+
+            return
         }
 
-        #endregion Iteration Paths
+        #endregion
 
-        #region Area Paths
+        #region OUTPUTS
 
-        # Check if project area path exists
-        Write-Verbose ("Checking if project area path '{0}\Area\{1}' exists..." -f $project.name, $team.name)
-        $rootArea = Get-AdoClassificationNode -ProjectId $project.id -StructureType 'Areas' -Depth 2 -Verbose:$VerbosePreference
-
-        if ($rootArea.hasChildren) {
-            $area = $rootArea.Children | Where-Object {
-                $_.Name -contains $team.name
+        if (-not $WhatIfPreference) {
+            if ($get) {
+                $team = Get-AdoTeam -ProjectId $prj.Id -TeamId $team.Id -ErrorAction Stop
             }
+
+            $output = [PSCustomObject]@{
+                ProjectId = $prj.Id
+                TeamId    = $team.Id
+                Team      = ($team | Select-Object -Property *)
+                Status    = $status
+            }
+
+            return $output
         }
 
-        if ($null -eq $area) {
-            Write-Verbose ("Project area path '{0}\Area\{1}' does not exist. Creating area path..." -f $project.name, $team.name)
+        #endregion
 
-            $area = New-AdoClassificationNode -ProjectId $project.id -Name $team.name -StructureType 'Areas' -Verbose:$VerbosePreference
-
-        } else {
-            Write-Verbose ("Project area path '{0}' exists." -f $area.path)
-        }
-
-        # Check if team area path exists
-        Write-Verbose ("Checking if team area path '{0}\{1}' exists..." -f $project.name, $team.name)
-        $fieldValue = Get-AdoTeamFieldValue -ProjectId $project.id -Team $team.id -Verbose:$VerbosePreference
-
-        if ($null -eq $fieldValue.defaultValue) {
-            # Set team area path to the team
-            Write-Verbose ("Set team area path '{0}\{1}'..." -f $project.name, $team.name)
-            $defaultValue = ('{0}\{1}' -f $project.name, $team.name)
-            $values = @(
-                @{
-                    value           = $defaultValue
-                    includeChildren = $false
-                }
-            )
-            Set-AdoTeamFieldValue -ProjectId $project.id -Team $team.id -DefaultValue $defaultValue -Values $values -Verbose:$VerbosePreference | Out-Null
-
-        } else {
-            Write-Verbose ("Team area path '{0}' exists." -f $fieldValue.defaultValue)
-        }
-
-        #endregion Area Paths
-
-        return $team
+        return
 
     } catch {
         throw $_
@@ -343,5 +421,5 @@ process {
 }
 
 end {
-    Write-Verbose ('[Exit]: .\{0}' -f $MyInvocation.MyCommand.Name)
+    Write-Verbose "[Exit]: .\src\res\team\$($MyInvocation.MyCommand.Name)"
 }

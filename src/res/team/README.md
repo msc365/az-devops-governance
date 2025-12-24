@@ -4,7 +4,7 @@
 
 ![Version](https://img.shields.io/badge/script--version-0.1.0-blue) [![License](https://img.shields.io/badge/license-MIT-purple)](https://github.com/msc365/az-devops-governance/blob/main/LICENSE)
 
-Create or update an Azure DevOps Team within a specified project.
+Create, update or rollback an Azure DevOps Team within a specified project.
 
 <!-- omit from toc -->
 ## Navigation
@@ -20,23 +20,21 @@ Create or update an Azure DevOps Team within a specified project.
 
 ## Description
 
-This script creates or updates an Azure DevOps Team within a specified project. It allows you to set team properties such as name and description.
+This script creates, updates or rolls back an Azure DevOps Team within a specified project. It allows you to set team properties such as name, description and team settings.
 
-If the team already exists, it updates the properties as needed.
+If the team already exists, it updates the properties and settings as needed.
 
 ## Parameters
 
 | Parameter | Type | Required | Default | Description |
 | :-- | :-- | :-- | :-- | :-- |
-| `Organization` | `String` | Yes | - | Required.  The name of the Azure DevOps organization where the project is located. |
-| `ProjectId` | `String` | Yes | - | Required.  The ID of the Azure DevOps project where the team will be created or updated |
-| `TeamId` | `String` | Yes | - | Required.  The id or name of the Azure DevOps team to create or update. |
+| `ProjectId` | `String` | Yes | - | Required. The Azure DevOps project ID or Name where the environment will be created. |
+| `TeamId` | `String` | Yes | - | Optional. The ID or Name of the Azure DevOps team to create, update or rollback. |
 | `Description` | `String` | No | - | Optional. A description for the Azure DevOps team. |
-| `Force` | `Switch` | No | - | Optional. If specified, the removal of the team will proceed without user confirmation. |
-| `GroupMembership` | `Object[]` | No | - | No description provided. |
-| `Name` | `String` | No | - | Optional. The display name of the Azure DevOps team. |
-| `Remove` | `Switch` | No | - | Optional. If specified, the team will be removed instead of created or updated. <br /> <b> WARNING! </b> <br /> Use with caution! Removing a team is irreversible and may affect team members and their access to project resources. |
-| `Settings` | `Hashtable` | No | - | Optional. A hashtable containing team settings to override the default settings. |
+| `Force` | `Switch` | No | - | Optional. Switch to force deletion without confirmation during rollback. |
+| `GroupMembership` | `Object[]` | No | - | {{ Fill in the Description }} |
+| `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (delete) the team and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing a team is irreversible and may affect teams relying on it. See [Notes](#notes) for more information. |
+| `TeamSettings` | `Object` | No | - | Optional. A hashtable containing team settings to override the default settings. |
 
 ## Examples
 
@@ -45,23 +43,73 @@ If the team already exists, it updates the properties as needed.
 #### PowerShell
 
 ```powershell
-$paramSplat = @{
-    Organization     = 'my-org'
-    ProjectId        = 'my-project'
-    TeamId           = 'my-other-team'
-    Name             = 'my-other-team-updated'
-    Description      = 'My team description'
+$deploySplat = @{
+    TemplateFile          = 'main.ps1'
+    TemplateParameterFile = 'params\main.parameters.json'
 }
 
-..\src\res\team\main.ps1 @paramSplat -Verbose
+.\deploy.ps1 @deploySplat -Verbose
 ```
 
-This example creates or updates a team named 'my-team' in the 'my-project' project within the 'my-org' organization, setting its name and description.
+Deploys the team using the specified template and parameters.
 
+### Example 2
+
+#### PowerShell
+
+```powershell
+$customSplat = @{
+    TemplateFile          = 'main.ps1'
+    TemplateParameterFile = 'params\custom.parameters.json'
+}
+
+.\deploy.ps1 @customSplat -Verbose
+```
+
+Deploys the team using the specified template and custom parameters.
+
+### Example 3
+
+#### PowerShell
+
+```powershell
+$rollbackSplat = @{
+    TemplateFile          = 'main.ps1'
+    TemplateParameterFile = 'params\main.parameters.json'
+}
+
+.\deploy.ps1 @rollbackSplat -Rollback -Force -Verbose
+```
+
+Rolls back (deletes) the team and related resources without confirmation.
+
+### Example 4
+
+#### PowerShell
+
+```powershell
+$paramSplat = @{
+    ProjectId = 'e2egov-prjHb72x9'
+    TeamId = 'Other Team'
+    TeamSettings = @{
+        BugsBehavior = "asRequirements"
+        WorkingDays = @(
+            "monday",
+            "tuesday",
+            "wednesday"
+        )
+    }
+    Description = 'Other Team Description'
+}
+
+.\src\res\team\main.ps1 @paramSplat -Verbose
+```
+
+Deploys or updates a team in the specified Azure DevOps project using the provided parameters in code.
 
 ## Outputs
 
-Returns: `object`
+### `PSCustomObject`
 
 ## Support
 
@@ -71,6 +119,13 @@ This cmdlet supports the common parameters: `-Debug`, `-ErrorAction`, `-ErrorVar
 `-InformationAction`, `-InformationVariable`, `-OutBuffer`, `-OutVariable`, `-PipelineVariable`,  
 `-ProgressAction`, `-Verbose`, `-WarningAction`, and `-WarningVariable`.  
 For more information, see [about_CommonParameters](https://go.microsoft.com/fwlink/?LinkID=113216).
+
+### SupportsShouldProcess
+
+This script supports the `-WhatIf` and `-Confirm` parameters for safe execution:
+
+- **`-WhatIf`**: Shows what would happen if the script runs without actually making any changes.
+- **`-Confirm`**: Prompts for confirmation before performing each action.
 
 ## Dependencies
 
@@ -83,17 +138,25 @@ This script requires the following PowerShell modules:
 
 - [deploy](deploy.ps1)
 
+### Modules
+
+- [nested_areaPaths](modules/nested_areaPaths.ps1)
+- [nested_iterationPaths](modules/nested_iterationPaths.ps1)
+- [nested_teamSettings](modules/nested_teamSettings.ps1)
+
 ### Tests
 
+- [all](tests/e2e/all)
 - [default](tests/e2e/default)
-- [remove](tests/e2e/remove)
+- [rollback](tests/e2e/rollback)
 - [update](tests/e2e/update)
 
 
 ## Notes
 
-- The script uses `CmdletBinding()` and supports common parameters (`-Verbose`, `-Debug`, etc.)
-- All operations are logged with `Write-Verbose` for debugging
-- The script automatically imports the `Azure.DevOps.PSModule` if not already loaded
-- Automatic connection to Azure DevOps organization if not already connected
-- Team refresh operations occur after modifications to ensure data consistency
+- Operations are idempotent (safe to run multiple times).
+- Ensure you are logged in to Azure using Connect-AzAccount before running this script.
+- User confirmation is required for deletion unless `-Force` is specified.
+
+> [!WARNING]
+> Deleting a team removes all team configuration settings (dashboards, backlogs, boards). Work item data remains unchanged. Team configurations cannot be recovered once deleted. [Learn more about deleting teams](https://learn.microsoft.com/en-us/azure/devops/organizations/settings/rename-remove-team?view=azure-devops&tabs=preview-page#delete-a-team).

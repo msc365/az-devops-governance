@@ -1,10 +1,9 @@
 {
-    "organization": "msc365",
-    "projectId": "my-project",
-    "teamId": "My Other Team",
-    "name": "",
-    "description": "My other team description",
-    "settings": {
+    "$schema": "../../../../schemas/team.schema.json",
+    "projectId": "{prefix}-prj{uniqueId}",
+    "teamId": "Other Team",
+    "description": "Other team description",
+    "teamSettings": {
         "backlogVisibilities": {
             "Microsoft.EpicCategory": false,
             "Microsoft.FeatureCategory": true,

@@ -12,22 +12,24 @@
 
 #region PARAMETERS
 
-$params = @{
+$params = [hashtable]@{
     ProjectId       = 'e2egov-prjHb72x9'
     TeamId          = 'Test Team'
-    Description     = 'Updates test team description'
+    Description     = 'Test team description'
     TeamSettings    = @{
         backlogVisibilities   = @{
-            'Microsoft.EpicCategory'        = $true
+            'Microsoft.EpicCategory'        = $false
             'Microsoft.FeatureCategory'     = $true
             'Microsoft.RequirementCategory' = $true
         }
-        bugsBehavior          = 'asRequirements'
+        bugsBehavior          = 'asTasks'
         defaultIterationMacro = '@currentIteration'
         workingDays           = @(
+            'monday'
             'tuesday'
             'wednesday'
             'thursday'
+            'friday'
         )
     }
     GroupMembership = @(
