@@ -2,5 +2,5 @@
     "$schema": "../../schemas/config.schema.json",
     "uniqueId": "Hb72x9",
     "prefix": "e2egov",
-    "organization": "e2egov-org"
+    "collectionUri": "https://dev.azure.com/e2egov-org"
 }
