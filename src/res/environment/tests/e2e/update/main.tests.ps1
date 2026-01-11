@@ -13,10 +13,10 @@
 #region PARAMETERS
 
 $params = @{
-    Organization  = 'e2egov-org'
-    ProjectId     = 'e2egov-prjHb72x9'
+    CollectionUri = 'https://dev.azure.com/e2egov-org'
+    ProjectName   = 'e2egov-prjHb72x9'
     Name          = 'env-e2egov-prjHb72x9-tst'
-    Description   = 'Updated e2e governance description'
+    Description   = 'Updated environment description'
     ResourceGroup = @{
         Name           = 'rg-e2egov-prjHb72x9-tst-weu'
         Location       = 'westeurope'

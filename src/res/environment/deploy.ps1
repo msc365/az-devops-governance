@@ -10,10 +10,7 @@ param (
     [string]$ConfigFile = '..\..\cfg\main.config.json',
 
     [Parameter()]
-    [switch]$Rollback,
-
-    [Parameter()]
-    [switch]$Force
+    [switch]$Rollback
 )
 
 begin {
@@ -42,14 +39,13 @@ process {
             $params.Remove('$schema') | Out-Null
         }
 
-        Write-Verbose 'Using params:'
-        Write-Verbose ($params | ConvertTo-Json -Depth 5)
+        Write-Verbose "Using params: $($params | ConvertTo-Json -Depth 5)"
 
         # Execute the deployment template with parameters
         $params += @{
             Rollback = $Rollback.IsPresent
-            Force    = $Force.IsPresent
             WhatIf   = $WhatIfPreference
+            Confirm  = $ConfirmPreference
             Verbose  = $VerbosePreference
         }
 

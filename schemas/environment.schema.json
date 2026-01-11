@@ -17,8 +17,8 @@
         "environment": {
             "type": "object",
             "required": [
-                "organization",
-                "projectId",
+                "collectionUri",
+                "projectName",
                 "name"
             ],
             "properties": {
@@ -26,13 +26,13 @@
                     "type": "string",
                     "description": "JSON Schema reference"
                 },
-                "organization": {
+                "collectionUri": {
                     "type": "string",
-                    "description": "The Azure DevOps organization name"
+                    "description": "The Azure DevOps collection URI"
                 },
-                "projectId": {
+                "projectName": {
                     "type": "string",
-                    "description": "The Azure DevOps project Id or Name"
+                    "description": "The Azure DevOps project ID or Name"
                 },
                 "name": {
                     "type": "string",

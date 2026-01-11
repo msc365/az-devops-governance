@@ -7,37 +7,36 @@
 Create, update or rollback an Azure DevOps Environment.
 
 <!-- omit from toc -->
-## Navigation
+## NAVIGATION
 
-- [Description](#description)
-- [Parameters](#parameters)
-- [Examples](#examples)
-- [Outputs](#outputs)
-- [Support](#support)
-- [Dependencies](#dependencies)
-- [Resources](#resources)
-- [Notes](#notes)
+- [DESCRIPTION](#description)
+- [PARAMETERS](#parameters)
+- [EXAMPLES](#examples)
+- [OUTPUTS](#outputs)
+- [SUPPORT](#support)
+- [DEPENDENCIES](#dependencies)
+- [RESOURCES](#resources)
+- [NOTES](#notes)
 
-## Description
+## DESCRIPTION
 
 This PowerShell script creates, updates or rolls back an Azure DevOps Environment.
 
 It provides comprehensive environment management capabilities including configuration of an optional resource group
 and its properties as a scoped environment.
 
-## Parameters
+## PARAMETERS
 
 | Parameter | Type | Required | Default | Description |
 | :-- | :-- | :-- | :-- | :-- |
-| `Name` | `String` | Yes | - | Required. The name of the environment to create or update. |
-| `Organization` | `String` | Yes | - | Required. The Azure DevOps organization name. |
-| `ProjectId` | `String` | Yes | - | Required. The Azure DevOps project ID or Name where the environment will be created. |
+| `Name` | `String` | Yes | - | Required. The name of the environment to create, update, or remove. |
+| `CollectionUri` | `String` | No | `$env:DefaultAdoCollectionUri` | Optional. The collection URI of the Azure DevOps collection/organization, e.g., https://dev.azure.com/my-org. |
 | `Description` | `String` | No | - | Optional. A description for the environment. |
-| `Force` | `Switch` | No | - | Optional. Switch to force deletion without confirmation during rollback. |
-| `ResourceGroup` | `Object` | No | - | Optional. An optional object defining the resource group properties: `Name`, `Location`, `SubscriptionId`, `Tags`. See [Notes](#notes) for more information. |
-| `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (delete) the environment and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing an environment is irreversible and may affect teams relying on it. See [Notes](#notes) for more information. |
+| `ProjectName` | `String` | No | `$env:DefaultAdoProjectName` | Optional. The Azure DevOps project ID or Name where the environment will be created. |
+| `ResourceGroup` | `Hashtable` | No | - | Optional. An optional object defining the resource group properties: `Name`, `Location`, `SubscriptionId`, `Tags`. See [Notes](#notes) for more information. |
+| `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (remove) the environment and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing an environment is irreversible and may affect teams relying on it. See [Notes](#notes) for more information. |
 
-## Examples
+## EXAMPLES
 
 ### Example 1
 
@@ -79,10 +78,10 @@ $rollbackSplat = @{
     TemplateParameterFile = 'params\main.parameters.json'
 }
 
-.\deploy.ps1 @rollbackSplat -Rollback -Force -Verbose
+.\deploy.ps1 @rollbackSplat -Rollback -Confirm:$false -Verbose
 ```
 
-Rolls back (deletes) the environment and related resources without confirmation.
+Rolls back (removes) the environment and related resources without confirmation.
 
 ### Example 4
 
@@ -90,11 +89,11 @@ Rolls back (deletes) the environment and related resources without confirmation.
 
 ```powershell
 $paramSplat = @{
-    Organization   = 'e2egov-org'
-    ProjectId      = 'e2egov-prjHb72x9'
-    Name           = 'env-e2egov-prjHb72x9-tst'
-    Description    = 'Default e2e governance description'
-    ResourceGroup  = @{
+    CollectionUri = 'https://dev.azure.com/e2egov-org'
+    ProjectName   = 'e2egov-prjHb72x9'
+    Name          = 'env-e2egov-prjHb72x9-tst'
+    Description   = 'Default environment description'
+    ResourceGroup = @{
         Name           = 'rg-e2egov-prjHb72x9-tst-weu'
         Location       = 'westeurope'
         SubscriptionId = '00000000-0000-0000-0000-000000000000'
@@ -105,14 +104,31 @@ $paramSplat = @{
 ```
 
 Deploys a new environment including the configuration of an optional resource group
-and its properties as a (least privileged) scoped environment using the specified parameters in code.
-See [Service Connection](../service-connection) deployment for creating a service connection with least privileged access to the resource group.
+and its properties as a (least privileged) scoped environment using the specified parameters in code. <br><br>
+See [Service Connection](../service-connection) deployment for creating a service connection with least privileged access to the resource group.
 
-## Outputs
+## OUTPUTS
 
-### `PSCustomObject`
+```text
+[PSCustomObject]@{
+    id             = Environment ID
+    name           = Environment Name
+    description    = Environment Description
+    resourceGroup  = @{
+        name       = Resource Group Name
+        location   = Resource Group Location
+        resourceId = Resource Group Resource ID
+    }
+    createdBy      = User who created the environment
+    createdOn      = Timestamp of environment creation
+    lastModifiedBy = User who last modified the environment
+    lastModifiedOn = Timestamp of last modification
+    projectName    = Azure DevOps Project Name
+    collectionUri  = Azure DevOps Collection URI
+}
+```
 
-## Support
+## SUPPORT
 
 ### CommonParameters
 
@@ -128,7 +144,7 @@ This script supports the `-WhatIf` and `-Confirm` parameters for safe execution:
 - **`-WhatIf`**: Shows what would happen if the script runs without actually making any changes.
 - **`-Confirm`**: Prompts for confirmation before performing each action.
 
-## Dependencies
+## DEPENDENCIES
 
 This script requires the following PowerShell modules:
 
@@ -136,7 +152,7 @@ This script requires the following PowerShell modules:
 - `Az.Resources`
 - `Azure.DevOps.PSModule`
 
-## Resources
+## RESOURCES
 
 - [deploy](deploy.ps1)
 
@@ -152,11 +168,22 @@ This script requires the following PowerShell modules:
 - [update](tests/e2e/update)
 
 
-## Notes
+## NOTES
 
 - Operations are idempotent (safe to run multiple times).
 - Ensure you are logged in to Azure using Connect-AzAccount before running this script.
-- User confirmation is required for deletion unless `-Force` is specified.
+- User confirmation is required unless `-Force` is specified.
+
+<!-- > [!NOTE]
+> **Declarative design**  
+> This script follows a declarative, idempotent design pattern similar to Desired State Configuration (DSC). Resources are identified by their **Name** (logical identifier), not by system-generated IDs. The script automatically determines the required operation based on current state:
+>
+> - **Create**: If environment with the specified name doesn't exist
+> - **Update**: If environment exists and properties differ from desired state
+> - **No Change**: If environment exists and matches desired state
+> - **Remove**: If -Rollback switch is specified
+>
+> This approach enables true infrastructure-as-code where configuration files define the desired state, and the script converges the actual state to match it. -->
 
 > [!IMPORTANT]
 > **Rollback does not perform actual Resource group deletion**. Resource groups may contain shared resources that are not part of this implementation but could be deployed by other systems or requirements over time. Deleting the Resource group could impact other services and operations relying on those resources.

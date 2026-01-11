@@ -13,10 +13,10 @@
 #region PARAMETERS
 
 $params = @{
-    Organization = 'e2egov-org'
-    ProjectId    = 'e2egov-prjHb72x9'
-    Name         = 'env-e2egov-prjHb72x9-tst'
-    Description  = 'Default e2e governance description'
+    CollectionUri = 'https://dev.azure.com/e2egov-org'
+    ProjectName   = 'e2egov-prjHb72x9'
+    Name          = 'env-e2egov-prjHb72x9-tst'
+    Description   = 'Default environment description'
 }
 
 # endregion

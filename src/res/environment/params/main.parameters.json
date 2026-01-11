@@ -1,7 +1,7 @@
 {
     "$schema": "../../../../schemas/environment.schema.json",
-    "organization": "{organization}",
-    "projectId": "{prefix}-prj{uniqueId}",
+    "collectionUri": "{collectionUri}",
+    "projectName": "{prefix}-prj{uniqueId}",
     "name": "env-{prefix}-prj{uniqueId}-tst",
     "description": "Default e2e governance description",
     "resourceGroup": {
