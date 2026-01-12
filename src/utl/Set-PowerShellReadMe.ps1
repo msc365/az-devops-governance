@@ -91,7 +91,9 @@ function Get-ScriptMetadata {
 
     # Extract outputs
     if ($scriptContent -match '\.OUTPUTS([\s\S]*?)(?=\.(PARAMETER|EXAMPLE|NOTES|SYNOPSIS|DESCRIPTION|#>))') {
-        $metadata.Outputs = $matches[1].Trim()
+        # Remove leading/trailing newlines but preserve indentation structure
+        $outputText = $matches[1] -replace '^\r?\n', '' -replace '\r?\n\s*$', ''
+        $metadata.Outputs = $outputText
     }
 
     # Extract parameter details from param block
@@ -203,7 +205,7 @@ function Initialize-ReadMe {
     # Add badges if available
     $badges = @()
     if ($Metadata.PSScriptInfo.Version) {
-        $badges += "![Version](https://img.shields.io/badge/script--version-$($Metadata.PSScriptInfo.Version)-blue)"
+        $badges += "![Version](https://img.shields.io/badge/script%20version-$($Metadata.PSScriptInfo.Version)-blue)"
     }
 
     # License badge - use explicit LICENSE field or try to infer from repository LICENSE file
@@ -266,7 +268,7 @@ function Set-DescriptionSection {
     )
 
     $newContent = @()
-    $newContent += '## Description'
+    $newContent += '## DESCRIPTION'
     $newContent += ''
 
     if ($Metadata.Description) {
@@ -306,7 +308,7 @@ function Set-DescriptionSection {
 
     $newContent += ''
 
-    return Merge-FileWithNewContent -OldContent $ReadMeContent -NewContent $newContent -SectionStartIdentifier '## Description' -ContentType 'nextH2'
+    return Merge-FileWithNewContent -OldContent $ReadMeContent -NewContent $newContent -SectionStartIdentifier '## DESCRIPTION' -ContentType 'nextH2'
 }
 
 function Set-ParametersSection {
@@ -328,7 +330,7 @@ function Set-ParametersSection {
     }
 
     $newContent = @()
-    $newContent += '## Parameters'
+    $newContent += '## PARAMETERS'
     $newContent += ''
     $newContent += '| Parameter | Type | Required | Default | Description |'
     $newContent += '| :-- | :-- | :-- | :-- | :-- |'
@@ -346,7 +348,7 @@ function Set-ParametersSection {
             'Object'
         }
 
-        # Format default value - handle hashtables specially
+        # Format default value - handle hashtable specially
         if ($param.Default) {
             if ($param.Default -match '^@\{(.+)\}$') {
                 # Format hashtable with <br /> tags (with spaces for proper HTML rendering)
@@ -407,7 +409,192 @@ function Set-ParametersSection {
 
     $newContent += ''
 
-    return Merge-FileWithNewContent -OldContent $ReadMeContent -NewContent $newContent -SectionStartIdentifier '## Parameters' -ContentType 'nextH2'
+    return Merge-FileWithNewContent -OldContent $ReadMeContent -NewContent $newContent -SectionStartIdentifier '## PARAMETERS' -ContentType 'nextH2'
+}
+
+function Set-ParameterSetsSection {
+    <#
+    .SYNOPSIS
+        Creates or updates the Syntax section with parameter sets.
+    #>
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory)]
+        [object[]] $ReadMeContent,
+
+        [Parameter(Mandatory)]
+        [string] $ScriptPath,
+
+        [Parameter(Mandatory)]
+        [object] $Metadata
+    )
+
+    # Parse script to extract parameter sets
+    $scriptContent = Get-Content -Path $ScriptPath -Raw
+    $scriptAst = [System.Management.Automation.Language.Parser]::ParseInput($scriptContent, [ref]$null, [ref]$null)
+
+    $paramBlock = $scriptAst.ParamBlock
+    if (-not $paramBlock) {
+        return $ReadMeContent
+    }
+
+    # Get script/function name
+    $scriptName = Split-Path -Path $ScriptPath -LeafBase
+
+    # Collect parameter set information with full details
+    $parameterSets = @{}
+    $defaultParameterSet = $null
+    $parameterDetails = @{}
+    $parameterOrder = @()  # Track original parameter order
+
+    # Check CmdletBinding for DefaultParameterSetName
+    if ($scriptContent -match '\[CmdletBinding\([^\)]*DefaultParameterSetName\s*=\s*[''"]([^''"]+)[''"]') {
+        $defaultParameterSet = $matches[1]
+    }
+
+    # Collect full parameter details and preserve order
+    foreach ($param in $paramBlock.Parameters) {
+        $paramName = $param.Name.VariablePath.UserPath
+        $paramType = $param.StaticType.Name
+
+        # Track original order
+        if ($paramName -notin $parameterOrder) {
+            $parameterOrder += $paramName
+        }
+
+        $parameterDetails[$paramName] = @{
+            Type    = $paramType
+            Default = if ($param.DefaultValue) { $param.DefaultValue.Extent.Text } else { $null }
+        }
+
+        # Find ParameterSet attributes
+        foreach ($attribute in $param.Attributes) {
+            if ($attribute.TypeName.Name -eq 'Parameter') {
+                $setName = '__AllParameterSets'  # Default set name
+
+                foreach ($namedArg in $attribute.NamedArguments) {
+                    if ($namedArg.ArgumentName -eq 'ParameterSetName') {
+                        $setName = $namedArg.Argument.Value
+                        break
+                    }
+                }
+
+                if (-not $parameterSets.ContainsKey($setName)) {
+                    $parameterSets[$setName] = @()
+                }
+
+                # Check if parameter is mandatory in this set
+                $isMandatory = $false
+                foreach ($namedArg in $attribute.NamedArguments) {
+                    if ($namedArg.ArgumentName -eq 'Mandatory' -and $namedArg.Argument.Value -eq $true) {
+                        $isMandatory = $true
+                        break
+                    }
+                }
+
+                # Check for ValueFromPipeline
+                $valueFromPipeline = $false
+                foreach ($namedArg in $attribute.NamedArguments) {
+                    if ($namedArg.ArgumentName -eq 'ValueFromPipeline' -and $namedArg.Argument.Value -eq $true) {
+                        $valueFromPipeline = $true
+                        break
+                    }
+                }
+
+                $parameterSets[$setName] += @{
+                    Name              = $paramName
+                    Mandatory         = $isMandatory
+                    Type              = $paramType
+                    ValueFromPipeline = $valueFromPipeline
+                }
+            }
+        }
+    }
+
+    # If only __AllParameterSets exists, no need for this section
+    if ($parameterSets.Count -eq 1 -and $parameterSets.ContainsKey('__AllParameterSets')) {
+        return $ReadMeContent
+    }
+
+    # Store common parameters that apply to all sets
+    $commonParams = @()
+    if ($parameterSets.ContainsKey('__AllParameterSets')) {
+        $commonParams = $parameterSets['__AllParameterSets']
+    }
+
+    # If there are multiple parameter sets, exclude __AllParameterSets from being shown as separate section
+    if ($parameterSets.Count -gt 1 -and $parameterSets.ContainsKey('__AllParameterSets')) {
+        $parameterSets.Remove('__AllParameterSets')
+    }
+
+    # Build the SYNTAX section
+    $newContent = @()
+    $newContent += '## SYNTAX'
+    $newContent += ''
+
+    # Sort parameter sets: default first, then alphabetically
+    $sortedSets = $parameterSets.Keys | Sort-Object {
+        if ($_ -eq $defaultParameterSet) { "0_$_" }
+        else { "1_$_" }
+    }
+
+    foreach ($setName in $sortedSets) {
+        $newContent += "### $setName"
+        $newContent += ''
+        $newContent += '```text'
+
+        # Build syntax string
+        $syntaxLine = $scriptName
+
+        # Get parameters for this set, preserving original order
+        $setParams = $parameterSets[$setName]
+        $orderedParams = @()
+
+        # Sort by original order from param block
+        foreach ($paramName in $parameterOrder) {
+            # Check if parameter is in this specific set
+            $param = $setParams | Where-Object { $_.Name -eq $paramName }
+            if ($param) {
+                $orderedParams += $param
+            }
+            # Also check if parameter is in common parameters (available to all sets)
+            else {
+                $commonParam = $commonParams | Where-Object { $_.Name -eq $paramName }
+                if ($commonParam) {
+                    $orderedParams += $commonParam
+                }
+            }
+        }
+
+        foreach ($param in $orderedParams) {
+            $paramName = $param.Name
+            $paramType = $param.Type.ToLower()
+
+            # Format parameter with type
+            if ($paramType -eq 'switchparameter') {
+                $paramSyntax = "[-$paramName]"
+            } else {
+                if ($param.Mandatory) {
+                    $paramSyntax = "[-$paramName] <$paramType>"
+                } else {
+                    $paramSyntax = "[[-$paramName] <$paramType>]"
+                }
+            }
+
+            $syntaxLine += " $paramSyntax"
+        }
+
+        # Add CommonParameters if script has CmdletBinding
+        if ($Metadata.HasCmdletBinding) {
+            $syntaxLine += ' [<CommonParameters>]'
+        }
+
+        $newContent += $syntaxLine
+        $newContent += '```'
+        $newContent += ''
+    }
+
+    return Merge-FileWithNewContent -OldContent $ReadMeContent -NewContent $newContent -SectionStartIdentifier '## SYNTAX' -ContentType 'nextH2'
 }
 
 function Set-ExamplesSection {
@@ -429,7 +616,7 @@ function Set-ExamplesSection {
     }
 
     $newContent = @()
-    $newContent += '## Examples'
+    $newContent += '## EXAMPLES'
     $newContent += ''
 
     $exampleNumber = 1
@@ -525,7 +712,7 @@ function Set-ExamplesSection {
         $exampleNumber++
     }
 
-    return Merge-FileWithNewContent -OldContent $ReadMeContent -NewContent $newContent -SectionStartIdentifier '## Examples' -ContentType 'nextH2'
+    return Merge-FileWithNewContent -OldContent $ReadMeContent -NewContent $newContent -SectionStartIdentifier '## EXAMPLES' -ContentType 'nextH2'
 }
 
 function Set-OutputsSection {
@@ -543,11 +730,44 @@ function Set-OutputsSection {
     )
 
     $newContent = @()
-    $newContent += '## Outputs'
+    $newContent += '## OUTPUTS'
     $newContent += ''
 
     if ($Metadata.Outputs) {
-        $newContent += $Metadata.Outputs
+        $newContent += '```text'
+
+        # Process output lines - trim leading indentation while preserving structure
+        $outputLines = $Metadata.Outputs -split '\r?\n'
+
+        # Find minimum indentation (excluding empty lines)
+        $minIndent = 999
+        foreach ($line in $outputLines) {
+            if ($line.Trim()) {
+                if ($line -match '^(\s*)') {
+                    $leadingSpaces = $matches[1].Length
+                    if ($leadingSpaces -lt $minIndent) {
+                        $minIndent = $leadingSpaces
+                    }
+                }
+            }
+        }
+        if ($minIndent -eq 999) { $minIndent = 0 }
+
+        # Process each line: remove common indentation, preserve empty lines and trailing spaces
+        foreach ($line in $outputLines) {
+            if (-not $line.Trim()) {
+                # Empty line - preserve it
+                $newContent += ''
+            } elseif ($minIndent -gt 0 -and $line.Length -ge $minIndent) {
+                # Remove common leading indentation but preserve trailing spaces
+                $newContent += $line.Substring($minIndent)
+            } else {
+                # No common indentation to remove, or line is shorter than minIndent
+                $newContent += $line.TrimStart()
+            }
+        }
+
+        $newContent += '```'
     } else {
         # Try to detect OutputType attribute
         $scriptContent = Get-Content -Path $ScriptFilePath -Raw
@@ -560,7 +780,7 @@ function Set-OutputsSection {
 
     $newContent += ''
 
-    return Merge-FileWithNewContent -OldContent $ReadMeContent -NewContent $newContent -SectionStartIdentifier '## Outputs' -ContentType 'nextH2'
+    return Merge-FileWithNewContent -OldContent $ReadMeContent -NewContent $newContent -SectionStartIdentifier '## OUTPUTS' -ContentType 'nextH2'
 }
 
 function Set-SupportSection {
@@ -583,7 +803,7 @@ function Set-SupportSection {
     }
 
     $newContent = @()
-    $newContent += '## Support'
+    $newContent += '## SUPPORT'
     $newContent += ''
 
     # Add CommonParameters subsection if script has CmdletBinding, use multi-line for better readability
@@ -608,7 +828,7 @@ function Set-SupportSection {
         $newContent += ''
     }
 
-    return Merge-FileWithNewContent -OldContent $ReadMeContent -NewContent $newContent -SectionStartIdentifier '## Support' -ContentType 'nextH2'
+    return Merge-FileWithNewContent -OldContent $ReadMeContent -NewContent $newContent -SectionStartIdentifier '## SUPPORT' -ContentType 'nextH2'
 }
 
 function Set-DependenciesSection {
@@ -644,7 +864,7 @@ function Set-DependenciesSection {
     }
 
     $newContent = @()
-    $newContent += '## Dependencies'
+    $newContent += '## DEPENDENCIES'
     $newContent += ''
     $newContent += 'This script requires the following PowerShell modules:'
     $newContent += ''
@@ -655,7 +875,7 @@ function Set-DependenciesSection {
 
     $newContent += ''
 
-    return Merge-FileWithNewContent -OldContent $ReadMeContent -NewContent $newContent -SectionStartIdentifier '## Dependencies' -ContentType 'nextH2'
+    return Merge-FileWithNewContent -OldContent $ReadMeContent -NewContent $newContent -SectionStartIdentifier '## DEPENDENCIES' -ContentType 'nextH2'
 }
 
 function Set-ResourcesSection {
@@ -781,7 +1001,7 @@ function Set-ResourcesSection {
 
     # Build the Resources section with subsections
     $newContent = @()
-    $newContent += '## Resources'
+    $newContent += '## RESOURCES'
     $newContent += ''
 
     # Deploy script directly under Resources (not in a subsection)
@@ -840,7 +1060,7 @@ function Set-ResourcesSection {
         $newContent += ''
     }
 
-    return Merge-FileWithNewContent -OldContent $ReadMeContent -NewContent $newContent -SectionStartIdentifier '## Resources' -ContentType 'nextH2'
+    return Merge-FileWithNewContent -OldContent $ReadMeContent -NewContent $newContent -SectionStartIdentifier '## RESOURCES' -ContentType 'nextH2'
 }
 
 function Set-TableOfContent {
@@ -857,7 +1077,7 @@ function Set-TableOfContent {
     $sections = @()
 
     foreach ($line in $ReadMeContent) {
-        if ($line -match '^## (.+)$' -and $matches[1] -ne 'Navigation') {
+        if ($line -match '^## (.+)$' -and $matches[1] -ne 'NAVIGATION') {
             $sectionName = $matches[1]
             $anchor = $sectionName.ToLower() -replace '\s+', '-' -replace '[^a-z0-9-]', ''
             $sections += @{
@@ -873,7 +1093,7 @@ function Set-TableOfContent {
 
     $newContent = @()
     $newContent += '<!-- omit from toc -->'
-    $newContent += '## Navigation'
+    $newContent += '## NAVIGATION'
     $newContent += ''
 
     foreach ($section in $sections) {
@@ -985,11 +1205,12 @@ function Set-PowerShellReadMe {
         [string] $ReadMeFilePath = (Join-Path (Split-Path $ScriptFilePath -Parent) 'README.md'),
 
         [Parameter(Mandatory = $false)]
-        [ValidateSet('Description', 'Navigation', 'Parameters', 'Examples', 'Outputs', 'Support', 'Dependencies', 'Resources')]
+        [ValidateSet('Description', 'Navigation', 'Parameters', 'ParameterSets', 'Examples', 'Outputs', 'Support', 'Dependencies', 'Resources')]
         [string[]] $SectionsToRefresh = @(
             'Description'
             'Navigation'
             'Parameters'
+            'ParameterSets'
             'Examples'
             'Outputs'
             'Support'
@@ -1030,7 +1251,7 @@ function Set-PowerShellReadMe {
 
             # Preserve Notes section if it exists
             $notes = @()
-            if ($match = $readMeContent | Select-String -Pattern '^## Notes$') {
+            if ($match = $readMeContent | Select-String -Pattern '^## (Notes|NOTES)$') {
                 $startIndex = $match.LineNumber - 1
                 $endIndex = $startIndex + 1
 
@@ -1039,6 +1260,8 @@ function Set-PowerShellReadMe {
                 }
 
                 $notes = $readMeContent[$startIndex..$endIndex]
+                # Update header to CAPS
+                $notes[0] = '## NOTES'
             }
 
             # Initialize README
@@ -1050,6 +1273,10 @@ function Set-PowerShellReadMe {
             # Update sections
             if ($SectionsToRefresh -contains 'Description') {
                 $tempContent = Set-DescriptionSection -ReadMeContent $tempContent -Metadata $metadata
+            }
+
+            if ($SectionsToRefresh -contains 'ParameterSets') {
+                $tempContent = Set-ParameterSetsSection -ReadMeContent $tempContent -ScriptPath $ScriptFilePath -Metadata $metadata
             }
 
             if ($SectionsToRefresh -contains 'Parameters') {
@@ -1095,7 +1322,7 @@ function Set-PowerShellReadMe {
                     # Add Notes to navigation if it exists
                     if ($notes.Count -gt 0) {
                         $sections += @{
-                            Name   = 'Notes'
+                            Name   = 'NOTES'
                             Anchor = 'notes'
                         }
                     }
@@ -1103,7 +1330,7 @@ function Set-PowerShellReadMe {
                     # Insert Navigation right after the title/synopsis section
                     $navContent = @()
                     $navContent += '<!-- omit from toc -->'
-                    $navContent += '## Navigation'
+                    $navContent += '## NAVIGATION'
                     $navContent += ''
                     foreach ($section in $sections) {
                         $navContent += "- [$($section.Name)](#$($section.Anchor))"
