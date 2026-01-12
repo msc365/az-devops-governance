@@ -64,7 +64,7 @@
         visibility    = Project Visibility
         defaultTeam   = Default Team Object
         featureStates = Array of Feature State Objects
-        resourceType  = 'Project'
+        resourceType  = Resource Type (Project)
         collectionUri = Collection URI
         status        = Operation Status (Created, Updated, UnChanged, Removed, NotFound, Skipped)
     }

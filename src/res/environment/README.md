@@ -123,8 +123,10 @@ See [Service Connection](../service-connection) deployment for creating a servic
     createdOn      = Timestamp of environment creation
     lastModifiedBy = User who last modified the environment
     lastModifiedOn = Timestamp of last modification
+    resourceType   = Resource Type (Environment)
     projectName    = Azure DevOps Project Name
     collectionUri  = Azure DevOps Collection URI
+    status         = Operation Status (Created, Updated, NoChange, Removed, NotFound, Skipped)
 }
 ```
 

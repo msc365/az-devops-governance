@@ -62,8 +62,10 @@
         createdOn      = Timestamp of environment creation
         lastModifiedBy = User who last modified the environment
         lastModifiedOn = Timestamp of last modification
+        resourceType   = Resource Type (Environment)
         projectName    = Azure DevOps Project Name
         collectionUri  = Azure DevOps Collection URI
+        status         = Operation Status (Created, Updated, NoChange, Removed, NotFound, Skipped)
     }
 
 .EXAMPLE
@@ -355,11 +357,13 @@ process {
 
             # Return rollback result
             return [PSCustomObject]@{
-                id      = if ($env) { $env.id } else { $null }
-                name    = $Name
-                project = $ProjectName
-                action  = 'Rollback'
-                status  = $status
+                id            = if ($env) { $env.id } else { $null }
+                name          = $Name
+                resourceType  = 'Environment'
+                projectName   = $ProjectName
+                collectionUri = $CollectionUri
+                action        = 'Rollback'
+                status        = $status
             }
         }
 
@@ -387,6 +391,7 @@ process {
             $obj['lastModifiedBy'] = $env.lastModifiedBy
             $obj['lastModifiedOn'] = $env.lastModifiedOn
         }
+        $obj['resourceType'] = 'Environment'
         $obj['projectName'] = $ProjectName
         $obj['collectionUri'] = $CollectionUri
         $obj['status'] = $status
