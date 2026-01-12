@@ -60,7 +60,7 @@ function Set-PlaceholderValue {
                 $value = $config[$key]
 
                 if ($null -ne $value) {
-                    Write-Verbose ('Replacing placeholder {0} with value: {1}' -f $placeholder, $value)
+                    Write-Verbose ('Set {0} with value: {1}' -f $placeholder, $value)
                     $outputJson = $outputJson -replace [regex]::Escape($placeholder), $value
                 }
             }
