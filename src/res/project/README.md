@@ -2,44 +2,43 @@
 <!-- omit from toc -->
 # Project `[res\project\main.ps1]`
 
-![Version](https://img.shields.io/badge/script--version-0.1.0-blue) [![License](https://img.shields.io/badge/license-MIT-purple)](https://github.com/msc365/az-devops-governance/blob/main/LICENSE)
+![Version](https://img.shields.io/badge/script%20version-0.1.0-blue) [![License](https://img.shields.io/badge/license-MIT-purple)](https://github.com/msc365/az-devops-governance/blob/main/LICENSE)
 
-Create, update or rollback an Azure DevOps Project with specified settings.
+Create, update or rollback an Azure DevOps Project.
 
 <!-- omit from toc -->
-## Navigation
+## NAVIGATION
 
-- [Description](#description)
-- [Parameters](#parameters)
-- [Examples](#examples)
-- [Outputs](#outputs)
-- [Support](#support)
-- [Dependencies](#dependencies)
-- [Resources](#resources)
-- [Notes](#notes)
+- [DESCRIPTION](#description)
+- [PARAMETERS](#parameters)
+- [EXAMPLES](#examples)
+- [OUTPUTS](#outputs)
+- [SUPPORT](#support)
+- [DEPENDENCIES](#dependencies)
+- [RESOURCES](#resources)
+- [NOTES](#notes)
 
-## Description
+## DESCRIPTION
 
 This script creates, updates or rolls back an Azure DevOps Project within a specified organization.
 
-It allows you to set project properties such as name, description, process template, source control type, visibility, and feature states.
+It provides options to configure project properties such as description, default team, process template, source control type, visibility, and feature states.
 
-## Parameters
+## PARAMETERS
 
 | Parameter | Type | Required | Default | Description |
 | :-- | :-- | :-- | :-- | :-- |
 | `Name` | `String` | Yes | - | Required. The name of the Azure DevOps project to create, update or delete. |
-| `Organization` | `String` | Yes | - | Required. The name of the Azure DevOps organization where the project will be created or updated. |
+| `CollectionUri` | `String` | No | `$env:DefaultAdoCollectionUri` | Optional. The collection URI of the Azure DevOps collection/organization, e.g. : `https://dev.azure.com/my-org`, `https://vssps.dev.azure.com/my-org`. |
 | `DefaultTeam` | `String` | No | - | Optional. The name of the default team for the project. Defaults to '\<Project Name> Team'. |
 | `Description` | `String` | No | - | Optional. A description for the Azure DevOps project. |
 | `Features` | `Hashtable` | No | - | Optional. A hashtable defining the feature states for the project. Valid features are 'boards', 'repos', 'pipelines', 'testPlans', and 'artifacts' with states 'enabled' or 'disabled'. |
-| `Force` | `Switch` | No | - | Optional. Switch to force soft deletion without confirmation during rollback. |
 | `Process` | `String` | No | - | Optional. The process template to use for the project. Valid values are 'Agile', 'Scrum', 'CMMI', and 'Basic'. Defaults to the organization's default process. |
 | `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (soft delete) the project and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing a project may affect teams relying on it. See [Notes](#notes) for more information. |
 | `SourceControl` | `String` | No | - | Optional. The type of source control to use for the project. Valid values are 'Git' and 'Tfvc'. Defaults to 'Git'. |
 | `Visibility` | `String` | No | - | Optional. The visibility of the project. Valid values are 'Private' and 'Public'. Defaults to 'Private'. |
 
-## Examples
+## EXAMPLES
 
 ### Example 1
 
@@ -54,7 +53,8 @@ $deploySplat = @{
 .\deploy.ps1 @deploySplat -Verbose
 ```
 
-Deploys the project using the specified template and parameters.
+Deploys the project using the specified template and parameters.
+
 
 ### Example 2
 
@@ -69,7 +69,8 @@ $customSplat = @{
 .\deploy.ps1 @customSplat -Verbose
 ```
 
-Deploys the project using the specified template and custom parameters.
+Deploys the project using the specified template and custom parameters.
+
 
 ### Example 3
 
@@ -81,10 +82,11 @@ $rollbackSplat = @{
     TemplateParameterFile = 'params\main.parameters.json'
 }
 
-.\deploy.ps1 @rollbackSplat -Rollback -Force -Verbose
+.\deploy.ps1 @rollbackSplat -Rollback -Confirm:$false -Verbose
 ```
 
-Rolls back (deletes) the project and related resources without confirmation.
+Rolls back (removes) the project and related resources without confirmation.
+
 
 ### Example 4
 
@@ -92,9 +94,9 @@ Rolls back (deletes) the project and related resources without confirmation.
 
 ```powershell
 $paramSplat = @{
-    Organization  = 'e2egov-org'
+    CollectionUri = 'https://dev.azure.com/e2egov-org'
     Name          = 'e2egov-prjHb72x9'
-    Description   = 'Default e2e governance description'
+    Description   = 'Default project description'
     DefaultTeam   = 'Default Team'
     SourceControl = 'Git'
     Process       = 'Agile'
@@ -113,11 +115,24 @@ $paramSplat = @{
 
 Deploys or updates a project in the specified Azure DevOps organization using the provided parameters in code.
 
-## Outputs
 
-### `PSCustomObject`
+## OUTPUTS
 
-## Support
+```text
+[PSCustomObject]@{
+    id            = Project ID
+    name          = Project Name
+    description   = Project Description
+    visibility    = Project Visibility
+    defaultTeam   = Default Team Object
+    featureStates = Array of Feature State Objects
+    resourceType  = 'Project'
+    collectionUri = Collection URI
+    status        = Operation Status (Created, Updated, UnChanged, Removed, NotFound, Skipped)
+}
+```
+
+## SUPPORT
 
 ### CommonParameters
 
@@ -133,14 +148,14 @@ This script supports the `-WhatIf` and `-Confirm` parameters for safe execution:
 - **`-WhatIf`**: Shows what would happen if the script runs without actually making any changes.
 - **`-Confirm`**: Prompts for confirmation before performing each action.
 
-## Dependencies
+## DEPENDENCIES
 
 This script requires the following PowerShell modules:
 
 - `Az.Accounts`
 - `Azure.DevOps.PSModule`
 
-## Resources
+## RESOURCES
 
 - [deploy](deploy.ps1)
 
@@ -152,11 +167,11 @@ This script requires the following PowerShell modules:
 - [update](tests/e2e/update)
 
 
-## Notes
+## NOTES
 
 - Operations are idempotent (safe to run multiple times).
 - Ensure you are logged in to Azure using Connect-AzAccount before running this script.
-- User confirmation is required for deletion unless `-Force` is specified.
+- User confirmation is required for deletion unless `-Confirm:$false` is specified.
 
 > [!WARNING]
 > You will have up to 28 days to recover this project. After, this project will be deleted resulting in a loss of all project artifacts including work items, repos, teams, and builds. [Learn more about deleting projects](https://aka.ms/az-delete-project).

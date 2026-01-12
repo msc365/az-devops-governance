@@ -1,8 +1,8 @@
 {
     "$schema": "../../../../schemas/project.schema.json",
-    "organization": "{organization}",
+    "collectionUri": "{collectionUri}",
     "name": "{prefix}-prj{uniqueId}",
-    "description": "Default e2e governance description",
+    "description": "Default project description",
     "defaultTeam": "Default Team",
     "sourceControl": "Git",
     "process": "Agile",

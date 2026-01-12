@@ -22,15 +22,15 @@
 #>
 <#
 .SYNOPSIS
-    Create, update or rollback an Azure DevOps Project with specified settings.
+    Create, update or rollback an Azure DevOps Project.
 
 .DESCRIPTION
     This script creates, updates or rolls back an Azure DevOps Project within a specified organization.
 
-    It allows you to set project properties such as name, description, process template, source control type, visibility, and feature states.
+    It provides options to configure project properties such as description, default team, process template, source control type, visibility, and feature states.
 
-.PARAMETER Organization
-    Required. The name of the Azure DevOps organization where the project will be created or updated.
+.PARAMETER CollectionUri
+    Optional. The collection URI of the Azure DevOps collection/organization, e.g. : `https://dev.azure.com/my-org`, `https://vssps.dev.azure.com/my-org`.
 
 .PARAMETER Name
     Required. The name of the Azure DevOps project to create, update or delete.
@@ -56,8 +56,18 @@
 .PARAMETER Rollback
     Optional. Switch to indicate if the operation should rollback (soft delete) the project and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing a project may affect teams relying on it. See [Notes](#notes) for more information.
 
-.PARAMETER Force
-    Optional. Switch to force soft deletion without confirmation during rollback.
+.OUTPUTS
+    [PSCustomObject]@{
+        id            = Project ID
+        name          = Project Name
+        description   = Project Description
+        visibility    = Project Visibility
+        defaultTeam   = Default Team Object
+        featureStates = Array of Feature State Objects
+        resourceType  = 'Project'
+        collectionUri = Collection URI
+        status        = Operation Status (Created, Updated, UnChanged, Removed, NotFound, Skipped)
+    }
 
 .EXAMPLE
     $deploySplat = @{
@@ -85,15 +95,15 @@
         TemplateParameterFile = 'params\main.parameters.json'
     }
 
-    .\deploy.ps1 @rollbackSplat -Rollback -Force -Verbose
+    .\deploy.ps1 @rollbackSplat -Rollback -Confirm:$false -Verbose
 
-    Rolls back (deletes) the project and related resources without confirmation.
+    Rolls back (removes) the project and related resources without confirmation.
 
 .EXAMPLE
     $paramSplat = @{
-        Organization  = 'e2egov-org'
+        CollectionUri = 'https://dev.azure.com/e2egov-org'
         Name          = 'e2egov-prjHb72x9'
-        Description   = 'Default e2e governance description'
+        Description   = 'Default project description'
         DefaultTeam   = 'Default Team'
         SourceControl = 'Git'
         Process       = 'Agile'
@@ -110,35 +120,50 @@
     .\src\res\project\main.ps1 @paramSplat
 
     Deploys or updates a project in the specified Azure DevOps organization using the provided parameters in code.
+
+.NOTES
+    ## Declarative (DSC-like) Design
+
+    This script follows a declarative, idempotent design pattern similar to Desired State Configuration (DSC).
+    Resources are identified by their **Name** (logical identifier), not by system-generated IDs.
+
+    The script automatically determines the required operation based on current state:
+    - **Create**: If environment with the specified name doesn't exist
+    - **Update**: If environment exists and properties differ from desired state
+    - **No Change**: If environment exists and matches desired state
+    - **Remove**: If -Rollback switch is specified
+
+    This approach enables true infrastructure-as-code where configuration files define the desired state,
+    and the script converges the actual state to match it.
 #>
 [CmdletBinding(SupportsShouldProcess)]
 [OutputType([PSCustomObject])]
 param (
-    [Parameter(Mandatory)]
-    [string]$Organization,
+    [Parameter()]
+    [string]$CollectionUri = $env:DefaultAdoCollectionUri,
 
     [Parameter(Mandatory)]
     [string]$Name,
 
-    [Parameter(Mandatory = $false)]
+    [Parameter()]
     [string]$DefaultTeam,
 
-    [Parameter(Mandatory = $false)]
+    [Parameter()]
     [string]$Description,
 
-    [Parameter(Mandatory = $false)]
+    [Parameter()]
     [ValidateSet('Agile', 'Scrum', 'CMMI', 'Basic')]
     [string]$Process,
 
-    [Parameter(Mandatory = $false)]
+    [Parameter()]
     [ValidateSet('Git', 'Tfvc')]
     [string]$SourceControl,
 
-    [Parameter(Mandatory = $false)]
+    [Parameter()]
     [ValidateSet('Private', 'Public')]
     [string]$Visibility,
 
-    [Parameter(Mandatory = $false)]
+    [Parameter()]
     [ValidateScript({
             $validKeys = @('boards', 'repos', 'pipelines', 'artifacts', 'testPlans')
             $validValues = @('enabled', 'disabled')
@@ -156,48 +181,57 @@ param (
     [hashtable]$Features,
 
     [Parameter()]
-    [switch]$Rollback,
-
-    [Parameter()]
-    [switch]$Force
+    [switch]$Rollback
 )
 
 begin {
     Write-Verbose "[Enter]: .\src\res\project\$($MyInvocation.MyCommand.Name)"
 
-    if ($null -eq (Get-AzContext)) {
+    # Validate required parameters
+    if ([string]::IsNullOrWhiteSpace($CollectionUri)) {
+        throw "CollectionUri is required. Provide via parameter or use Set-AdoDefault to set '`$env:DefaultAdoCollectionUri'."
+    }
+
+    # Validate Azure context
+    $currentContext = Get-AzContext
+    if ($null -eq $currentContext) {
         throw 'No Azure context found. Please login using Connect-AzAccount.'
     }
-
-    # Define required modules
-    $modules = @(
-        'Azure.DevOps.PSModule'
-    )
-
-    # Import required modules
-    $modules | ForEach-Object {
-        if (-not (Get-Module -Name $_)) {
-            Import-Module $_ -Force -Verbose:$false -ErrorAction Stop
-        }
+    if ($null -eq $currentContext.Subscription) {
+        throw 'No active Azure subscription found in current context. Use Set-AzContext to select a subscription.'
     }
 
-    # Connect to Azure DevOps Organization
-    Connect-AdoOrganization -Organization $Organization | Out-Null
+    $ctxSplat = @{
+        Tenant           = $currentContext.Tenant.Id
+        SubscriptionId   = $currentContext.Subscription.Id
+        SubscriptionName = $currentContext.Subscription.Name
+    }
+    Write-Verbose "Context: $($ctxSplat | ConvertTo-Json -Depth 5)"
+
+    # Import required module if not already loaded
+    $requiredModule = 'Azure.DevOps.PSModule'
+
+    if (-not (Get-Module -Name $requiredModule)) {
+        Import-Module $requiredModule -Force -Verbose:$false -ErrorAction Stop
+        Write-Verbose "Module '$requiredModule' imported successfully."
+    }
 }
 
 process {
     try {
         $ErrorActionPreference = 'Stop'
-        $Error.Clear()
 
         #region INITIALIZE
+
+        # Status
+        $status = 'Unknown'
 
         # Variables
 
         $prj, $set, $get = $null
 
         # Project
-        $prj = Get-AdoProject -ProjectId $Name -ErrorAction SilentlyContinue
+        $prj = Get-AdoProject -Project $Name -WhatIf:$false -ErrorAction SilentlyContinue
 
         #endregion
 
@@ -205,11 +239,9 @@ process {
 
         if (-not $Rollback.IsPresent) {
             if ($null -eq $prj) {
-                if ($PSCmdlet.ShouldProcess("project/$($Name)", 'Create')) {
-
+                if ($PSCmdlet.ShouldProcess($CollectionUri, "Create project: $($Name)")) {
                     $prjSplat = @{
-                        Name    = $Name
-                        Verbose = $VerbosePreference
+                        Name = $Name
                     }
 
                     if ($PSBoundParameters.ContainsKey('Description')) {
@@ -225,85 +257,127 @@ process {
                         $prjSplat['Visibility'] = $Visibility
                     }
 
-                    $prj = New-AdoProject @prjSplat -ErrorAction Stop
+                    $prj = New-AdoProject @prjSplat -Confirm:$false -ErrorAction Stop
+
+                    $status = 'Created'
+                    Write-Verbose "[CREATE] Project: '$Name' (ID: $($prj.Id))"
+                } else {
+                    $status = 'Skipped'
+                    Write-Verbose "[WHATIF] Call New-AdoProject with parameters: $($prjSplat | ConvertTo-Json -Depth 5)"
                 }
             }
 
             if ($null -ne $prj) {
+                # Environment already exists -> check for changes
+                $hasChanges = $false
+                if ($status -ne 'Created') { $status = 'UnChanged' }
 
-                $set = $false
                 $prjSplat = @{
-                    ProjectId = $prj.Id
-                    Verbose   = $VerbosePreference
+                    CollectionUri = $CollectionUri
+                    Id            = $prj.Id
+                    Name          = $Name
                 }
 
-                if ($PSBoundParameters.ContainsKey('Description') -and ($prj.Description -ne $Description)) {
-                    if ($PSCmdlet.ShouldProcess("Property='Description' Value='$($Description.Substring(0, [Math]::Min($Description.Length, 16)))...'", 'Update')) {
+                # Only check description if it was explicitly provided
+                if ($PSBoundParameters.ContainsKey('Description')) {
 
+                    # Normalize to empty string for comparison
+                    $currentDesc = $prj.Description ?? ''
+                    $newDesc = $Description ?? ''
+
+                    if ($newDesc -ne $currentDesc) {
                         $prjSplat['Description'] = $Description
-                        $set = $true
+                        $hasChanges = $true
                     }
                 }
 
-                if ($PSBoundParameters.ContainsKey('Visibility') -and ($prj.Visibility -ne $Visibility)) {
-                    if ($PSCmdlet.ShouldProcess("Property='Visibility' Value='$($Visibility)'", 'Update')) {
-
+                # Only check visibility if it was explicitly provided
+                if ($PSBoundParameters.ContainsKey('Visibility')) {
+                    if ($Visibility -ne $prj.Visibility) {
                         $prjSplat['Visibility'] = $Visibility
-                        $set = $true
+                        $hasChanges = $true
                     }
                 }
 
-                if ($set) {
-                    Set-AdoProject @prjSplat -ErrorAction Stop | Out-Null
-                    $get = $true
+                if ($hasChanges) {
+                    if ($PSCmdlet.ShouldProcess($CollectionUri, "Update project: $($Name)")) {
+                        Set-AdoProject @prjSplat -Confirm:$false -ErrorAction Stop | Out-Null
+
+                        if ($status -ne 'Created') { $status = 'Updated' }
+                        $hasChanges = $false
+                        Write-Verbose "[UPDATE] Project: '$Name' (ID: $($prj.Id))"
+                    } else {
+                        $status = 'Skipped'
+                        $hasChanges = $false
+                        Write-Verbose "[WHATIF] Call Set-AdoProject with parameters: $($prjSplat | ConvertTo-Json -Depth 5)"
+                    }
                 }
 
-                if ($PSBoundParameters.ContainsKey('DefaultTeam') -and $prj.DefaultTeam.Name -ne $DefaultTeam) {
-                    if ($PSCmdlet.ShouldProcess("Property='DefaultTeam' Value='$($DefaultTeam)'", 'Update')) {
+                # Only check default team if it was explicitly provided
+                if ($PSBoundParameters.ContainsKey('DefaultTeam')) {
+                    $teamSplat = @{
+                        CollectionUri = $CollectionUri
+                        ProjectName   = $Name
+                        Id            = $prj.DefaultTeam.Id
+                    }
 
-                        $teamSplat = @{
-                            ProjectId = $prj.Id
-                            TeamId    = $prj.DefaultTeam.Id
-                            Name      = $DefaultTeam
+                    # Normalize to empty string for comparison
+                    $currentDefaultTeam = $prj.DefaultTeam.Name ?? ''
+                    $newDefaultTeam = $DefaultTeam ?? ''
+
+                    if ($currentDefaultTeam -ne $newDefaultTeam) {
+                        $teamSplat['Name'] = $DefaultTeam
+                        $hasChanges = $true
+                    }
+
+                    if ($hasChanges) {
+                        if ($PSCmdlet.ShouldProcess($Name, "Update default team: $($DefaultTeam)")) {
+
+                            Set-AdoTeam @teamSplat -Confirm:$false -ErrorAction Stop | Out-Null
+
+                            if ($status -ne 'Created') { $status = 'Updated' }
+                            $hasChanges = $false
+                            Write-Verbose "[UPDATE] DefaultTeam: '$DefaultTeam' (ID: $($prj.DefaultTeam.Id))"
+                        } else {
+                            $status = 'Skipped'
+                            $hasChanges = $false
+                            Write-Verbose "[WHATIF] Call Set-AdoTeam with parameters: $($teamSplat | ConvertTo-Json -Depth 5)"
                         }
-
-                        Set-AdoTeam @teamSplat -Verbose:$VerbosePreference | Out-Null
-                        $get = $true
                     }
                 }
 
-                # Features
+                # Only check features if it was explicitly provided
                 if ($PSBoundParameters.ContainsKey('Features')) {
-
                     $featureStatesSplat = @{
-                        ProjectId = $prj.Id
+                        CollectionUri = $CollectionUri
+                        ProjectName   = $Name
                     }
 
+                    # Get current feature states
                     $featureStates = Get-AdoFeatureState @featureStatesSplat -ErrorAction Stop
 
-                    foreach ($featureId in $featureStates.featureIds) {
-                        # Map feature ID to feature name
-                        $featureName = switch ($featureId) {
-                            'ms.vss-work.agile' { 'boards' }
-                            'ms.vss-code.version-control' { 'repos' }
-                            'ms.vss-build.pipelines' { 'pipelines' }
-                            'ms.vss-test-web.test' { 'testPlans' }
-                            'ms.azure-artifacts.feature' { 'artifacts' }
-                        }
+                    foreach ($fst in $featureStates) {
+                        $featureName = $fst.feature
+                        $featureState = $fst.state
 
                         if ($Features.ContainsKey($featureName)) {
-                            $featureState = $featureStates.featureStates.$featureId.state
-
-                            # Only update if different
+                            # Only update if state differs
                             if ($Features[$featureName] -ne $featureState) {
-                                if ($PSCmdlet.ShouldProcess("Feature='$($featureName)' Value='$($Features[$featureName])'", 'Update')) {
+                                if ($PSCmdlet.ShouldProcess($Name, "Update feature state '$($featureName)' to '$($Features[$featureName])'")) {
                                     $featureSplat = @{
-                                        ProjectId    = $prj.Id
-                                        Feature      = $featureName
-                                        FeatureState = $Features[$featureName]
+                                        CollectionUri = $CollectionUri
+                                        ProjectName   = $Name
+                                        Feature       = $featureName
+                                        FeatureState  = $Features[$featureName]
                                     }
 
-                                    Set-AdoFeatureState @featureSplat -Verbose:$VerbosePreference | Out-Null
+                                    Set-AdoFeatureState @featureSplat -Confirm:$false -ErrorAction Stop | Out-Null
+
+                                    if ($status -ne 'Created') { $status = 'Updated' }
+                                    Write-Verbose "[UPDATE] FeatureState: '$featureName' to '$($Features[$featureName])' (ID: $($fst.featureId))"
+                                } else {
+                                    $status = 'Skipped'
+                                    Write-Verbose "[WHATIF] Call Set-AdoFeatureState with parameters: $($featureSplat | ConvertTo-Json -Depth 5)"
                                 }
                             }
                         }
@@ -318,61 +392,68 @@ process {
 
         if ($Rollback.IsPresent) {
             if ($null -ne $prj) {
-                if ($PSCmdlet.ShouldProcess("$($Name)", 'Delete')) {
-                    if (-not $Force.IsPresent) {
-                        $prompt = @(
-                            "This script will delete project '$($Name)'."
-                            'All related resources like repositories, pipelines, artifacts and boards will be lost.'
-                            "Do you want to continue? 'Yes [Y]' 'No [N]'"
-                        ) -join "`n"
 
-                        $result = Read-Host -Prompt $prompt
-                        $result = $result.ToLower()
+                $prjSplat = @{
+                    CollectionUri = $CollectionUri
+                    Id            = $prj.Id
+                }
 
-                        if ($result -ne 'y' -and $result -ne 'yes') {
-                            Write-Warning 'Operation cancelled by user'
-                            return
-                        }
-                    }
+                if ($PSCmdlet.ShouldProcess($CollectionUri, "Remove project: $($Name)")) {
+                    Remove-AdoProject @prjSplat -Confirm:$false -ErrorAction Stop
 
-                    # Project
-                    $prjSplat = @{
-                        ProjectId = $prj.Id
-                        Verbose   = $VerbosePreference
-                    }
-
-                    Remove-AdoProject @prjSplat -ErrorAction Stop
-                    Write-Verbose "Deleted: 'project/$($Name)'"
+                    $status = 'Removed'
+                    Write-Verbose "[REMOVE] Project: '$Name' (ID: $($prj.Id))"
+                } else {
+                    $status = 'Skipped'
+                    Write-Verbose "[WHATIF] Call Remove-AdoProject with parameters: $($prjSplat | ConvertTo-Json -Depth 5)"
                 }
             } else {
-                Write-Warning "Doesn't exist: 'project/$($Name)'"
+                $status = 'NotFound'
+                Write-Verbose "[NOTFOUND] Project: '$Name' (ID: UNKNOWN)"
             }
 
-            return
+            # Return rollback result
+            return [PSCustomObject]@{
+                id            = if ($prj) { $prj.id } else { $null }
+                name          = $Name
+                resourceType  = 'Project'
+                collectionUri = $CollectionUri
+                action        = 'Rollback'
+                status        = $status
+            }
         }
 
-        #end region
+        #endregion
 
         #region OUTPUTS
 
-        if (-not $WhatIfPreference) {
-            # Refresh project info if synced
-            if ($get) {
-                $prj = Get-AdoProject -ProjectId $prj.Id -ErrorAction Stop
-            }
-
-            # Get feature states whether updated or not
-            $featureStates = Get-AdoFeatureState -ProjectId $prj.Id -ErrorAction Stop
-
-            $output = [PSCustomObject]@{
-                Project       = ($prj | Select-Object *) ?? $null
-                FeatureStates = ($featureStates.FeatureStates | Select-Object *) ?? $null
-            }
-
-            return $output
+        # Refresh project details after create and update operations
+        if ($status -in @('Created', 'Updated')) {
+            $prj = Get-AdoProject -CollectionUri $CollectionUri -Name $Name -WhatIf:$false -ErrorAction Stop
         }
 
-        return $null
+        # Always refresh all feature states, because $Features may not have been provided
+        $fst = Get-AdoFeatureState -CollectionUri $CollectionUri -ProjectName $Name -WhatIf:$false -ErrorAction Stop
+
+        $obj = [ordered]@{
+            id          = if ($prj) { $prj.id } else { $null }
+            name        = if ($prj) { $prj.name } else { $null }
+            description = if ($prj) { $prj.description } else { $null }
+            visibility  = if ($prj) { $prj.visibility } else { $null }
+            defaultTeam = if ($prj) { $prj.DefaultTeam } else { $null }
+        }
+        $obj['featureStates'] = if ($fst) {
+            foreach ($fs_ in $fst) {
+                [PSCustomObject]@{
+                    feature = $fs_.feature
+                    state   = $fs_.state
+                }
+            }
+        } else { $null }
+        $obj['resourceType'] = 'Project'
+        $obj['collectionUri'] = $CollectionUri
+        $obj['status'] = $status
+        [PSCustomObject]$obj
 
         #endregion
 

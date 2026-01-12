@@ -13,10 +13,9 @@
 #region PARAMETERS
 
 $params = @{
-    Organization = 'e2egov-org'
-    Name         = 'e2egov-prjHb72x9'
-    Rollback     = $true
-    Force        = $true
+    CollectionUri = 'https://dev.azure.com/e2egov-org'
+    Name          = 'e2egov-prjHb72x9'
+    Rollback      = $true
 }
 
 # endregion
@@ -29,6 +28,6 @@ $rootPath = (Get-Item $PSScriptRoot).Parent.Parent.Parent.FullName
 
 #region TEST EXECUTION
 
-& (Join-Path $rootPath -ChildPath 'main.ps1') @params -Verbose
+& (Join-Path $rootPath -ChildPath 'main.ps1') @params -Confirm:$false -Verbose
 
 #endregion
