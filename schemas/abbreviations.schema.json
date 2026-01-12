@@ -28,7 +28,7 @@
             },
             "additionalProperties": false
         },
-        "entraId": {
+        "entra": {
             "type": "object",
             "description": "Abbreviation mappings for Entra ID resources",
             "patternProperties": {

@@ -20,7 +20,7 @@
         "virtualNetworks": "vnet",
         "vpnGateways": "vngw"
     },
-    "entraId": {
+    "entra": {
         "applications": "app",
         "groups": "grp",
         "managedIdentities": "id",
