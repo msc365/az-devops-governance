@@ -13,19 +13,17 @@
             "type": "string",
             "pattern": "^[a-zA-Z0-9]{6}$|^$",
             "maxLength": 6,
-            "description": "Unique identifier (6 lowercase alphanumeric characters, or empty)"
+            "description": "The unique identifier (6 lowercase alphanumeric characters, or empty)"
         },
         "prefix": {
             "type": "string",
             "pattern": "^[a-z0-9]{1,10}$",
             "maxLength": 10,
-            "description": "Prefix to be used in resource names (max 10 lowercase alphanumeric characters)"
+            "description": "A prefix to be used in resource names (max 10 lowercase alphanumeric characters)"
         },
-        "organization": {
+        "collectionUri": {
             "type": "string",
-            "pattern": "^[a-zA-Z0-9][a-zA-Z0-9-]{2,62}$",
-            "maxLength": 63,
-            "description": "Azure DevOps organization name"
+            "description": "The Azure DevOps collection URI"
         }
     },
     "required": [
