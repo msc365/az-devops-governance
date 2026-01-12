@@ -58,9 +58,9 @@ BeforeAll {
     Mock -CommandName Invoke-Expression -MockWith { }
 }
 
-Describe 'Environment Deployment - Core Functionality' {
+Describe 'Environment DSC Script - Core Functionality' {
 
-    Context 'When creating a new environment' {
+    Context 'DSC Scenario: Create - Environment Does Not Exist' {
         BeforeEach {
             Mock -CommandName Get-AdoEnvironment -MockWith { $null }
             Mock -CommandName New-AdoEnvironment -MockWith {
@@ -114,7 +114,7 @@ Describe 'Environment Deployment - Core Functionality' {
         }
     }
 
-    Context 'When updating an existing environment' {
+    Context 'DSC Scenario: Update - Environment Exists with Different Properties' {
         BeforeEach {
             Mock -CommandName Get-AdoEnvironment -MockWith {
                 [PSCustomObject]@{
@@ -170,7 +170,7 @@ Describe 'Environment Deployment - Core Functionality' {
         }
     }
 
-    Context 'When removing an environment (rollback)' {
+    Context 'DSC Scenario: Rollback - Remove Environment' {
         BeforeEach {
             Mock -CommandName Get-AdoEnvironment -MockWith {
                 [PSCustomObject]@{
@@ -221,7 +221,7 @@ Describe 'Environment Deployment - Core Functionality' {
     }
 }
 
-Describe 'Environment Deployment - Parameter Validation' {
+Describe 'Environment DSC Script - Parameter Validation' {
 
     Context 'When required parameters are missing' {
         BeforeEach {
@@ -270,7 +270,7 @@ Describe 'Environment Deployment - Parameter Validation' {
     }
 }
 
-Describe 'Environment Deployment - Azure Context Validation' {
+Describe 'Environment DSC Script - Azure Context Validation' {
 
     Context 'When Azure context is invalid' {
         It 'Should throw when no Azure context exists' {
@@ -308,7 +308,7 @@ Describe 'Environment Deployment - Azure Context Validation' {
     }
 }
 
-Describe 'Environment Deployment - ResourceGroup Integration' {
+Describe 'Environment DSC Script - ResourceGroup Integration' {
 
     Context 'When ResourceGroup parameter is provided' {
         BeforeEach {
