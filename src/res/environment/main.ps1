@@ -43,7 +43,10 @@
     Optional. A description for the environment.
 
 .PARAMETER ResourceGroup
-    Optional. An optional object defining the resource group properties: `Name`, `Location`, `SubscriptionId`, `Tags`. See [Notes](#notes) for more information.
+    Optional. An optional object defining the resource group properties: `Name`, `Location`, `Tags`. See [Notes](#notes) for more information.
+
+.PARAMETER SubscriptionId
+    Optional. The Azure subscription ID where the resource group will be created. Required when ResourceGroup is specified.
 
 .PARAMETER Rollback
     Optional. Switch to indicate if the operation should rollback (remove) the environment and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing an environment is irreversible and may affect teams relying on it. See [Notes](#notes) for more information.
@@ -100,15 +103,15 @@
 
 .EXAMPLE
     $paramSplat = @{
-        CollectionUri = 'https://dev.azure.com/e2egov-org'
-        ProjectName   = 'e2egov-prjHb72x9'
-        Name          = 'env-e2egov-prjHb72x9-tst'
-        Description   = 'Default environment description'
-        ResourceGroup = @{
-            Name           = 'rg-e2egov-prjHb72x9-tst-weu'
-            Location       = 'westeurope'
-            SubscriptionId = '00000000-0000-0000-0000-000000000000'
-            Tags           = @{ environment = 'tst'; service = 'e2egov' }
+        CollectionUri  = 'https://dev.azure.com/e2egov-org'
+        ProjectName    = 'e2egov-prjHb72x9'
+        Name           = 'env-e2egov-prjHb72x9-tst'
+        Description    = 'Default environment description'
+        SubscriptionId = '00000000-0000-0000-0000-000000000000'
+        ResourceGroup  = @{
+            Name     = 'rg-e2egov-prjHb72x9-tst-weu'
+            Location = 'westeurope'
+            Tags     = @{ environment = 'tst'; service = 'e2egov' }
         }
     }
     .\main.ps1 @paramSplat -Verbose
@@ -148,6 +151,9 @@ param (
     [string]$Description,
 
     [Parameter()]
+    [string]$SubscriptionId,
+
+    [Parameter()]
     [hashtable]$ResourceGroup,
 
     [Parameter()]
@@ -170,16 +176,6 @@ begin {
     if ($null -eq $currentContext) {
         throw 'No Azure context found. Please login using Connect-AzAccount.'
     }
-    if ($null -eq $currentContext.Subscription) {
-        throw 'No active Azure subscription found in current context. Use Set-AzContext to select a subscription.'
-    }
-
-    $ctxSplat = @{
-        Tenant           = $currentContext.Tenant.Id
-        SubscriptionId   = $currentContext.Subscription.Id
-        SubscriptionName = $currentContext.Subscription.Name
-    }
-    Write-Verbose "Context: $($ctxSplat | ConvertTo-Json -Depth 5)"
 
     # Import required module if not already loaded
     $requiredModule = 'Azure.DevOps.PSModule'
@@ -200,7 +196,7 @@ process {
         $status = 'Unknown'
 
         # Variables
-        $env, $ctx, $sub, $rg = $null
+        $env, $rg = $null
 
         # Environment - Lookup by Name (DSC-like declarative approach)
         $envSplat = @{
@@ -213,7 +209,7 @@ process {
 
         if ($PSBoundParameters.ContainsKey('ResourceGroup') -and ($null -ne $ResourceGroup)) {
             # Validate required properties
-            $requiredProps = @('name', 'location', 'subscriptionId')
+            $requiredProps = @('name', 'location')
 
             foreach ($prop in $requiredProps) {
                 if (-not $ResourceGroup.ContainsKey($prop) -or
@@ -222,44 +218,25 @@ process {
                 }
             }
 
-            # Validate subscription ID format
-            if ($ResourceGroup.subscriptionId -notmatch '^[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}$') {
-                throw "Invalid subscription ID format: '$($ResourceGroup.subscriptionId)'"
+            # Validate SubscriptionId is provided when ResourceGroup is specified
+            if ([string]::IsNullOrWhiteSpace($SubscriptionId)) {
+                throw 'SubscriptionId parameter is required when ResourceGroup is specified.'
             }
 
-            # Switch context if needed
-            $ctx = Get-AzContext -ErrorAction Stop
-
-            if ($ctx.Subscription.Id -ne $ResourceGroup.subscriptionId) {
-                $subSplat = @{
-                    TenantId       = $ctx.Tenant.Id
-                    SubscriptionId = $ResourceGroup.subscriptionId
-                    WhatIf         = $false
-                }
-                $sub = Set-AzContext @subSplat -ErrorAction Stop
-
-                # Verify the context switch was successful
-                $currentCtx = Get-AzContext
-                if ($currentCtx.Subscription.Id -ne $ResourceGroup.subscriptionId) {
-                    throw "Failed to switch to subscription '$($ResourceGroup.subscriptionId)'"
-                }
-
-                Write-Verbose "Switched to subscription: $($ResourceGroup.subscriptionId)"
-            }
+            # Verify tags
+            $tags = if ($ResourceGroup.ContainsKey('tags')) { $ResourceGroup.tags } else { $null }
 
             # Resource Group
             $rgSplat = @{
-                Name     = $ResourceGroup.name
-                Location = $ResourceGroup.location
-                Rollback = $Rollback.IsPresent
-                WhatIf   = $WhatIfPreference
-                Verbose  = $VerbosePreference
+                Name           = $ResourceGroup.name
+                Location       = $ResourceGroup.location
+                SubscriptionId = $SubscriptionId
+                Tags           = $tags
+                Rollback       = $Rollback.IsPresent
+                WhatIf         = $WhatIfPreference
+                Verbose        = $VerbosePreference
             }
 
-            # Only add tags if they exist and are not empty
-            if ($ResourceGroup.ContainsKey('tags') -and $ResourceGroup.tags -and $ResourceGroup.tags.Count -gt 0) {
-                $rgSplat['Tags'] = $ResourceGroup.tags
-            }
             $rg = & (Join-Path -Path $PSScriptRoot -ChildPath '..\shared\resource-group\main.ps1') @rgSplat -Confirm:$false
         }
 
@@ -401,25 +378,6 @@ process {
 
     } catch {
         throw $_
-    }
-
-    finally {
-        if ($null -ne $ctx -and $null -ne $sub -and
-            $ctx.Subscription.Id -ne $rg.SubscriptionId) {
-
-            try {
-                $ctxSplat = @{
-                    TenantId       = $ctx.Tenant.Id
-                    SubscriptionId = $ctx.Subscription.Id
-                    WhatIf         = $false
-                }
-                $restored = Set-AzContext @ctxSplat -ErrorAction Stop
-                Write-Verbose "Restored original subscription context: $($restored.Subscription.Id)"
-            } catch {
-                Write-Warning "Failed to restore original Azure context: $_"
-                Write-Warning "Current context may be set to subscription: $($sub.Subscription.Id)"
-            }
-        }
     }
 }
 

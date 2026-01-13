@@ -42,12 +42,16 @@
                     "type": "string",
                     "description": "The description of the environment"
                 },
+                "subscriptionId": {
+                    "type": "string",
+                    "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+                    "description": "The subscription ID (must be a valid GUID)"
+                },
                 "resourceGroup": {
                     "type": "object",
                     "required": [
                         "name",
-                        "location",
-                        "subscriptionId"
+                        "location"
                     ],
                     "properties": {
                         "name": {
@@ -57,11 +61,6 @@
                         "location": {
                             "type": "string",
                             "description": "The location/region of the resource group"
-                        },
-                        "subscriptionId": {
-                            "type": "string",
-                            "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
-                            "description": "The subscription ID (must be a valid GUID)"
                         },
                         "tags": {
                             "type": "object",

@@ -4,14 +4,14 @@
     "projectName": "{prefix}-prj{uniqueId}",
     "name": "env-{prefix}-prj{uniqueId}-tst",
     "description": "Default e2e governance description",
+    "subscriptionId": "00000000-0000-0000-0000-000000000000",
     "resourceGroup": {
-        "name": "rg-{prefix}-prj{uniqueId}-txt-weu",
+        "name": "rg-{prefix}-prj{uniqueId}-tst-weu",
         "location": "westeurope",
-        "subscriptionId": "00000000-0000-0000-0000-000000000000",
         "tags": {
             "public": "false",
             "service": "{prefix}",
-            "environment": "txt",
+            "environment": "tst",
             "security": "rbac",
             "iac": "bicep",
             "ci": "azure-pipelines"
