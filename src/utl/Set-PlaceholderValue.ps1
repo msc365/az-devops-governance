@@ -41,7 +41,7 @@ function Set-PlaceholderValue {
     )
 
     begin {
-        Write-Verbose ('[Enter]: .\src\utl\{0}' -f $MyInvocation.MyCommand.Name)
+        Write-Verbose "[Enter]: .\src\utl\$($MyInvocation.MyCommand.Name)"
     }
 
     process {
@@ -74,6 +74,6 @@ function Set-PlaceholderValue {
     }
 
     end {
-        Write-Verbose ('[Exit]: .\src\utl\{0}' -f $MyInvocation.MyCommand.Name)
+        Write-Verbose "[Exit]: .\src\utl\$($MyInvocation.MyCommand.Name)"
     }
 }
