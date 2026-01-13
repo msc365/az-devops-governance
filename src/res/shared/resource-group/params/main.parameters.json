@@ -1,0 +1,14 @@
+{
+    "$schema": "../../../../../schemas/resource-group.schema.json",
+    "subscriptionId": "00000000-0000-0000-0000-000000000000",
+    "name": "rg-{prefix}-prj{uniqueId}-tst-weu",
+    "location": "westeurope",
+    "tags": {
+        "public": "false",
+        "service": "{prefix}",
+        "environment": "tst",
+        "security": "rbac",
+        "iac": "bicep",
+        "ci": "azure-pipelines"
+    }
+}

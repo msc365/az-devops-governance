@@ -2,36 +2,37 @@
 <!-- omit from toc -->
 # Resource Group `[res\shared\resource-group\main.ps1]`
 
-![Version](https://img.shields.io/badge/script--version-0.1.0-blue) [![License](https://img.shields.io/badge/license-MIT-purple)](https://github.com/msc365/az-devops-governance/blob/main/LICENSE)
+![Version](https://img.shields.io/badge/script%20version-0.1.0-blue) [![License](https://img.shields.io/badge/license-MIT-purple)](https://github.com/msc365/az-devops-governance/blob/main/LICENSE)
 
 Create or update an Azure Resource Group.
 
 <!-- omit from toc -->
-## Navigation
+## NAVIGATION
 
-- [Description](#description)
-- [Parameters](#parameters)
-- [Examples](#examples)
-- [Outputs](#outputs)
-- [Support](#support)
-- [Dependencies](#dependencies)
-- [Notes](#notes)
+- [DESCRIPTION](#description)
+- [PARAMETERS](#parameters)
+- [EXAMPLES](#examples)
+- [OUTPUTS](#outputs)
+- [SUPPORT](#support)
+- [DEPENDENCIES](#dependencies)
+- [RESOURCES](#resources)
+- [NOTES](#notes)
 
-## Description
+## DESCRIPTION
 
 This script creates a new Azure Resource Group or updates an existing one with specified tags.
 
-## Parameters
+## PARAMETERS
 
 | Parameter | Type | Required | Default | Description |
 | :-- | :-- | :-- | :-- | :-- |
 | `Location` | `String` | Yes | - | Required. The Azure region where the Resource Group will be created e.g.: 'westeurope', 'northeurope'. |
 | `Name` | `String` | Yes | - | Required. The name of the Resource Group. |
-| `Force` | `Switch` | No | - | Not implemented yet. |
-| `Rollback` | `Switch` | No | - | Not implemented yet. See [Notes](#notes) for detailed information. |
+| `Rollback` | `Switch` | No | - | Not implemented by design. See [Notes](#notes) for detailed information. |
+| `SubscriptionId` | `String` | No | - | Optional. The Azure subscription ID where the resource group will be created. If not provided, the current context subscription will be used. |
 | `Tags` | `Object` | No | - | Optional. A hashtable of tags to assign to the Resource Group. |
 
-## Examples
+## EXAMPLES
 
 ### Example 1
 
@@ -39,24 +40,25 @@ This script creates a new Azure Resource Group or updates an existing one with s
 
 ```powershell
 $rgParams = @{
-    Name     = 'rg-e2egov-prjHb72x9-tst-weu'
-    Location = 'westeurope'
-    Tags     = @{
+    Name           = 'rg-e2egov-prjHb72x9-tst-weu'
+    Location       = 'westeurope'
+    SubscriptionId = '00000000-0000-0000-0000-000000000000'
+    Tags           = @{
         'environment' = 'tst'
         'owner'       = 'e2egov'
     }
-    Verbose  = $true
 }
 .\main.ps1 @rgParams
 ```
 
-Creates or updates the Resource Group 'rg-e2egov-prjHb72x9-tst-weu' in the 'westeurope' region with the specified tags.
+Creates or updates the resource group 'rg-e2egov-prjHb72x9-tst-weu' in the 'westeurope' region with the specified tags.
+The resource group will be deployed in  current Azure subscription context.
 
-## Outputs
+## OUTPUTS
 
 ### `PSCustomObject`
 
-## Support
+## SUPPORT
 
 ### CommonParameters
 
@@ -72,15 +74,27 @@ This script supports the `-WhatIf` and `-Confirm` parameters for safe execution:
 - **`-WhatIf`**: Shows what would happen if the script runs without actually making any changes.
 - **`-Confirm`**: Prompts for confirmation before performing each action.
 
-## Dependencies
+## DEPENDENCIES
 
 This script requires the following PowerShell modules:
 
 - `Az.Accounts`
 - `Az.Resources`
 
+## RESOURCES
 
-## Notes
+- [deploy](deploy.ps1)
+
+### Tests
+
+- [all](tests/e2e/all)
+- [default](tests/e2e/default)
+- [rollback](tests/e2e/rollback)
+- [update](tests/e2e/update)
+- [unit](tests/unit)
+
+
+## NOTES
 
 - Operations are idempotent (safe to run multiple times).
 

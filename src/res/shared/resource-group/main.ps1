@@ -35,27 +35,28 @@
 .PARAMETER Tags
     Optional. A hashtable of tags to assign to the Resource Group.
 
-.PARAMETER Rollback
-    Not implemented yet. See [Notes](#notes) for detailed information.
+.PARAMETER SubscriptionId
+    Optional. The Azure subscription ID where the resource group will be created. If not provided, the current context subscription will be used.
 
-.PARAMETER Force
-    Not implemented yet.
+.PARAMETER Rollback
+    Not implemented by design. See [Notes](#notes) for detailed information.
 
 .EXAMPLE
     $rgParams = @{
-        Name     = 'rg-e2egov-prjHb72x9-tst-weu'
-        Location = 'westeurope'
-        Tags     = @{
+        Name           = 'rg-e2egov-prjHb72x9-tst-weu'
+        Location       = 'westeurope'
+        SubscriptionId = '00000000-0000-0000-0000-000000000000'
+        Tags           = @{
             'environment' = 'tst'
             'owner'       = 'e2egov'
         }
-        Verbose  = $true
     }
     .\main.ps1 @rgParams
 
-    Creates or updates the Resource Group 'rg-e2egov-prjHb72x9-tst-weu' in the 'westeurope' region with the specified tags.
+    Creates or updates the resource group 'rg-e2egov-prjHb72x9-tst-weu' in the 'westeurope' region with the specified tags.
+    The resource group will be deployed in  current Azure subscription context.
 #>
-[CmdletBinding(SupportsShouldProcess)]
+[CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Medium')]
 [OutputType([PSCustomObject])]
 param (
     [Parameter(Mandatory)]
@@ -64,18 +65,39 @@ param (
     [Parameter(Mandatory)]
     [string]$Location,
 
-    [Parameter(Mandatory = $false)]
+    [Parameter()]
+    [string]$SubscriptionId,
+
+    [Parameter()]
     [object]$Tags,
 
     [Parameter()]
-    [switch]$Rollback,
-
-    [Parameter()]
-    [switch]$Force
+    [switch]$Rollback
 )
 
 begin {
     Write-Verbose "[Enter]: .\src\res\shared\resource-group\$($MyInvocation.MyCommand.Name)"
+
+    # Variables
+    $ctxInfo = $null
+
+    # Import and use context helper utility if SubscriptionId is provided
+    if ($PSBoundParameters.ContainsKey('SubscriptionId') -and
+        -not [string]::IsNullOrWhiteSpace($SubscriptionId)) {
+
+        . (Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\utl\Set-AzContextInfo.ps1')
+
+        $ctxInfo = Set-AzContextInfo -SubscriptionId $SubscriptionId -Verbose:$VerbosePreference
+    }
+
+    # Validate Azure context
+    $subscription = (Get-AzContext).Subscription
+
+    if ($null -eq $subscription) {
+        throw 'No Azure subscription context found. Please login using Connect-AzAccount.'
+    } else {
+        Write-Verbose "Using subscription: $($subscription.Name) (ID: $($subscription.Id))"
+    }
 }
 
 process {
@@ -84,27 +106,37 @@ process {
 
         #region INITIALIZE
 
+        # Status
+        $status = 'Unknown'
+
         # Variables
         $rg = $null
 
-        # Resource Group
+        # Resource group
         $rg = Get-AzResourceGroup -Name $Name -ErrorAction SilentlyContinue
 
         #endregion
 
-        #region DEPLOYMENT
+        #region DEPLOYMENTS
 
         if (-not $Rollback.IsPresent) {
             if ($null -eq $rg) {
-                if ($PSCmdlet.ShouldProcess("resourceGroup/$($Name)", 'Create')) {
+                if ($PSCmdlet.ShouldProcess($subscription.Name, "Create resource group: $Name")) {
                     $rgSplat = @{
                         Name     = $Name
                         Location = $Location
-                        Tags     = $Tags
-                        Verbose  = $VerbosePreference
+                    }
+                    if ($null -ne $Tags) {
+                        $rgSplat['Tags'] = $Tags
                     }
 
-                    $rg = New-AzResourceGroup @rgSplat -ErrorAction Stop
+                    $rg = New-AzResourceGroup @rgSplat -Verbose:$false -ErrorAction Stop
+
+                    $status = 'Created'
+                    Write-Verbose "[CREATE] Resource group: '$Name'"
+                } else {
+                    $status = 'Skipped'
+                    Write-Verbose "[WHATIF] Call New-AzResourceGroup with parameters: $($rgSplat | ConvertTo-Json -Depth 5)"
                 }
             } else {
                 # Check if tags differ
@@ -119,19 +151,25 @@ process {
                     }
                 }
 
-                # Update tags if they differ
+                # Set tags if they differ
                 if ($tagsDiff) {
-                    if ($PSCmdlet.ShouldProcess("resourceGroup/$($Name)", 'Update')) {
+                    if ($PSCmdlet.ShouldProcess($subscription.Name, "Update resource group: $Name")) {
                         $rgSplat = @{
-                            Name    = $Name
-                            Tags    = $Tags
-                            Verbose = $VerbosePreference
+                            Name = $Name
+                            Tags = $Tags
                         }
 
-                        $rg = Set-AzResourceGroup @rgSplat -ErrorAction Stop
+                        $rg = Set-AzResourceGroup @rgSplat -Verbose:$false -ErrorAction Stop
+
+                        $status = 'Updated'
+                        Write-Verbose "[UPDATE] Resource group: '$Name'"
+                    } else {
+                        $status = 'Skipped'
+                        Write-Verbose "[WHATIF] Call Set-AzResourceGroup with parameters: $($rgSplat | ConvertTo-Json -Depth 5)"
                     }
                 } else {
-                    Write-Verbose "Exists: 'resourceGroup/$($Name)'"
+                    $status = 'NoChange'
+                    Write-Verbose "[NOCHANGE] Resource group: '$Name'"
                 }
             }
         }
@@ -142,24 +180,61 @@ process {
 
         if ($Rollback.IsPresent) {
             if ($null -ne $rg) {
-                if ($PSCmdlet.ShouldProcess("resourceGroup/$($Name)", 'None')) {
-                    Write-Verbose "Not Deleted: 'resourceGroup/$($Name)'"
+                if ($PSCmdlet.ShouldProcess($subscription.Name, "Skip resource group: $Name (not removed by design)")) {
+                    $status = 'Skipped'
+                    Write-Verbose "[SKIPPED] Resource group: '$Name' (not removed by design)"
+                } else {
+                    $status = 'Skipped'
+                    Write-Verbose "[WHATIF] Resource group: '$Name' would be skipped (not removed)"
                 }
             } else {
-                Write-Verbose "Doesn't exist: 'resourceGroup/$($Name)'"
+                $status = 'NotFound'
+                Write-Verbose "[NOTFOUND] Resource group: '$Name'"
+            }
+
+            # Return rollback result
+            return [PSCustomObject]@{
+                name         = $Name
+                location     = $Location
+                subscription = [ordered]@{
+                    Id   = $subscription.Id
+                    Name = $subscription.Name
+                }
+                resourceType = 'ResourceGroup [Az]'
+                action       = 'Rollback'
+                status       = $status
             }
         }
 
         #endregion
 
-        #region OUTPUT
+        #region OUTPUTS
 
-        return $rg
+        $obj = [ordered]@{
+            name         = if ($rg) { $rg.ResourceGroupName } else { $Name }
+            location     = if ($rg) { $rg.Location } else { $Location }
+            resourceId   = if ($rg) { $rg.ResourceId } else { $null }
+            subscription = [ordered]@{
+                Id   = $subscription.Id
+                Name = $subscription.Name
+            }
+        }
+        if ($rg -and $rg.Tags) {
+            $obj['tags'] = $rg.Tags
+        }
+        $obj['resourceType'] = 'ResourceGroup [Az]'
+        $obj['status'] = $status
+        [PSCustomObject]$obj
 
         #endregion
 
     } catch {
         throw $_
+    } finally {
+        # Restore original Azure context if it was switched
+        if ($null -ne $ctxInfo) {
+            Restore-AzContextInfo -ContextInfo $ctxInfo
+        }
     }
 }
 
