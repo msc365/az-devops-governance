@@ -47,7 +47,8 @@ End‑to‑end governance is platform‑agnostic. This repository illustrates on
 - [Entra ID Groups](#entra-id-groups)
 - [Components](#components)
 - [Considerations](#considerations)
-
+- [Support](#support)
+- [License](#license)
 
 ## Use cases
 
@@ -265,15 +266,45 @@ Once the code has been accepted into a protected branch, the next layer of acces
 
 🚧 Todo → Description
 
-<!-- omit from toc -->
+## Support
+
+This project uses GitHub Issues to track bugs and feature requests.
+Please [search the existing issues](https://github.com/msc365/az-devops-governance/issues?q=is%3Aissue) before filing
+new issues to avoid duplicates.
+
+- For new issues, file your bug or feature request as a [new issue](https://github.com/msc365/az-devops-governance/issues/new/choose).
+- For help and questions, please raise an issue or start a [new discussion](https://github.com/msc365/az-devops-governance/discussions).
+
 ## License
 
 ![logo small martin swinkels cloud](.assets/logo-small.png)  
-<sub>Part of Martin's Cloud on GitHub</sub>
+Part of Martin's Cloud on GitHub
 
-[MIT License](LICENSE) | Copyright (c) 2025 MSc365.eu by Martin Swinkels
+[MIT License](LICENSE) | Copyright (c) 2025-2026 MSc365.eu by Martin Swinkels
 
 <!-- omit from toc -->
 ## Disclaimer
 
-Sample only – this is not an official supported repository. Use at your own risk.
+This repository is provided "**as is**" and is subject to **limited support**. While reasonable efforts
+have been made to ensure its usefulness, there are **no warranties or guarantees** regarding accuracy,
+reliability, security, or ongoing maintenance. By using this code, you acknowledge and agree that you
+do so at your own risk. It is your responsibility to validate, test, and ensure suitability for your specific
+use case, particularly in production environments. We welcome community contributions and feedback to improve
+the project; however, official support will limited.
+
+<!-- omit from toc -->
+## Liability
+
+Under no circumstances shall the authors, contributors, or affiliated organizations be held liable for
+any direct, indirect, incidental, or consequential damages arising from the use of this repository, including
+but not limited to loss of data, business interruption, or system failures.
+Use of this code implies acceptance of these terms.
+
+<!-- omit from toc -->
+## Trademarks
+
+This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft
+trademarks or logos is subject to and must follow
+[Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/legal/intellectualproperty/trademarks/usage/general).
+Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft
+sponsorship. Any use of third-party trademarks or logos are subject to those third-party's policies.
