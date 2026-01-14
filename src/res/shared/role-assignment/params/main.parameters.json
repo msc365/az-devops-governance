@@ -1,0 +1,15 @@
+{
+    "$schema": "../../../../../schemas/role-assignment.schema.json",
+    "objectId": "00000000-0000-0000-0000-000000000000",
+    "roleAssignments": [
+        {
+            "roleDefinitionName": "Reader",
+            "scope": "/subscriptions/00000000-0000-0000-0000-000000000000"
+        },
+        {
+            "roleDefinitionName": "Headless Owner (DevOps CI/CD)",
+            "scope": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-{prefix}-prj{uniqueId}-tst-weu"
+        }
+    ],
+    "enforce": false
+}

@@ -2,50 +2,49 @@
 <!-- omit from toc -->
 # Role Assignment `[res\shared\role-assignment\main.ps1]`
 
-![Version](https://img.shields.io/badge/script--version-0.1.0-blue) [![License](https://img.shields.io/badge/license-MIT-purple)](https://github.com/msc365/az-devops-governance/blob/main/LICENSE)
+![Version](https://img.shields.io/badge/script%20version-0.1.0-blue) [![License](https://img.shields.io/badge/license-MIT-purple)](https://github.com/msc365/az-devops-governance/blob/main/LICENSE)
 
 Manage Azure Role Assignments with Desired State Configuration.
 
 <!-- omit from toc -->
-## Navigation
+## NAVIGATION
 
-- [Description](#description)
-- [Parameters](#parameters)
-- [Examples](#examples)
-- [Outputs](#outputs)
-- [Support](#support)
-- [Dependencies](#dependencies)
-- [Notes](#notes)
+- [DESCRIPTION](#description)
+- [PARAMETERS](#parameters)
+- [EXAMPLES](#examples)
+- [OUTPUTS](#outputs)
+- [SUPPORT](#support)
+- [DEPENDENCIES](#dependencies)
+- [RESOURCES](#resources)
+- [NOTES](#notes)
 
-## Description
+## DESCRIPTION
 
 This script manages Azure Role Assignments using a desired state configuration approach.
 It compares the current state of role assignments against the desired state and:
 
-- Creates missing role assignments
-- Removes extra role assignments (when Enforce is enabled)
+- Creates missing role assignments (additive only)
 - Keeps existing assignments that match the desired state
+- To remove assignments: use `-Rollback` with the same assignments, then deploy new desired state
 
-This ensures idempotent deployments and prevents configuration drift.
+This ensures safe, explicit operations and prevents accidental deletion of role assignments.
 
-## Parameters
+## PARAMETERS
 
 | Parameter | Type | Required | Default | Description |
 | :-- | :-- | :-- | :-- | :-- |
 | `ObjectId` | `String` | Yes | - | Required. The Object ID of the principal (user, group, or service principal) to manage role assignments for. |
-| `RoleAssignments` | `Array` | Yes | - | Required. An array of PSCustomObjects defining the desired role assignments. Each object should contain: `roleDefinitionName`, `scope` See [Examples](#examples) for more information. |
-| `EnforceDesiredState` | `Switch` | No | - | Optional. When specified, removes role assignments that exist but are not in the desired state. <br /> Without this flag, the script only ensures desired assignments exist (additive only). |
-| `Force` | `Switch` | No | - | Optional. Switch to force deletion without confirmation during rollback. |
-| `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (delete) the desired state. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing a role assignment is irreversible and may affect teams relying on it. |
+| `RoleAssignments` | `Array` | Yes | - | Required. An array of hashtables defining the desired role assignments. Each object should contain: <br> - roleDefinitionName: The name of the role (e.g.: 'Contributor', 'Reader') <br> - scope: The resource scope (e.g.: subscription or resource group) |
+| `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (delete) the desired state. |
 
-## Examples
+## EXAMPLES
 
 ### Example 1
 
 #### PowerShell
 
 ```powershell
-$RoleAssignments = @(
+$roleAssignments = @(
     @{
         roleDefinitionName = 'Contributor'
         scope              = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-e2egov-prjHb72x9-tst-weu'
@@ -57,16 +56,16 @@ $RoleAssignments = @(
 )
 
 $params = @{
-    ObjectId                = '00000000-0000-0000-0000-000000000000'
-    DesiredRoleAssignments  = $RoleAssignments
-    EnforceDesiredState     = $true
-    Verbose                 = $true
+    ObjectId        = '00000000-0000-0000-0000-000000000000'
+    RoleAssignments = $roleAssignments
+    Verbose         = $true
 }
 
-.\main2.ps1 @params
+.\main.ps1 @params
 ```
 
-Ensures the specified ObjectId has exactly the two role assignments defined, removing any others.
+Ensures the specified ObjectId has the two role assignments defined. Existing assignments are preserved.
+
 
 ### Example 2
 
@@ -74,22 +73,22 @@ Ensures the specified ObjectId has exactly the two role assignments defined, rem
 
 ```powershell
 $params = @{
-    ObjectId                = '00000000-0000-0000-0000-000000000000'
-    DesiredRoleAssignments  = $RoleAssignments
-    Rollback                = $true
-    Force                   = $true
+    ObjectId        = '00000000-0000-0000-0000-000000000000'
+    RoleAssignments = $roleAssignments
+    Rollback        = $true
 }
 
-.\main2.ps1 @params
+.\main.ps1 @params -Confirm:$false
 ```
 
-Removes all role assignments defined in the desired state without confirmation.
+Removes all role assignments defined in the desired state without confirmation prompts.
 
-## Outputs
 
-### `System.Collections.ArrayList`
+## OUTPUTS
 
-## Support
+### `PSCustomObject[]`
+
+## SUPPORT
 
 ### CommonParameters
 
@@ -105,17 +104,34 @@ This script supports the `-WhatIf` and `-Confirm` parameters for safe execution:
 - **`-WhatIf`**: Shows what would happen if the script runs without actually making any changes.
 - **`-Confirm`**: Prompts for confirmation before performing each action.
 
-## Dependencies
+## DEPENDENCIES
 
 This script requires the following PowerShell modules:
 
 - `Az.Accounts`
 - `Az.Resources`
 
+## RESOURCES
 
-## Notes
+- [deploy](deploy.ps1)
 
-- Operations are idempotent (safe to run multiple times).
-- User confirmation is required for deletion unless `-Force` is specified.
-- When `EnforceDesiredState` is not specified, only missing assignments are created (safe mode).
-- When `EnforceDesiredState` is specified, extra assignments are removed (full enforcement).
+### Tests
+
+- [default](tests/e2e/default)
+- [rollback](tests/e2e/rollback)
+- [unit](tests/unit)
+
+
+## NOTES
+
+> [!CAUTION]
+> Use the `-Rollback` flag with caution.
+>
+> - Deployment mode is always additive - only creates missing assignments, never removes.
+> - To remove assignments: first rollback with same RoleAssignments, then deploy new desired state.
+> - Only manages assignments where ObjectId + Scope + Role match the RoleAssignments parameter.
+> - Uses `SupportsShouldProcess` for confirmation prompts on destructive operations (Rollback).
+> - Script is scoped to specific _objectId_ and assignments in _RoleAssignments_ only.
+> - Does not affect other principals or assignments outside the defined scope.
+>
+> Always use `-WhatIf` first to preview changes before running with `-Rollback` in production.

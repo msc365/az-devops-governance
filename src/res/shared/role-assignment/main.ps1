@@ -1,5 +1,4 @@
-﻿#Requires -Version 7.0
-<#PSScriptInfo
+﻿<#PSScriptInfo
     .VERSION 0.1.0
 
     .GUID 8c4a3de2-9f7b-4c5e-a1d3-5e8b7f9c2a4d
@@ -28,29 +27,25 @@
     This script manages Azure Role Assignments using a desired state configuration approach.
     It compares the current state of role assignments against the desired state and:
 
-    - Creates missing role assignments
-    - Removes extra role assignments (when Enforce is enabled)
+    - Creates missing role assignments (additive only)
     - Keeps existing assignments that match the desired state
+    - To remove assignments: use -Rollback with the same assignments, then deploy new desired state
 
-    This ensures idempotent deployments and prevents configuration drift.
+    This ensures safe, explicit operations and prevents accidental deletion of role assignments.
 
 .PARAMETER ObjectId
     Required. The Object ID of the principal (user, group, or service principal) to manage role assignments for.
 
 .PARAMETER RoleAssignments
-    Required. An array of PSCustomObjects defining the desired role assignments. Each object should contain: `roleDefinitionName`, `scope` See [Examples](#examples) for more information.
-
-.PARAMETER EnforceDesiredState
-    Optional. When specified, removes role assignments that exist but are not in the desired state. <br /> Without this flag, the script only ensures desired assignments exist (additive only).
+    Required. An array of hashtables defining the desired role assignments. Each object should contain:
+    - roleDefinitionName: The name of the role (e.g.: 'Contributor', 'Reader')
+    - scope: The resource scope (e.g.: subscription or resource group)
 
 .PARAMETER Rollback
-    Optional. Switch to indicate if the operation should rollback (delete) the desired state. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing a role assignment is irreversible and may affect teams relying on it.
-
-.PARAMETER Force
-    Optional. Switch to force deletion without confirmation during rollback.
+    Optional. Switch to indicate if the operation should rollback (delete) the desired state.
 
 .EXAMPLE
-    $RoleAssignments = @(
+    $roleAssignments = @(
         @{
             roleDefinitionName = 'Contributor'
             scope              = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-e2egov-prjHb72x9-tst-weu'
@@ -62,34 +57,36 @@
     )
 
     $params = @{
-        ObjectId                = '00000000-0000-0000-0000-000000000000'
-        DesiredRoleAssignments  = $RoleAssignments
-        EnforceDesiredState     = $true
-        Verbose                 = $true
+        ObjectId        = '00000000-0000-0000-0000-000000000000'
+        RoleAssignments = $roleAssignments
+        Verbose         = $true
     }
 
-    .\main2.ps1 @params
+    .\main.ps1 @params
 
-    Ensures the specified ObjectId has exactly the two role assignments defined, removing any others.
+    Ensures the specified ObjectId has the two role assignments defined. Existing assignments are preserved.
 
 .EXAMPLE
     $params = @{
-        ObjectId                = '00000000-0000-0000-0000-000000000000'
-        DesiredRoleAssignments  = $RoleAssignments
-        Rollback                = $true
-        Force                   = $true
+        ObjectId        = '00000000-0000-0000-0000-000000000000'
+        RoleAssignments = $roleAssignments
+        Rollback        = $true
     }
 
-    .\main2.ps1 @params
+    .\main.ps1 @params -Confirm:$false
 
-    Removes all role assignments defined in the desired state without confirmation.
+    Removes all role assignments defined in the desired state without confirmation prompts.
 
 .NOTES
-    - When `EnforceDesiredState` is not specified, only missing assignments are created (safe mode).
-    - When `EnforceDesiredState` is specified, extra assignments are removed (full enforcement).
+    - Deployment mode is always additive - only creates missing assignments, never removes.
+    - To remove assignments: first rollback with same RoleAssignments, then deploy new desired state.
+    - Only manages assignments where ObjectId + Scope + Role match the RoleAssignments parameter.
+    - Uses `SupportsShouldProcess` for confirmation prompts on destructive operations (Rollback).
+    - Script is scoped to specific `-ObjectId` and assignments in `-RoleAssignments` only.
+    - Does not affect other principals or assignments outside the defined scope.
 #>
-[CmdletBinding(SupportsShouldProcess)]
-[OutputType([System.Collections.ArrayList])]
+[CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'High')]
+[OutputType([PSCustomObject[]])]
 param (
     [Parameter(Mandatory)]
     [string]$ObjectId,
@@ -99,13 +96,7 @@ param (
     [array]$RoleAssignments,
 
     [Parameter()]
-    [switch]$EnforceDesiredState,
-
-    [Parameter()]
-    [switch]$Rollback,
-
-    [Parameter()]
-    [switch]$Force
+    [switch]$Rollback
 )
 
 begin {
@@ -116,130 +107,178 @@ process {
     try {
         $ErrorActionPreference = 'Stop'
 
-        #region INITIALIZE
+        $RESOURCE_TYPE = 'RoleAssignment'
 
-        # Variables
-        $results = [System.Collections.ArrayList]::new()
+        #region HELPER
 
-        Write-Verbose "Retrieving current role assignments for ObjectId: $ObjectId"
-        $currentRoleAssignments = Get-AzRoleAssignment -ObjectId $ObjectId -ErrorAction SilentlyContinue
+        function New-RoleAssignmentResult {
+            param(
+                [Parameter(Mandatory)]
+                [object]$Assignment,
 
-        if ($null -eq $currentRoleAssignments) {
-            $currentRoleAssignments = @()
-        } elseif ($currentRoleAssignments -isnot [array]) {
-            $currentRoleAssignments = @($currentRoleAssignments)
+                [Parameter(Mandatory)]
+                [string]$Status
+            )
+
+            [PSCustomObject]@{
+                objectId           = $Assignment.ObjectId
+                displayName        = $Assignment.DisplayName
+                roleDefinitionName = $Assignment.RoleDefinitionName
+                scope              = $Assignment.Scope
+                roleAssignmentId   = $Assignment.RoleAssignmentId
+                resourceType       = $RESOURCE_TYPE
+                status             = $Status
+            }
         }
 
-        Write-Verbose "Found $($currentRoleAssignments.Count) current role assignment(s)"
+        #endregion
+
+        #region VALIDATE
+
+        # Validate ObjectId format
+        if (-not [System.Guid]::TryParse($ObjectId, [ref][System.Guid]::Empty)) {
+            throw "Invalid ObjectId format: '$ObjectId'. Expected a valid GUID (e.g.: '00000000-0000-0000-0000-000000000000')"
+        }
+
+        # Validate RoleAssignments structure and scope formats
+        foreach ($assignment in $RoleAssignments) {
+            # Check required properties
+            if ([string]::IsNullOrWhiteSpace($assignment.roleDefinitionName)) {
+                throw "Invalid role assignment: 'roleDefinitionName' property is required and cannot be empty. Assignment: $($assignment | ConvertTo-Json -Compress)"
+            }
+            if ([string]::IsNullOrWhiteSpace($assignment.scope)) {
+                throw "Invalid role assignment: 'scope' property is required and cannot be empty. Assignment: $($assignment | ConvertTo-Json -Compress)"
+            }
+
+            # Validate scope format - supports Management Group, Subscription, and Resource Group
+            $isManagementGroup = $assignment.scope -match '^/providers/Microsoft\.Management/managementGroups/[\w\-\.]+$'
+            $isSubscription = $assignment.scope -match '^/subscriptions/[a-f0-9-]{36}$'
+            $isResourceGroup = $assignment.scope -match '^/subscriptions/[a-f0-9-]{36}/resourceGroups/[\w\-\.\(\)]+$'
+
+            if (-not ($isManagementGroup -or $isSubscription -or $isResourceGroup)) {
+                $msg = @(
+                    "Invalid scope format: '$($assignment.scope)'."
+                    'Expected one of:'
+                    '- Management Group: /providers/Microsoft.Management/managementGroups/{groupId}'
+                    '- Subscription: /subscriptions/{guid}'
+                    '- Resource Group: /subscriptions/{guid}/resourceGroups/{name}'
+                ) -join "`n"
+                throw $msg
+            }
+        }
+
+        Write-Debug "Input validation passed ObjectId and $($RoleAssignments.Count) role assignments"
+
+        #endregion
+
+        #region INITIALIZE
+
+        # Status tracking
+        $results = @()
+
+        # Note: Azure PowerShell doesn't support scope filtering in Get-AzRoleAssignment
+        # All assignments for the ObjectId are retrieved, then filtered to managed scopes client-side
+        Write-Debug "Retrieving current role assignments for ObjectId: $ObjectId"
+        $existingRoleAssignments = @(Get-AzRoleAssignment -ObjectId $ObjectId -ErrorAction SilentlyContinue)
+
+        Write-Verbose "Found $($existingRoleAssignments.Count) existing role assignment(s)"
 
         #endregion
 
         #region COMPARE
 
-        # Filter current assignments to only those in managed scopes
+        # Always filter to managed scopes (assignments defined in RoleAssignments parameter)
+        # Only manage assignments where ObjectId + Scope + Role match the desired state
         $managedScopes = $RoleAssignments.scope | Select-Object -Unique
 
-        $currentManagedAssignments = $currentRoleAssignments | Where-Object {
-            $_.Scope -in $managedScopes
+        # Use hashtable for O(1) scope lookups
+        $managedScopesLookup = @{}
+        foreach ($scope in $managedScopes) {
+            $managedScopesLookup[$scope.ToLowerInvariant()] = $true
         }
 
-        Write-Verbose "Filtering to $($currentManagedAssignments.Count) assignment(s) in managed scopes"
+        $currentScopedAssignments = $existingRoleAssignments | Where-Object {
+            $managedScopesLookup.ContainsKey($_.Scope.ToLowerInvariant())
+        }
 
-        # Determine assignments to create (in desired but not in current)
+        $modeDescription = if ($Rollback.IsPresent) { 'Rollback' } else { 'Deployment' }
+        Write-Debug "$modeDescription mode: evaluating $($currentScopedAssignments.Count) assignment(s) in managed scopes"
+
+        # Build lookup dictionary for O(1) comparisons: "rolename|scope" -> assignment object
+        $currentLookup = @{}
+        foreach ($current in $currentScopedAssignments) {
+            $key = "$($current.RoleDefinitionName)|$($current.Scope)".ToLowerInvariant()
+            $currentLookup[$key] = $current
+        }
+
+        # Determine assignments to create (in desired but not in current) and track matches
         $assignmentsToCreate = @()
+        $matchedAssignments = @{}
+
         foreach ($desired in $RoleAssignments) {
+            $key = "$($desired.roleDefinitionName)|$($desired.scope)".ToLowerInvariant()
 
-            $exists = $currentManagedAssignments | Where-Object {
-                $_.RoleDefinitionName -eq $desired.roleDefinitionName -and
-                $_.Scope -eq $desired.scope
-            }
-
-            if (-not $exists) {
-                $assignmentsToCreate += $desired
-                Write-Verbose "To Create: $($desired.roleDefinitionName) at $($desired.scope)"
-
-            } else {
-                Write-Verbose "Exists: $($desired.roleDefinitionName) at $($desired.scope)"
-            }
-        }
-
-        # Determine assignments to remove (in current but not in desired)
-        $assignmentsToRemove = @()
-        if ($EnforceDesiredState.IsPresent -or $Rollback.IsPresent) {
-            foreach ($current in $currentManagedAssignments) {
-
-                $isDesired = $RoleAssignments | Where-Object {
-                    $_.roleDefinitionName -eq $current.RoleDefinitionName -and
-                    $_.scope -eq $current.Scope
+            if (-not $currentLookup.ContainsKey($key)) {
+                if (-not $Rollback.IsPresent) {
+                    $assignmentsToCreate += $desired
+                    Write-Verbose "[TO CREATE] Role assignment: '$($desired.roleDefinitionName)' at scope: $($desired.scope)"
                 }
-
-                if (-not $isDesired) {
-                    $assignmentsToRemove += $current
-                    Write-Verbose "To Remove: $($current.RoleDefinitionName) at $($current.Scope)"
+            } else {
+                $matchedAssignments[$key] = $currentLookup[$key]
+                if ($Rollback.IsPresent) {
+                    Write-Verbose "[TO REMOVE] Role assignment: '$($desired.roleDefinitionName)' at scope: $($desired.scope)"
+                } else {
+                    Write-Verbose "[NOCHANGE] Role assignment: '$($desired.roleDefinitionName)' at scope: $($desired.scope)"
                 }
             }
         }
 
         #endregion
 
-        #region DEPLOYMENT
+        #region DEPLOYMENTS
 
         if (-not $Rollback.IsPresent) {
             foreach ($assignment in $assignmentsToCreate) {
-                if ($PSCmdlet.ShouldProcess("roleAssignment/$($assignment.roleDefinitionName)/$($ObjectId)", 'Create')) {
+                $raSplat = @{
+                    ObjectId           = $ObjectId
+                    RoleDefinitionName = $assignment.roleDefinitionName
+                    Scope              = $assignment.scope
+                }
 
-                    Write-Verbose "Creating role assignment: $($assignment.roleDefinitionName) at $($assignment.scope)"
+                if ($PSCmdlet.ShouldProcess($ObjectId, "Create role assignment: $($assignment.roleDefinitionName)")) {
 
-                    $raSplat = @{
+                    $ra = New-AzRoleAssignment @raSplat -Verbose:$false -ErrorAction Stop
+
+                    $resultObj = New-RoleAssignmentResult -Assignment $ra -Status 'Created'
+                    $results += $resultObj
+
+                    Write-Verbose "[CREATED] Role assignment: '$($ra.RoleDefinitionName)' for '$($ra.DisplayName)' at scope: $($ra.Scope)"
+                } else {
+                    # WhatIf mode: create placeholder result object
+                    $whatIfAssignment = [PSCustomObject]@{
                         ObjectId           = $ObjectId
+                        DisplayName        = '(WhatIf)'
                         RoleDefinitionName = $assignment.roleDefinitionName
                         Scope              = $assignment.scope
-                        Verbose            = $VerbosePreference
+                        RoleAssignmentId   = '(WhatIf)'
                     }
 
-                    $ra = New-AzRoleAssignment @raSplat -ErrorAction Stop
-                    [void]$results.Add($ra)
+                    $resultObj = New-RoleAssignmentResult -Assignment $whatIfAssignment -Status 'WouldCreate'
+                    $results += $resultObj
 
-                    Write-Verbose "Created: 'roleAssignment/$($ra.RoleDefinitionName)/$($ra.DisplayName)'"
+                    Write-Verbose "[WHATIF] Call New-AzRoleAssignment with parameters: $($raSplat | ConvertTo-Json -Depth 5)"
                 }
             }
 
-            if ($EnforceDesiredState.IsPresent) {
-                foreach ($assignment in $assignmentsToRemove) {
-                    if ($PSCmdlet.ShouldProcess("roleAssignment/$($assignment.RoleDefinitionName)/$($assignment.DisplayName)", 'Delete')) {
-                        if (-not $Force.IsPresent) {
-                            $prompt = @(
-                                "Enforcing desired state will delete 'roleAssignment/$($assignment.RoleDefinitionName)/$($assignment.DisplayName)'."
-                                'This assignment is not in the desired configuration.'
-                                "Do you want to continue? 'Yes [Y]' 'No [N]'"
-                            ) -join "`n"
-
-                            $result = Read-Host -Prompt $prompt
-                            $result = $result.ToLower()
-
-                            if ($result -ne 'y' -and $result -ne 'yes') {
-                                Write-Warning 'Operation cancelled by user'
-                                continue
-                            }
-                        }
-
-                        Write-Verbose "Removing undesired role assignment: $($assignment.RoleDefinitionName) at $($assignment.Scope)"
-
-                        Remove-AzRoleAssignment -InputObject $assignment -ErrorAction Stop | Out-Null
-                        Write-Verbose "Deleted: 'roleAssignment/$($assignment.RoleDefinitionName)/$($assignment.DisplayName)'"
-                    }
-                }
-            }
-
-            # Add existing assignments that match desired state to results
-            foreach ($desired in $RoleAssignments) {
-                $existing = $currentManagedAssignments | Where-Object {
-                    $_.RoleDefinitionName -eq $desired.roleDefinitionName -and
-                    $_.Scope -eq $desired.scope
+            # Add existing assignments that match desired state to results (from cached matches)
+            foreach ($matched in $matchedAssignments.Values) {
+                $alreadyInResults = $results | Where-Object {
+                    $_.roleAssignmentId -eq $matched.RoleAssignmentId
                 }
 
-                if ($existing -and $existing -notin $results) {
-                    [void]$results.Add($existing)
+                if (-not $alreadyInResults) {
+                    $resultObj = New-RoleAssignmentResult -Assignment $matched -Status 'NoChange'
+                    $results += $resultObj
                 }
             }
         }
@@ -249,48 +288,42 @@ process {
         #region ROLLBACK
 
         if ($Rollback.IsPresent) {
-            # Remove all assignments in desired state
+            # Remove all assignments in desired state (use lookup from comparison phase)
             foreach ($desired in $RoleAssignments) {
-                $existing = $currentManagedAssignments | Where-Object {
-                    $_.RoleDefinitionName -eq $desired.roleDefinitionName -and
-                    $_.Scope -eq $desired.scope
-                }
+                $key = "$($desired.roleDefinitionName)|$($desired.scope)".ToLowerInvariant()
+                $existing = $currentLookup[$key]
 
                 if ($existing) {
-                    if ($PSCmdlet.ShouldProcess("roleAssignment/$($existing.RoleDefinitionName)/$($existing.DisplayName)", 'Delete')) {
-                        if (-not $Force.IsPresent) {
-                            $prompt = @(
-                                "This will delete 'roleAssignment/$($existing.RoleDefinitionName)/$($existing.DisplayName)'."
-                                "Do you want to continue? 'Yes [Y]' 'No [N]'"
-                            ) -join "`n"
+                    if ($PSCmdlet.ShouldProcess($ObjectId, "Rollback role assignment: $($existing.RoleDefinitionName)")) {
 
-                            $result = Read-Host -Prompt $prompt
-                            $result = $result.ToLower()
+                        Remove-AzRoleAssignment -InputObject $existing -Confirm:$false -Verbose:$false -ErrorAction Stop | Out-Null
 
-                            if ($result -ne 'y' -and $result -ne 'yes') {
-                                Write-Warning 'Operation cancelled by user'
-                                continue
-                            }
-                        }
+                        $resultObj = New-RoleAssignmentResult -Assignment $existing -Status 'Removed'
+                        $results += $resultObj
 
-                        Write-Verbose "Rolling back role assignment: $($existing.RoleDefinitionName) at $($existing.Scope)"
-                        $removed = Remove-AzRoleAssignment -InputObject $existing -ErrorAction Stop
-                        [void]$results.Add($removed)
+                        Write-Verbose "[ROLLBACK] Role assignment: '$($existing.RoleDefinitionName)' for '$($existing.DisplayName)' at scope: $($existing.Scope)"
+                    } else {
 
-                        Write-Verbose "Deleted: 'roleAssignment/$($existing.RoleDefinitionName)/$($existing.DisplayName)'"
+                        $resultObj = New-RoleAssignmentResult -Assignment $existing -Status 'WouldRemove'
+                        $results += $resultObj
+
+                        Write-Verbose "[WHATIF] Call Remove-AzRoleAssignment with parameters: $([ordered]@{
+                            objectId = $existing.ObjectId
+                            roleDefinitionName = $existing.RoleDefinitionName
+                            scope = $existing.Scope
+                        } | ConvertTo-Json -Depth 5)"
                     }
                 } else {
-                    Write-Warning "Doesn't exist: 'roleAssignment/$($desired.roleDefinitionName)' at scope '$($desired.scope)'"
+                    Write-Warning "[NOTFOUND] Role assignment: '$($desired.roleDefinitionName)' at scope: $($desired.scope)"
                 }
             }
         }
 
         #endregion
 
-        #region OUTPUT
+        #region OUTPUTS
 
-        Write-Verbose "Operation completed. Processed $($results.Count) role assignment(s)"
-        return $results
+        $results
 
         #endregion
 
