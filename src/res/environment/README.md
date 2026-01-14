@@ -30,7 +30,7 @@ and its properties as a scoped environment.
 | Parameter | Type | Required | Default | Description |
 | :-- | :-- | :-- | :-- | :-- |
 | `Name` | `String` | Yes | - | Required. The name of the environment to create, update, or remove. |
-| `CollectionUri` | `String` | No | `$env:DefaultAdoCollectionUri` | Optional. The collection URI of the Azure DevOps collection/organization, e.g. : `https://dev.azure.com/my-org`, `https://vssps.dev.azure.com/my-org`. |
+| `CollectionUri` | `String` | No | `$env:DefaultAdoCollectionUri` | Optional. The collection URI of the Azure DevOps collection/organization, e.g.: `https://dev.azure.com/my-org`, `https://vssps.dev.azure.com/my-org`. |
 | `Description` | `String` | No | - | Optional. A description for the environment. |
 | `ProjectName` | `String` | No | `$env:DefaultAdoProjectName` | Optional. The Azure DevOps project ID or Name where the environment will be created. |
 | `ResourceGroup` | `Hashtable` | No | - | Optional. An optional object defining the resource group properties: `Name`, `Location`, `SubscriptionId`, `Tags`. See [Notes](#notes) for more information. |
@@ -51,7 +51,8 @@ $deploySplat = @{
 .\deploy.ps1 @deploySplat -Verbose
 ```
 
-Deploys the environment using the specified template and parameters.
+Deploys the environment using the specified template and parameters.
+
 
 ### Example 2
 
@@ -66,7 +67,8 @@ $customSplat = @{
 .\deploy.ps1 @customSplat -Verbose
 ```
 
-Deploys the environment using the specified template and custom parameters.
+Deploys the environment using the specified template and custom parameters.
+
 
 ### Example 3
 
@@ -81,7 +83,8 @@ $rollbackSplat = @{
 .\deploy.ps1 @rollbackSplat -Rollback -Confirm:$false -Verbose
 ```
 
-Rolls back (removes) the environment and related resources without confirmation.
+Rolls back (removes) the environment and related resources without confirmation.
+
 
 ### Example 4
 
@@ -105,7 +108,8 @@ $paramSplat = @{
 
 Deploys a new environment including the configuration of an optional resource group
 and its properties as a (least privileged) scoped environment using the specified parameters in code. <br><br>
-See [Service Connection](../service-connection) deployment for creating a service connection with least privileged access to the resource group.
+See [Service Connection](../service-connection) deployment for creating a service connection with least privileged access to the resource group.
+
 
 ## OUTPUTS
 

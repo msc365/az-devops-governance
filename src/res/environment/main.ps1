@@ -31,7 +31,7 @@
     and its properties as a scoped environment.
 
 .PARAMETER CollectionUri
-    Optional. The collection URI of the Azure DevOps collection/organization, e.g. : `https://dev.azure.com/my-org`, `https://vssps.dev.azure.com/my-org`.
+    Optional. The collection URI of the Azure DevOps collection/organization, e.g.: `https://dev.azure.com/my-org`, `https://vssps.dev.azure.com/my-org`.
 
 .PARAMETER ProjectName
     Optional. The Azure DevOps project ID or Name where the environment will be created.
@@ -49,7 +49,9 @@
     Optional. The Azure subscription ID where the resource group will be created. Required when ResourceGroup is specified.
 
 .PARAMETER Rollback
-    Optional. Switch to indicate if the operation should rollback (remove) the environment and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing an environment is irreversible and may affect teams relying on it. See [Notes](#notes) for more information.
+    Optional. Switch to indicate if the operation should rollback (remove) the environment and related resources.
+    ⚠️ <b> WARNING! </b>
+    Use with caution! Removing an environment is irreversible and may affect teams relying on it. See [Notes](#notes) for more information.
 
 .OUTPUTS
     [PSCustomObject]@{
