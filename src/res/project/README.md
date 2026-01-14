@@ -29,12 +29,12 @@ It provides options to configure project properties such as description, default
 | Parameter | Type | Required | Default | Description |
 | :-- | :-- | :-- | :-- | :-- |
 | `Name` | `String` | Yes | - | Required. The name of the Azure DevOps project to create, update or delete. |
-| `CollectionUri` | `String` | No | `$env:DefaultAdoCollectionUri` | Optional. The collection URI of the Azure DevOps collection/organization, e.g. : `https://dev.azure.com/my-org`, `https://vssps.dev.azure.com/my-org`. |
+| `CollectionUri` | `String` | No | `$env:DefaultAdoCollectionUri` | Optional. The collection URI of the Azure DevOps collection/organization, e.g.: `https://dev.azure.com/my-org`, `https://vssps.dev.azure.com/my-org`. |
 | `DefaultTeam` | `String` | No | - | Optional. The name of the default team for the project. Defaults to '\<Project Name> Team'. |
 | `Description` | `String` | No | - | Optional. A description for the Azure DevOps project. |
 | `Features` | `Hashtable` | No | - | Optional. A hashtable defining the feature states for the project. Valid features are 'boards', 'repos', 'pipelines', 'testPlans', and 'artifacts' with states 'enabled' or 'disabled'. |
 | `Process` | `String` | No | - | Optional. The process template to use for the project. Valid values are 'Agile', 'Scrum', 'CMMI', and 'Basic'. Defaults to the organization's default process. |
-| `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (soft delete) the project and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing a project may affect teams relying on it. See [Notes](#notes) for more information. |
+| `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (soft delete) the project and related resources. <br> ⚠️ <b> WARNING! </b> <br> Use with caution! Removing a project may affect teams relying on it. See [Notes](#notes) for more information. |
 | `SourceControl` | `String` | No | - | Optional. The type of source control to use for the project. Valid values are 'Git' and 'Tfvc'. Defaults to 'Git'. |
 | `Visibility` | `String` | No | - | Optional. The visibility of the project. Valid values are 'Private' and 'Public'. Defaults to 'Private'. |
 

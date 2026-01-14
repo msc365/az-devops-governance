@@ -30,7 +30,7 @@
     It provides options to configure project properties such as description, default team, process template, source control type, visibility, and feature states.
 
 .PARAMETER CollectionUri
-    Optional. The collection URI of the Azure DevOps collection/organization, e.g. : `https://dev.azure.com/my-org`, `https://vssps.dev.azure.com/my-org`.
+    Optional. The collection URI of the Azure DevOps collection/organization, e.g.: `https://dev.azure.com/my-org`, `https://vssps.dev.azure.com/my-org`.
 
 .PARAMETER Name
     Required. The name of the Azure DevOps project to create, update or delete.
@@ -54,7 +54,9 @@
     Optional. A hashtable defining the feature states for the project. Valid features are 'boards', 'repos', 'pipelines', 'testPlans', and 'artifacts' with states 'enabled' or 'disabled'.
 
 .PARAMETER Rollback
-    Optional. Switch to indicate if the operation should rollback (soft delete) the project and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing a project may affect teams relying on it. See [Notes](#notes) for more information.
+    Optional. Switch to indicate if the operation should rollback (soft delete) the project and related resources.
+    ⚠️ <b> WARNING! </b>
+    Use with caution! Removing a project may affect teams relying on it. See [Notes](#notes) for more information.
 
 .OUTPUTS
     [PSCustomObject]@{
