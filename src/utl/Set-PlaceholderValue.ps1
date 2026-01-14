@@ -4,7 +4,7 @@
     Replaces placeholders in parameter JSON with values from configuration.
 
 .DESCRIPTION
-    This function takes a parameter JSON string and replaces placeholder values (e.g., {uniqueId}, {prefix}, {organization})
+    This function takes a parameter JSON string and replaces placeholder values (e.g.: {uniqueId}, {prefix}, {organization})
     with actual values from a configuration hashtable. This centralizes the parameter placeholder resolution logic
     that is commonly used across deployment scripts.
 

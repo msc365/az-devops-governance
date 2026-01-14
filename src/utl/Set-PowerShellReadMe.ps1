@@ -384,22 +384,23 @@ function Set-ParametersSection {
             }
             if ($minIndent -eq 999) { $minIndent = 0 }
 
-            # Process each line: remove common indentation, preserve empty lines and trailing spaces
+            # Process each line: remove common indentation, trim whitespace
             $processedLines = $descLines | ForEach-Object {
                 if (-not $_.Trim()) {
-                    # Empty line - preserve it
-                    ''
+                    # Empty line - skip it
+                    $null
                 } else {
-                    # Remove common leading indentation but preserve trailing spaces (they're markdown line breaks)
+                    # Remove common leading indentation and trim
                     if ($minIndent -gt 0 -and $_.Length -ge $minIndent) {
-                        $_.Substring($minIndent)
+                        $_.Substring($minIndent).Trim()
                     } else {
-                        $_
+                        $_.Trim()
                     }
                 }
-            }
-            # Join lines with newline (markdown supports actual line breaks in table cells)
-            $description = $processedLines -join "`n"
+            } | Where-Object { $_ }  # Filter out nulls
+
+            # Join lines with <br> tag to keep them in a single table cell
+            $description = $processedLines -join ' <br> '
         } else {
             $description = ''
         }
@@ -1043,7 +1044,7 @@ function Set-ResourcesSection {
         $newContent += '### Tests'
         $newContent += ''
         foreach ($script in ($testScripts | Sort-Object -Property Path)) {
-            # Extract test case name from path (e.g., 'tests/e2e/default' -> 'default')
+            # Extract test case name from path (e.g.: 'tests/e2e/default' -> 'default')
             if ($script.Path -match '/([^/]+)/[^/]+\.ps1$') {
                 $displayName = $Matches[1]
             } else {
