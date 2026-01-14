@@ -104,6 +104,8 @@ process {
     try {
         $ErrorActionPreference = 'Stop'
 
+        $RESOURCE_TYPE = 'ResourceGroup'
+
         #region INITIALIZE
 
         # Status
@@ -200,7 +202,7 @@ process {
                     Id   = $subscription.Id
                     Name = $subscription.Name
                 }
-                resourceType = 'ResourceGroup [Az]'
+                resourceType = $RESOURCE_TYPE
                 action       = 'Rollback'
                 status       = $status
             }
@@ -222,7 +224,7 @@ process {
         if ($rg -and $rg.Tags) {
             $obj['tags'] = $rg.Tags
         }
-        $obj['resourceType'] = 'ResourceGroup [Az]'
+        $obj['resourceType'] = $RESOURCE_TYPE
         $obj['status'] = $status
         [PSCustomObject]$obj
 

@@ -89,7 +89,7 @@ Describe 'Resource Group DSC Script - Core Functionality' {
             $result.name | Should -Be 'rg-test-weu'
             $result.location | Should -Be 'westeurope'
             $result.status | Should -Be 'Created'
-            $result.resourceType | Should -Be 'ResourceGroup [Az]'
+            $result.resourceType | Should -Be 'ResourceGroup'
             Should -Invoke -CommandName New-AzResourceGroup -Times 1
         }
 
@@ -289,7 +289,7 @@ Describe 'Resource Group DSC Script - Core Functionality' {
             # Assert
             $result.name | Should -Be 'rg-rollback-weu'
             $result.action | Should -Be 'Rollback'
-            $result.resourceType | Should -Be 'ResourceGroup [Az]'
+            $result.resourceType | Should -Be 'ResourceGroup'
         }
     }
 
