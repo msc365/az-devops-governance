@@ -17,7 +17,7 @@
         "project": {
             "type": "object",
             "required": [
-                "organization",
+                "collectionUri",
                 "name"
             ],
             "properties": {
@@ -25,9 +25,9 @@
                     "type": "string",
                     "description": "JSON Schema reference"
                 },
-                "organization": {
+                "collectionUri": {
                     "type": "string",
-                    "description": "The Azure DevOps organization name"
+                    "description": "The Azure DevOps collection URI"
                 },
                 "name": {
                     "type": "string",
