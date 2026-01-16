@@ -145,7 +145,7 @@ param (
     [string]$CollectionUri = $env:DefaultAdoCollectionUri,
 
     [Parameter(Mandatory)]
-    [string]$Name,
+    [string]$Name = $env:DefaultAdoProject,
 
     [Parameter()]
     [string]$DefaultTeam,
@@ -233,7 +233,7 @@ process {
         $prj, $set, $get = $null
 
         # Project
-        $prj = Get-AdoProject -Project $Name -WhatIf:$false -ErrorAction SilentlyContinue
+        $prj = Get-AdoProject -CollectionUri $CollectionUri -Project $Name -IncludeCapabilities -ErrorAction SilentlyContinue
 
         #endregion
 
@@ -262,22 +262,22 @@ process {
                     $prj = New-AdoProject @prjSplat -Confirm:$false -ErrorAction Stop
 
                     $status = 'Created'
-                    Write-Verbose "[CREATE] Project: '$Name' (ID: $($prj.Id))"
+                    Write-Verbose "[CREATED] Project: '$Name' (ID: $($prj.Id))"
                 } else {
-                    $status = 'Skipped'
+                    $status = 'WouldCreate'
                     Write-Verbose "[WHATIF] Call New-AdoProject with parameters: $($prjSplat | ConvertTo-Json -Depth 5)"
                 }
             }
 
             if ($null -ne $prj) {
-                # Environment already exists -> check for changes
+                # Project already exists -> check for changes
                 $hasChanges = $false
-                if ($status -ne 'Created') { $status = 'UnChanged' }
+
+                if ($status -ne 'Created') { $status = 'NoChange' }
 
                 $prjSplat = @{
                     CollectionUri = $CollectionUri
                     Id            = $prj.Id
-                    Name          = $Name
                 }
 
                 # Only check description if it was explicitly provided
@@ -307,9 +307,9 @@ process {
 
                         if ($status -ne 'Created') { $status = 'Updated' }
                         $hasChanges = $false
-                        Write-Verbose "[UPDATE] Project: '$Name' (ID: $($prj.Id))"
+                        Write-Verbose "[UPDATED] Project: '$Name' (ID: $($prj.Id))"
                     } else {
-                        $status = 'Skipped'
+                        $status = 'WouldUpdate'
                         $hasChanges = $false
                         Write-Verbose "[WHATIF] Call Set-AdoProject with parameters: $($prjSplat | ConvertTo-Json -Depth 5)"
                     }
@@ -339,9 +339,9 @@ process {
 
                             if ($status -ne 'Created') { $status = 'Updated' }
                             $hasChanges = $false
-                            Write-Verbose "[UPDATE] DefaultTeam: '$DefaultTeam' (ID: $($prj.DefaultTeam.Id))"
+                            Write-Verbose "[UPDATED] DefaultTeam: '$DefaultTeam' (ID: $($prj.DefaultTeam.Id))"
                         } else {
-                            $status = 'Skipped'
+                            $status = 'WouldUpdate'
                             $hasChanges = $false
                             Write-Verbose "[WHATIF] Call Set-AdoTeam with parameters: $($teamSplat | ConvertTo-Json -Depth 5)"
                         }
@@ -376,9 +376,9 @@ process {
                                     Set-AdoFeatureState @featureSplat -Confirm:$false -ErrorAction Stop | Out-Null
 
                                     if ($status -ne 'Created') { $status = 'Updated' }
-                                    Write-Verbose "[UPDATE] FeatureState: '$featureName' to '$($Features[$featureName])' (ID: $($fst.featureId))"
+                                    Write-Verbose "[UPDATED] FeatureState: '$featureName' to '$($Features[$featureName])' (ID: $($fst.featureId))"
                                 } else {
-                                    $status = 'Skipped'
+                                    $status = 'WouldUpdate'
                                     Write-Verbose "[WHATIF] Call Set-AdoFeatureState with parameters: $($featureSplat | ConvertTo-Json -Depth 5)"
                                 }
                             }
@@ -394,7 +394,6 @@ process {
 
         if ($Rollback.IsPresent) {
             if ($null -ne $prj) {
-
                 $prjSplat = @{
                     CollectionUri = $CollectionUri
                     Id            = $prj.Id
@@ -404,24 +403,23 @@ process {
                     Remove-AdoProject @prjSplat -Confirm:$false -ErrorAction Stop
 
                     $status = 'Removed'
-                    Write-Verbose "[REMOVE] Project: '$Name' (ID: $($prj.Id))"
+                    Write-Verbose "[REMOVED] Project: '$Name' (ID: $($prj.Id))"
                 } else {
-                    $status = 'Skipped'
+                    $status = 'WouldRemove'
                     Write-Verbose "[WHATIF] Call Remove-AdoProject with parameters: $($prjSplat | ConvertTo-Json -Depth 5)"
                 }
             } else {
                 $status = 'NotFound'
+                $prj = [PSCustomObject]@{
+                    name          = $Name
+                    collectionUri = $CollectionUri
+                }
                 Write-Verbose "[NOTFOUND] Project: '$Name' (ID: UNKNOWN)"
             }
 
             # Return rollback result
-            return [PSCustomObject]@{
-                id            = if ($prj) { $prj.id } else { $null }
-                name          = $Name
-                resourceType  = 'Project'
-                collectionUri = $CollectionUri
-                action        = 'Rollback'
-                status        = $status
+            return $prj | Select-Object -Property *, @{
+                Name = 'status'; Expression = { $status }
             }
         }
 
@@ -431,31 +429,28 @@ process {
 
         # Refresh project details after create and update operations
         if ($status -in @('Created', 'Updated')) {
-            $prj = Get-AdoProject -CollectionUri $CollectionUri -Name $Name -WhatIf:$false -ErrorAction Stop
+            $prj = $null
+            $prj = Get-AdoProject -CollectionUri $CollectionUri -Name $Name -IncludeCapabilities -ErrorAction Stop
         }
 
         # Always refresh all feature states, because $Features may not have been provided
-        $fst = Get-AdoFeatureState -CollectionUri $CollectionUri -ProjectName $Name -WhatIf:$false -ErrorAction Stop
+        $fst = Get-AdoFeatureState -CollectionUri $CollectionUri -ProjectName $Name -ErrorAction Stop
 
-        $obj = [ordered]@{
-            id          = if ($prj) { $prj.id } else { $null }
-            name        = if ($prj) { $prj.name } else { $null }
-            description = if ($prj) { $prj.description } else { $null }
-            visibility  = if ($prj) { $prj.visibility } else { $null }
-            defaultTeam = if ($prj) { $prj.DefaultTeam } else { $null }
-        }
-        $obj['featureStates'] = if ($fst) {
-            foreach ($fs_ in $fst) {
-                [PSCustomObject]@{
-                    feature = $fs_.feature
-                    state   = $fs_.state
-                }
+        # Return deployment result
+        $prj | Select-Object -ExcludeProperty collectionUri -Property *,
+        @{Name = 'featureStates'; Expression = {
+                if ($fst) {
+                    foreach ($fs_ in $fst) {
+                        [PSCustomObject]@{
+                            feature = $fs_.feature
+                            state   = $fs_.state
+                        }
+                    }
+                } else { $null }
             }
-        } else { $null }
-        $obj['resourceType'] = 'Project'
-        $obj['collectionUri'] = $CollectionUri
-        $obj['status'] = $status
-        [PSCustomObject]$obj
+        },
+        @{Name = 'collectionUri'; Expression = { $CollectionUri } },
+        @{Name = 'status'; Expression = { $status } }
 
         #endregion
 

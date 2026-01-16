@@ -352,7 +352,7 @@ Describe 'Project DSC Script - Core Functionality' {
             $result = & $script:scriptPath @params
 
             # Assert
-            $result.status | Should -Be 'UnChanged'
+            $result.status | Should -Be 'NoChange'
             Should -Invoke -CommandName Set-AdoProject -Times 0
         }
 
@@ -387,7 +387,7 @@ Describe 'Project DSC Script - Core Functionality' {
             $result = & $script:scriptPath @params
 
             # Assert
-            $result.status | Should -Be 'UnChanged'
+            $result.status | Should -Be 'NoChange'
             Should -Invoke -CommandName Set-AdoProject -Times 0
             Should -Invoke -CommandName Set-AdoTeam -Times 0
             Should -Invoke -CommandName Set-AdoFeatureState -Times 0
@@ -420,7 +420,6 @@ Describe 'Project DSC Script - Core Functionality' {
 
             # Assert
             $result.status | Should -Be 'Removed'
-            $result.action | Should -Be 'Rollback'
             Should -Invoke -CommandName Remove-AdoProject -Times 1
         }
 
@@ -440,7 +439,6 @@ Describe 'Project DSC Script - Core Functionality' {
 
             # Assert
             $result.status | Should -Be 'NotFound'
-            $result.action | Should -Be 'Rollback'
             Should -Invoke -CommandName Remove-AdoProject -Times 0
         }
     }
