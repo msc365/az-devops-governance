@@ -25,26 +25,12 @@ This module deploys Entra groups used for end-to-end governance.
 | :-- | :-- | :-- |
 | [`groups`](#parameter-groups) | array | The list of Entra security groups to create. |
 
-**Optional parameters**
-
-| Parameter | Type | Description |
-| :-- | :-- | :-- |
-| [`customRoleDefinitionId`](#parameter-customroledefinitionid) | string | The ID of the custom `Headless Owner (DevOps CI/CD)` role definition to assign. |
-
 ### Parameter: `groups`
 
 The list of Entra security groups to create.
 
 - Required: Yes
 - Type: array
-
-### Parameter: `customRoleDefinitionId`
-
-The ID of the custom `Headless Owner (DevOps CI/CD)` role definition to assign.
-
-- Required: No
-- Type: string
-- Default: `''`
 
 ## Outputs
 

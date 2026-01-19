@@ -10,9 +10,6 @@ targetScope = 'subscription'
 // PARAMETERS //
 // ---------- //
 
-@description('Optional. The ID of the custom `Headless Owner (DevOps CI/CD)` role definition to assign.')
-param customRoleDefinitionId string = ''
-
 @description('Required. The list of Entra security groups to create.')
 param groups array
 
@@ -27,11 +24,6 @@ resource graphGroups 'Microsoft.Graph/groups@v1.0' = [
     mailNickname: group.mailNickname
     mailEnabled: false
     securityEnabled: true
-    owners: !empty(customRoleDefinitionId)
-      ? {
-          relationships: [customRoleDefinitionId]
-        }
-      : null
   }
 ]
 
