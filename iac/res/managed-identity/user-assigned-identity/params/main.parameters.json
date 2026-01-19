@@ -1,0 +1,21 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "serviceShort": {
+      "value": "prjHb72x9"
+    },
+    "developmentManagedIdentityName": {
+      "value": "id-e2egov-prjHb72x9-dev"
+    },
+    "productionManagedIdentityName": {
+      "value": "id-e2egov-prjHb72x9-prd"
+    },
+    "developmentResourceGroupName": {
+      "value": "rg-e2egov-prjHb72x9-dev-weu"
+    },
+    "productionResourceGroupName": {
+      "value": "rg-e2egov-prjHb72x9-prd-weu"
+    }
+  }
+}
