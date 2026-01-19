@@ -420,4 +420,8 @@ FodyWeavers.xsd
 # Local files
 .local/
 *.local.json
+*.local.bicepparam
 .release/
+
+*.sbx.json
+*.sbx.bicepparam
