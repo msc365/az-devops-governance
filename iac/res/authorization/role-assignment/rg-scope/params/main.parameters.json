@@ -1,0 +1,30 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "customRoleDefinitionId": {
+      "value": "<custom-role-definition-id>"
+    },
+    "stakeholderGroupUniqueName": {
+      "value": "sg-e2egov-prjHb72x9-stakeholders"
+    },
+    "developerGroupUniqueName": {
+      "value": "sg-e2egov-prjHb72x9-developers"
+    },
+    "administratorGroupUniqueName": {
+      "value": "sg-e2egov-prjHb72x9-administrators"
+    },
+    "developmentManagedIdentityName": {
+      "value": "id-e2egov-prjHb72x9-dev"
+    },
+    "productionManagedIdentityName": {
+      "value": "id-e2egov-prjHb72x9-prd"
+    },
+    "developmentResourceGroupName": {
+      "value": "rg-e2egov-prjHb72x9-dev-weu"
+    },
+    "productionResourceGroupName": {
+      "value": "rg-e2egov-prjHb72x9-prd-weu"
+    }
+  }
+}
