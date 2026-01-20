@@ -2,7 +2,7 @@ using '../main.bicep'
 
 import {
   getLocationCode
-} from '../../../../../utl/custom-functions/main.bicep'
+} from '../../../../../utl/functions/custom-functions/main.bicep'
 
 // --------- //
 // VARIABLES //

@@ -8,7 +8,7 @@ targetScope = 'subscription'
 // PARAMETERS //
 // ---------- //
 
-import { governanceIdentityType } from '../../../utl/custom-types/main.bicep'
+import { governanceIdentityType } from '../../../utl/types/custom-types/main.bicep'
 @description('Required. The list of governance identities to create managed identities for.')
 param managedIdentities governanceIdentityType[]
 

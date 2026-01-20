@@ -10,7 +10,7 @@ targetScope = 'subscription'
 // PARAMETERS //
 // ---------- //
 
-import { governanceSecurityGroupType } from '../../../utl/custom-types/main.bicep'
+import { governanceSecurityGroupType } from '../../../utl/types/custom-types/main.bicep'
 @description('Required. The list of Entra security groups to create.')
 param securityGroups governanceSecurityGroupType[]
 

@@ -8,7 +8,7 @@ targetScope = 'subscription'
 // PARAMETERS //
 // ---------- //
 
-import { governanceResourceGroupType } from '../../../utl/custom-types/main.bicep'
+import { governanceResourceGroupType } from '../../../utl/types/custom-types/main.bicep'
 @description('Required. The list of governance resource groups to create resource groups for.')
 param resourceGroups governanceResourceGroupType[]
 
