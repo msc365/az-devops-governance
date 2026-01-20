@@ -37,6 +37,16 @@
           "name": "rg-e2egov-prjHb72x9-prd-weu"
         }
       }
+    },
+    "subscriptions": {
+      "value": {
+        "development": {
+          "id": ""
+        },
+        "production": {
+          "id": ""
+        }
+      }
     }
   }
 }

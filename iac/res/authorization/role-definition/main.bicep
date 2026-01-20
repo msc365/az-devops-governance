@@ -14,6 +14,7 @@ param assignableScopes array
 // --------- //
 // RESOURCES //
 // --------- //
+
 module roleDefinition 'br/public:avm/ptn/authorization/role-definition:0.1.1' = {
   params: {
     name: 'headless-owner-devops-ci-cd)'
@@ -32,5 +33,6 @@ module roleDefinition 'br/public:avm/ptn/authorization/role-definition:0.1.1' = 
 // ------- //
 // OUTPUTS //
 // ------- //
+
 @description('The resource ID of the role definition.')
 output resourceId string = roleDefinition.outputs.roleDefinitionIdName

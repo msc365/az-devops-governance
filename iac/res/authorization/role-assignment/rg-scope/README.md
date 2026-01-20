@@ -1,6 +1,6 @@
 <!-- markdownlint-disable -->
 <!-- omit from toc -->
-# Role assignments at Resource group scope `[Authorization/roleAssignment/rgScope]`
+# Role assignments at resource group scope `[Authorization/roleAssignment/rgScope]`
 
 This module deploys role assignments at the resource group scope used for end-to-end governance.
 
@@ -24,21 +24,10 @@ This module deploys role assignments at the resource group scope used for end-to
 
 | Parameter | Type | Description |
 | :-- | :-- | :-- |
-| [`administratorGroupUniqueName`](#parameter-administratorgroupuniquename) | string | The unique name of the administrators security group. |
 | [`customRoleDefinitionId`](#parameter-customroledefinitionid) | string | The ID of the custom `Headless Owner (DevOps CI/CD)` role definition to assign. |
-| [`developerGroupUniqueName`](#parameter-developergroupuniquename) | string | The unique name of the developers security group. |
-| [`developmentManagedIdentityName`](#parameter-developmentmanagedidentityname) | string | The name of the managed identity to use as the owner of the development resource groups. |
-| [`developmentResourceGroupName`](#parameter-developmentresourcegroupname) | string | The name of the development resource group. |
-| [`productionManagedIdentityName`](#parameter-productionmanagedidentityname) | string | The name of the managed identity to use as the owner of the production resource groups. |
-| [`productionResourceGroupName`](#parameter-productionresourcegroupname) | string | The name of the production resource group. |
-| [`stakeholderGroupUniqueName`](#parameter-stakeholdergroupuniquename) | string | The unique name of the stakeholders security group. |
-
-### Parameter: `administratorGroupUniqueName`
-
-The unique name of the administrators security group.
-
-- Required: Yes
-- Type: string
+| [`managedIdentities`](#parameter-managedidentities) | object | Managed identities type containing development and production managed identity configurations. |
+| [`resourceGroups`](#parameter-resourcegroups) | object | Resource groups type containing development and production resource group configurations. |
+| [`securityGroups`](#parameter-securitygroups) | object | Security groups type containing administrator, developer, and stakeholder group configurations. |
 
 ### Parameter: `customRoleDefinitionId`
 
@@ -47,42 +36,183 @@ The ID of the custom `Headless Owner (DevOps CI/CD)` role definition to assign.
 - Required: Yes
 - Type: string
 
-### Parameter: `developerGroupUniqueName`
+### Parameter: `managedIdentities`
 
-The unique name of the developers security group.
+Managed identities type containing development and production managed identity configurations.
+
+- Required: Yes
+- Type: object
+
+**Required parameters**
+
+| Parameter | Type | Description |
+| :-- | :-- | :-- |
+| [`development`](#parameter-managedidentitiesdevelopment) | object | The development managed identity configuration. |
+| [`production`](#parameter-managedidentitiesproduction) | object | The production managed identity configuration. |
+
+### Parameter: `managedIdentities.development`
+
+The development managed identity configuration.
+
+- Required: Yes
+- Type: object
+
+**Required parameters**
+
+| Parameter | Type | Description |
+| :-- | :-- | :-- |
+| [`name`](#parameter-managedidentitiesdevelopmentname) | string | The name of the development managed identity. |
+
+### Parameter: `managedIdentities.development.name`
+
+The name of the development managed identity.
 
 - Required: Yes
 - Type: string
 
-### Parameter: `developmentManagedIdentityName`
+### Parameter: `managedIdentities.production`
 
-The name of the managed identity to use as the owner of the development resource groups.
+The production managed identity configuration.
+
+- Required: Yes
+- Type: object
+
+**Required parameters**
+
+| Parameter | Type | Description |
+| :-- | :-- | :-- |
+| [`name`](#parameter-managedidentitiesproductionname) | string | The name of the production managed identity. |
+
+### Parameter: `managedIdentities.production.name`
+
+The name of the production managed identity.
 
 - Required: Yes
 - Type: string
 
-### Parameter: `developmentResourceGroupName`
+### Parameter: `resourceGroups`
+
+Resource groups type containing development and production resource group configurations.
+
+- Required: Yes
+- Type: object
+
+**Required parameters**
+
+| Parameter | Type | Description |
+| :-- | :-- | :-- |
+| [`development`](#parameter-resourcegroupsdevelopment) | object | The development resource group configuration. |
+| [`production`](#parameter-resourcegroupsproduction) | object | The production resource group configuration. |
+
+### Parameter: `resourceGroups.development`
+
+The development resource group configuration.
+
+- Required: Yes
+- Type: object
+
+**Required parameters**
+
+| Parameter | Type | Description |
+| :-- | :-- | :-- |
+| [`name`](#parameter-resourcegroupsdevelopmentname) | string | The name of the development resource group. |
+
+### Parameter: `resourceGroups.development.name`
 
 The name of the development resource group.
 
 - Required: Yes
 - Type: string
 
-### Parameter: `productionManagedIdentityName`
+### Parameter: `resourceGroups.production`
 
-The name of the managed identity to use as the owner of the production resource groups.
+The production resource group configuration.
 
 - Required: Yes
-- Type: string
+- Type: object
 
-### Parameter: `productionResourceGroupName`
+**Required parameters**
+
+| Parameter | Type | Description |
+| :-- | :-- | :-- |
+| [`name`](#parameter-resourcegroupsproductionname) | string | The name of the production resource group. |
+
+### Parameter: `resourceGroups.production.name`
 
 The name of the production resource group.
 
 - Required: Yes
 - Type: string
 
-### Parameter: `stakeholderGroupUniqueName`
+### Parameter: `securityGroups`
+
+Security groups type containing administrator, developer, and stakeholder group configurations.
+
+- Required: Yes
+- Type: object
+
+**Required parameters**
+
+| Parameter | Type | Description |
+| :-- | :-- | :-- |
+| [`administrators`](#parameter-securitygroupsadministrators) | object | The administrators security group configuration. |
+| [`developers`](#parameter-securitygroupsdevelopers) | object | The developers security group configuration. |
+| [`stakeholders`](#parameter-securitygroupsstakeholders) | object | The stakeholders security group configuration. |
+
+### Parameter: `securityGroups.administrators`
+
+The administrators security group configuration.
+
+- Required: Yes
+- Type: object
+
+**Required parameters**
+
+| Parameter | Type | Description |
+| :-- | :-- | :-- |
+| [`name`](#parameter-securitygroupsadministratorsname) | string | The unique name of the administrators security group. |
+
+### Parameter: `securityGroups.administrators.name`
+
+The unique name of the administrators security group.
+
+- Required: Yes
+- Type: string
+
+### Parameter: `securityGroups.developers`
+
+The developers security group configuration.
+
+- Required: Yes
+- Type: object
+
+**Required parameters**
+
+| Parameter | Type | Description |
+| :-- | :-- | :-- |
+| [`name`](#parameter-securitygroupsdevelopersname) | string | The unique name of the developers security group. |
+
+### Parameter: `securityGroups.developers.name`
+
+The unique name of the developers security group.
+
+- Required: Yes
+- Type: string
+
+### Parameter: `securityGroups.stakeholders`
+
+The stakeholders security group configuration.
+
+- Required: Yes
+- Type: object
+
+**Required parameters**
+
+| Parameter | Type | Description |
+| :-- | :-- | :-- |
+| [`name`](#parameter-securitygroupsstakeholdersname) | string | The unique name of the stakeholders security group. |
+
+### Parameter: `securityGroups.stakeholders.name`
 
 The unique name of the stakeholders security group.
 

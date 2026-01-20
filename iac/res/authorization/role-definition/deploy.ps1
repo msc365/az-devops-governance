@@ -14,23 +14,26 @@ param (
 )
 
 begin {
-    Write-Verbose "[Enter]: $($MyInvocation.MyCommand.Name)"
-    Write-Verbose "Location: $($Location)"
-    Write-Verbose "ManagementGroupId: $($ManagementGroupId)"
-    Write-Verbose "TemplateFile: $($TemplateFile)"
-    Write-Verbose "TemplateParameterFile: $($TemplateParameterFile)"
+    $params = [ordered]@{
+        Location              = $Location
+        SubscriptionId        = $SubscriptionId
+        TemplateFile          = $TemplateFile
+        TemplateParameterFile = $TemplateParameterFile
+    } | ConvertTo-Json -Depth 3
+
+    Write-Verbose "[Enter]: $($MyInvocation.MyCommand.Name) with parameters: $params"
 }
 
 process {
     try {
 
         $ctx = Get-AzContext
-        $ctxInfo = @{
+        $ctxInfo = [ordered]@{
             Account      = $ctx.Account.Id
             Tenant       = $ctx.Tenant.Id
             Subscription = $ctx.Subscription.Name
         }
-        Write-Verbose "Call New-AzDeployment within context: $($ctxInfo | ConvertTo-Json -Depth 3)"
+        Write-Verbose "Call New-AzDeployment with context: $($ctxInfo | ConvertTo-Json -Depth 3)"
 
         $params = @{
             Name                  = -join ('dep-e2egov-rdf{0:yyyyMMdd-HHmmss}' -f (Get-Date))[0..63]

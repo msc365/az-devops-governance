@@ -4,12 +4,43 @@ import {
   getLocationCode
 } from '../../../../utl/custom-functions/main.bicep'
 
+// --------- //
+// VARIABLES //
+// --------- //
+
 var config = loadJsonContent('../../../../../src/cfg/main.config.json')
 
-var resourceName = '${config.prefix}-prj${config.uniqueId}'
+var location = config.location
+var geoCode = getLocationCode(location)
+var serviceShort = '${config.prefix}-prj${config.uniqueId}'
 
-param serviceShort = 'prj${config.uniqueId}'
+// ---------- //
+// PARAMETERS //
+// ---------- //
 
-// Managed identity names
-param developmentResourceGroupName = 'rg-${resourceName}-dev-${getLocationCode(config.location)}'
-param productionResourceGroupName = 'rg-${resourceName}-prd-${getLocationCode(config.location)}'
+param resourceGroups = [
+  {
+    name: 'rg-${serviceShort}-dev-${geoCode}'
+    location: location
+    tags: {
+      public: 'false'
+      service: serviceShort
+      environment: 'dev'
+      security: 'rbac'
+      iac: 'bicep'
+      ci: 'azure-pipelines'
+    }
+  }
+  {
+    name: 'rg-${serviceShort}-prd-${geoCode}'
+    location: location
+    tags: {
+      public: 'false'
+      service: serviceShort
+      environment: 'prd'
+      security: 'rbac'
+      iac: 'bicep'
+      ci: 'azure-pipelines'
+    }
+  }
+]

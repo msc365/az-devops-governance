@@ -1,5 +1,5 @@
 metadata name = 'Entra ID security groups'
-metadata description = 'This module deploys Entra groups used for end-to-end governance.'
+metadata description = 'This module deploys Entra security groups used for end-to-end governance.'
 metadata owner = 'project-administrators'
 
 extension microsoftGraphV1
@@ -10,20 +10,22 @@ targetScope = 'subscription'
 // PARAMETERS //
 // ---------- //
 
+import { governanceSecurityGroupType } from '../../../utl/custom-types/main.bicep'
 @description('Required. The list of Entra security groups to create.')
-param groups array
+param securityGroups governanceSecurityGroupType[]
 
 // --------- //
 // RESOURCES //
 // --------- //
 
-resource graphGroups 'Microsoft.Graph/groups@v1.0' = [
-  for (group, index) in groups: {
-    displayName: group.displayName
-    uniqueName: group.uniqueName
-    mailNickname: group.mailNickname
+resource securityGroup 'Microsoft.Graph/groups@v1.0' = [
+  for (sg, index) in securityGroups: {
+    displayName: sg.displayName
+    uniqueName: sg.uniqueName
+    mailNickname: sg.mailNickname
     mailEnabled: false
     securityEnabled: true
+    description: sg.?description
   }
 ]
 
@@ -31,12 +33,12 @@ resource graphGroups 'Microsoft.Graph/groups@v1.0' = [
 // OUTPUTS //
 // ------- //
 
-@description('The list of created Entra group IDs.')
-output groups array = [
-  for (group, index) in groups: {
-    id: graphGroups[index].id
-    displayName: graphGroups[index].displayName
-    uniqueName: graphGroups[index].uniqueName
-    mailNickname: graphGroups[index].mailNickname
+@description('The list of created Entra security groups.')
+output securityGroups array = [
+  for (sg, index) in securityGroups: {
+    id: securityGroup[index].id
+    displayName: securityGroup[index].displayName
+    uniqueName: securityGroup[index].uniqueName
+    mailNickname: securityGroup[index].mailNickname
   }
 ]

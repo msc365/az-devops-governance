@@ -8,17 +8,21 @@ param (
     [string]$SubscriptionId = "$($env:SUBSCRIPTION_ID)",
 
     [Parameter()]
-    [string]$TemplateFile = 'iac\res\graph\managed-identity\main.bicep',
+    [string]$TemplateFile = 'iac/res/managed-identity/user-assigned-identity/main.bicep',
 
     [Parameter()]
-    [string]$TemplateParameterFile = 'iac\res\graph\managed-identity\params\main.bicepparam'
+    [string]$TemplateParameterFile = 'iac/res/managed-identity/user-assigned-identity/params/main.bicepparam'
 )
 
 begin {
-    Write-Verbose "[Enter]: $($MyInvocation.MyCommand.Name)"
-    Write-Verbose "SubscriptionId: $($SubscriptionId)"
-    Write-Verbose "TemplateFile: $($TemplateFile)"
-    Write-Verbose "TemplateParameterFile: $($TemplateParameterFile)"
+    $params = [ordered]@{
+        Location              = $Location
+        SubscriptionId        = $SubscriptionId
+        TemplateFile          = $TemplateFile
+        TemplateParameterFile = $TemplateParameterFile
+    } | ConvertTo-Json -Depth 3
+
+    Write-Verbose "[Enter]: $($MyInvocation.MyCommand.Name) with parameters: $params"
 }
 
 process {
@@ -27,12 +31,12 @@ process {
         Set-AzContext -TenantId (Get-AzContext).Tenant.Id -SubscriptionId $SubscriptionId -WhatIf:$false | Out-Null
 
         $ctx = Get-AzContext
-        $ctxInfo = @{
+        $ctxInfo = [ordered]@{
             Account      = $ctx.Account.Id
             Tenant       = $ctx.Tenant.Id
             Subscription = $ctx.Subscription.Name
         }
-        Write-Verbose "Call New-AzDeployment within context: $($ctxInfo | ConvertTo-Json -Depth 3)"
+        Write-Verbose "Call New-AzDeployment with context: $($ctxInfo | ConvertTo-Json -Depth 3)"
 
         $deploymentName = -join ('dep-e2egov-msi{0:yyyyMMdd-HHmmss}' -f (Get-Date))[0..63]
 

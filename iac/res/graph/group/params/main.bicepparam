@@ -1,28 +1,34 @@
 using '../main.bicep'
 
+// --------- //
+// VARIABLES //
+// --------- //
+
 var config = loadJsonContent('../../../../../src/cfg/main.config.json')
 
-var resourceName = '${config.prefix}-prj${config.uniqueId}'
+var serviceShort = '${config.prefix}-prj${config.uniqueId}'
 
-// Security group unique names
-var stakeholderGroupUniqueName = 'sg-${resourceName}-stakeholders'
-var developerGroupUniqueName = 'sg-${resourceName}-developers'
-var administratorGroupUniqueName = 'sg-${resourceName}-administrators'
+// ---------- //
+// PARAMETERS //
+// ---------- //
 
-param groups = [
+param securityGroups = [
   {
-    displayName: 'SG ${resourceName} Administrators'
-    uniqueName: administratorGroupUniqueName
-    mailNickname: administratorGroupUniqueName
+    displayName: 'SG ${serviceShort} Administrators'
+    uniqueName: '${serviceShort}-admins'
+    mailNickname: '${serviceShort}-admins'
+    description: 'Administrators group for ${serviceShort} project.'
   }
   {
-    displayName: 'SG ${resourceName} Developers'
-    uniqueName: developerGroupUniqueName
-    mailNickname: developerGroupUniqueName
+    displayName: 'SG ${serviceShort} Developers'
+    uniqueName: '${serviceShort}-devs'
+    mailNickname: '${serviceShort}-devs'
+    description: 'Developers group for ${serviceShort} project.'
   }
   {
-    displayName: 'SG ${resourceName} Stakeholders'
-    uniqueName: stakeholderGroupUniqueName
-    mailNickname: stakeholderGroupUniqueName
+    displayName: 'SG ${serviceShort} Stakeholders'
+    uniqueName: '${serviceShort}-stakes'
+    mailNickname: '${serviceShort}-stakes'
+    description: 'Stakeholders group for ${serviceShort} project.'
   }
 ]

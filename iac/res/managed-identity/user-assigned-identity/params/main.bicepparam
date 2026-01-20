@@ -4,17 +4,45 @@ import {
   getLocationCode
 } from '../../../../utl/custom-functions/main.bicep'
 
+// --------- //
+// VARIABLES //
+// --------- //
+
 var config = loadJsonContent('../../../../../src/cfg/main.config.json')
 
-var resourceName = '${config.prefix}-prj${config.uniqueId}'
+var location = config.location
+var geoCode = getLocationCode(location)
+var serviceShort = '${config.prefix}-prj${config.uniqueId}'
 
-param location = 'westeurope'
-param serviceShort = 'prj${config.uniqueId}'
+// ---------- //
+// PARAMETERS //
+// ---------- //
 
-// Managed identity names
-param developmentManagedIdentityName = 'id-${resourceName}-dev'
-param productionManagedIdentityName = 'id-${resourceName}-prd'
-
-// Resource group names
-param developmentResourceGroupName = 'rg-${resourceName}-dev-${getLocationCode(location)}'
-param productionResourceGroupName = 'rg-${resourceName}-prd-${getLocationCode(location)}'
+param managedIdentities = [
+  {
+    name: 'id-${serviceShort}-dev'
+    resourceGroup: 'rg-${serviceShort}-dev-${geoCode}'
+    location: location
+    tags: {
+      public: 'false'
+      service: serviceShort
+      environment: 'dev'
+      security: 'rbac'
+      iac: 'bicep'
+      ci: 'azure-pipelines'
+    }
+  }
+  {
+    name: 'id-${serviceShort}-prd'
+    resourceGroup: 'rg-${serviceShort}-prd-${geoCode}'
+    location: location
+    tags: {
+      public: 'false'
+      service: serviceShort
+      environment: 'prd'
+      security: 'rbac'
+      iac: 'bicep'
+      ci: 'azure-pipelines'
+    }
+  }
+]

@@ -1,8 +1,8 @@
 <!-- markdownlint-disable -->
 <!-- omit from toc -->
-# Resource group `[Resources/resourceGroup]`
+# Resource groups `[Resources/resourceGroup]`
 
-This module deploys a resource group used for end-to-end governance.
+This module deploys resource groups used for end-to-end governance.
 
 ## Navigation
 
@@ -26,52 +26,72 @@ This module deploys a resource group used for end-to-end governance.
 
 | Parameter | Type | Description |
 | :-- | :-- | :-- |
-| [`developmentResourceGroupName`](#parameter-developmentresourcegroupname) | string | The name of the development resource group. |
-| [`productionResourceGroupName`](#parameter-productionresourcegroupname) | string | The name of the production resource group. |
+| [`resourceGroups`](#parameter-resourcegroups) | array | The list of governance resource groups to create resource groups for. |
+
+### Parameter: `resourceGroups`
+
+The list of governance resource groups to create resource groups for.
+
+- Required: Yes
+- Type: array
+
+**Required parameters**
+
+| Parameter | Type | Description |
+| :-- | :-- | :-- |
+| [`name`](#parameter-resourcegroupsname) | string | The unique name of the resource group. |
 
 **Optional parameters**
 
 | Parameter | Type | Description |
 | :-- | :-- | :-- |
-| [`location`](#parameter-location) | string | The Azure location to deploy the resource groups to. |
-| [`serviceShort`](#parameter-serviceshort) | string | Tags to apply to the managed identity. |
+| [`environmentType`](#parameter-resourcegroupsenvironmenttype) | string | The environment type of the resource group. |
+| [`location`](#parameter-resourcegroupslocation) | string | The location of the resource group. |
+| [`tags`](#parameter-resourcegroupstags) | object | The tags of the resource group used as metadata. |
 
-### Parameter: `developmentResourceGroupName`
+### Parameter: `resourceGroups.name`
 
-The name of the development resource group.
-
-- Required: Yes
-- Type: string
-
-### Parameter: `productionResourceGroupName`
-
-The name of the production resource group.
+The unique name of the resource group.
 
 - Required: Yes
 - Type: string
 
-### Parameter: `location`
+### Parameter: `resourceGroups.environmentType`
 
-The Azure location to deploy the resource groups to.
-
-- Required: No
-- Type: string
-- Default: `[deployment().location]`
-
-### Parameter: `serviceShort`
-
-Tags to apply to the managed identity.
+The environment type of the resource group.
 
 - Required: No
 - Type: string
-- Default: `'e2egov'`
+- Allowed:
+  ```Bicep
+  [
+    'dev'
+    'prd'
+    'sbx'
+    'stg'
+    'tst'
+  ]
+  ```
+
+### Parameter: `resourceGroups.location`
+
+The location of the resource group.
+
+- Required: No
+- Type: string
+
+### Parameter: `resourceGroups.tags`
+
+The tags of the resource group used as metadata.
+
+- Required: No
+- Type: object
 
 ## Outputs
 
 | Output | Type | Description |
 | :-- | :-- | :-- |
-| `resourceGroupDevelopment` | object | The development resource group. |
-| `resourceGroupProduction` | object | The production resource group. |
+| `resourceGroups` | array | The list of resource groups created. |
 
 ## Cross-referenced modules
 

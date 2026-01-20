@@ -1,8 +1,8 @@
 <!-- markdownlint-disable -->
 <!-- omit from toc -->
-# Managed Service Identity `[ManagedIdentity/userAssignedIdentity]`
+# Managed identity `[ManagedIdentity/userAssignedIdentity]`
 
-This module deploys a managed service identity for end-to-end governance.
+This module deploys user-assigned managed identities used for end-to-end governance.
 
 ## Navigation
 
@@ -23,65 +23,77 @@ This module deploys a managed service identity for end-to-end governance.
 
 | Parameter | Type | Description |
 | :-- | :-- | :-- |
-| [`developmentManagedIdentityName`](#parameter-developmentmanagedidentityname) | string | The name of the managed identity to create for the development environment. |
-| [`developmentResourceGroupName`](#parameter-developmentresourcegroupname) | string | The name of the development resource group. |
-| [`productionManagedIdentityName`](#parameter-productionmanagedidentityname) | string | The name of the managed identity to create for the production environment. |
-| [`productionResourceGroupName`](#parameter-productionresourcegroupname) | string | The name of the production resource group. |
+| [`managedIdentities`](#parameter-managedidentities) | array | The list of governance identities to create managed identities for. |
+
+### Parameter: `managedIdentities`
+
+The list of governance identities to create managed identities for.
+
+- Required: Yes
+- Type: array
+
+**Required parameters**
+
+| Parameter | Type | Description |
+| :-- | :-- | :-- |
+| [`name`](#parameter-managedidentitiesname) | string | The name of the managed identity. |
+| [`resourceGroup`](#parameter-managedidentitiesresourcegroup) | string | The resource group name of the managed identity. |
 
 **Optional parameters**
 
 | Parameter | Type | Description |
 | :-- | :-- | :-- |
-| [`location`](#parameter-location) | string | The Azure location to deploy the managed identity to. |
-| [`serviceShort`](#parameter-serviceshort) | string | Tags to apply to the managed identity. |
+| [`environmentType`](#parameter-managedidentitiesenvironmenttype) | string | The environment type of the managed identity. |
+| [`location`](#parameter-managedidentitieslocation) | string | The location of the managed identity. |
+| [`tags`](#parameter-managedidentitiestags) | object | The tags of the managed identity used as metadata. |
 
-### Parameter: `developmentManagedIdentityName`
+### Parameter: `managedIdentities.name`
 
-The name of the managed identity to create for the development environment.
-
-- Required: Yes
-- Type: string
-
-### Parameter: `developmentResourceGroupName`
-
-The name of the development resource group.
+The name of the managed identity.
 
 - Required: Yes
 - Type: string
 
-### Parameter: `productionManagedIdentityName`
+### Parameter: `managedIdentities.resourceGroup`
 
-The name of the managed identity to create for the production environment.
-
-- Required: Yes
-- Type: string
-
-### Parameter: `productionResourceGroupName`
-
-The name of the production resource group.
+The resource group name of the managed identity.
 
 - Required: Yes
 - Type: string
 
-### Parameter: `location`
+### Parameter: `managedIdentities.environmentType`
 
-The Azure location to deploy the managed identity to.
+The environment type of the managed identity.
 
 - Required: No
 - Type: string
-- Default: `[deployment().location]`
+- Allowed:
+  ```Bicep
+  [
+    'dev'
+    'prd'
+    'sbx'
+    'stg'
+    'tst'
+  ]
+  ```
 
-### Parameter: `serviceShort`
+### Parameter: `managedIdentities.location`
 
-Tags to apply to the managed identity.
+The location of the managed identity.
 
 - Required: No
 - Type: string
-- Default: `'e2egov'`
+
+### Parameter: `managedIdentities.tags`
+
+The tags of the managed identity used as metadata.
+
+- Required: No
+- Type: object
 
 ## Outputs
 
 | Output | Type | Description |
 | :-- | :-- | :-- |
-| `managedIdentityDevelopment` | object | The managed identity created for the development environment. |
-| `managedIdentityProduction` | object | The managed identity created for the production environment. |
+| `managedIdentities` | array | The list of managed identities created. |

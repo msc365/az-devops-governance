@@ -4,26 +4,44 @@ import {
   getLocationCode
 } from '../../../../../utl/custom-functions/main.bicep'
 
+// --------- //
+// VARIABLES //
+// --------- //
+
 var config = loadJsonContent('../../../../../../src/cfg/main.config.json')
 
-var resourceName = '${config.prefix}-prj${config.uniqueId}'
+var location = config.location
+var geoCode = getLocationCode(location)
+var serviceShort = '${config.prefix}-prj${config.uniqueId}'
 
-// Headless Owner (DevOps CI/CD)
+// ---------- //
+// PARAMETERS //
+// ---------- //
+
+// Custom role definition ID for Headless Owner (DevOps CI/CD)
 param customRoleDefinitionId = '<custom-role-definition-id>'
 
-// Security group unique names
-param stakeholderGroupUniqueName = 'sg-${resourceName}-stakeholders'
-param developerGroupUniqueName = 'sg-${resourceName}-developers'
-param administratorGroupUniqueName = 'sg-${resourceName}-administrators'
+// Security groups object-based pattern
+param securityGroups = {
+  administrators: { name: '${serviceShort}-admins' }
+  developers: { name: '${serviceShort}-devs' }
+  stakeholders: { name: '${serviceShort}-stakes' }
+}
 
-// Managed identity names
-param developmentManagedIdentityName = 'id-${resourceName}-dev'
-param productionManagedIdentityName = 'id-${resourceName}-prd'
+// Managed identities object-based pattern
+param managedIdentities = {
+  development: { name: 'id-${serviceShort}-dev' }
+  production: { name: 'id-${serviceShort}-prd' }
+}
 
-// Resource group names
-param developmentResourceGroupName = 'rg-${resourceName}-dev-${getLocationCode(config.location)}'
-param productionResourceGroupName = 'rg-${resourceName}-prd-${getLocationCode(config.location)}'
+// Resource groups object-based pattern
+param resourceGroups = {
+  development: { name: 'rg-${serviceShort}-dev-${geoCode}' }
+  production: { name: 'rg-${serviceShort}-prd-${geoCode}' }
+}
 
-// Subscription IDs
-param developmentSubscriptionId = ''
-param productionSubscriptionId = ''
+// Subscriptions object-based pattern
+param subscriptions = {
+  development: { id: '' }
+  production: { id: '' }
+}

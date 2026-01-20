@@ -1,4 +1,4 @@
-metadata name = 'Role assignments at Subscription scope'
+metadata name = 'Role assignments at subscription scope'
 metadata description = 'This module deploys role assignments at the subscription scope used for end-to-end governance.'
 metadata owner = 'project-administrators'
 
@@ -13,105 +13,94 @@ targetScope = 'subscription'
 @description('Required. The ID of the custom `Headless Owner (DevOps CI/CD)` role definition to assign.')
 param customRoleDefinitionId string
 
-// Security group unique names
-@description('Required. The unique name of the administrators security group.')
-param administratorGroupUniqueName string
+@description('Required. Security groups type containing administrator, developer, and stakeholder group configurations.')
+param securityGroups securityGroupsType
 
-@description('Required. The unique name of the developers security group.')
-param developerGroupUniqueName string
+@description('Required. Managed identities type containing development and production managed identity configurations.')
+param managedIdentities managedIdentitiesType
 
-@description('Required. The unique name of the stakeholders security group.')
-param stakeholderGroupUniqueName string
+@description('Required. Resource groups type containing development and production resource group configurations.')
+param resourceGroups resourceGroupsType
 
-// Managed identity names
-@description('Required. The name of the managed identity to use as the owner of the development resource groups.')
-param developmentManagedIdentityName string
+@description('Required. Subscriptions type containing development and production subscription configurations.')
+param subscriptions subscriptionsType
 
-@description('Required. The name of the managed identity to use as the owner of the production resource groups.')
-param productionManagedIdentityName string
+// -------- //
+// EXISTING //
+// -------- //
 
-// Resource group names
-@description('Required. The name of the development resource group.')
-param developmentResourceGroupName string
+// ---------------------- //
+// Custom Role Definition //
 
-@description('Required. The name of the production resource group.')
-param productionResourceGroupName string
-
-// Subscription IDs
-@description('Required. The subscription ID of the development subscription.')
-param developmentSubscriptionId string
-
-@description('Required. The subscription ID of the production subscription.')
-param productionSubscriptionId string
-
-// ------------------ //
-// EXISTING RESOURCES //
-// ------------------ //
-
-// Custom Role Definition - Headless Owner (DevOps CI/CD)
 resource customRoleDefinition 'Microsoft.Authorization/roleDefinitions@2022-04-01' existing = {
   name: customRoleDefinitionId
 }
 
-// Entra ID Security Groups - Existing
+// ---------------- //
+// Security  groups //
+
 resource administratorGroup 'Microsoft.Graph/groups@v1.0' existing = {
-  uniqueName: administratorGroupUniqueName
+  uniqueName: securityGroups.administrators.name
 }
 
 resource developerGroup 'Microsoft.Graph/groups@v1.0' existing = {
-  uniqueName: developerGroupUniqueName
+  uniqueName: securityGroups.developers.name
 }
 
 resource stakeholderGroup 'Microsoft.Graph/groups@v1.0' existing = {
-  uniqueName: stakeholderGroupUniqueName
+  uniqueName: securityGroups.stakeholders.name
 }
 
-// Managed Identities - Existing
-resource managedIdentity_development 'Microsoft.ManagedIdentity/userAssignedIdentities@2025-01-31-preview' existing = {
-  scope: resourceGroup_development
-  name: developmentManagedIdentityName
+// --------------- //
+// Resource Groups //
+
+resource developmentResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
+  name: resourceGroups.development.name
 }
 
-resource managedIdentity_production 'Microsoft.ManagedIdentity/userAssignedIdentities@2025-01-31-preview' existing = {
-  scope: resourceGroup_production
-  name: productionManagedIdentityName
+resource productionResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
+  name: resourceGroups.production.name
 }
 
-// Resource Groups - Existing
-resource resourceGroup_development 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
-  name: developmentResourceGroupName
+// ------------------ //
+// Managed Identities //
+
+resource developmentMangedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2025-01-31-preview' existing = {
+  scope: developmentResourceGroup
+  name: managedIdentities.development.name
 }
 
-resource resourceGroup_production 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
-  name: productionResourceGroupName
+resource productionMangedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2025-01-31-preview' existing = {
+  scope: productionResourceGroup
+  name: managedIdentities.production.name
 }
 
 // --------- //
 // RESOURCES //
 // --------- //
 
-// Managed Identities - Subscription - Role Assignment
-module managedIdentityRoleAssignment_development 'br/public:avm/res/authorization/role-assignment/sub-scope:0.1.1' = if (!empty(developmentSubscriptionId)) {
-  scope: subscription(developmentSubscriptionId)
+// Managed Identities - Role Assignment
+module managedIdentityRoleAssignment_development 'br/public:avm/res/authorization/role-assignment/sub-scope:0.1.1' = if (!empty(subscriptions.development.id)) {
+  scope: subscription(subscriptions.development.id)
   params: {
-    principalId: managedIdentity_development.properties.principalId
+    principalId: developmentMangedIdentity.properties.principalId
     roleDefinitionIdOrName: customRoleDefinition.id
     principalType: 'ServicePrincipal'
   }
 }
 
-module managedIdentityRoleAssignment_production 'br/public:avm/res/authorization/role-assignment/sub-scope:0.1.1' = if (!empty(productionSubscriptionId)) {
-  scope: subscription(productionSubscriptionId)
+module managedIdentityRoleAssignment_production 'br/public:avm/res/authorization/role-assignment/sub-scope:0.1.1' = if (!empty(subscriptions.production.id)) {
+  scope: subscription(subscriptions.production.id)
   params: {
-    principalId: managedIdentity_production.properties.principalId
+    principalId: productionMangedIdentity.properties.principalId
     roleDefinitionIdOrName: customRoleDefinition.id
     principalType: 'ServicePrincipal'
   }
 }
 
-// Administrators Group - Subscription - Role Assignment
-module administratorGroupRoleAssignment_development 'br/public:avm/res/authorization/role-assignment/sub-scope:0.1.1' = if (!empty(developmentSubscriptionId)) {
-  scope: subscription(developmentSubscriptionId)
+// Administrators Group - Role Assignment
+module administratorGroupRoleAssignment_development 'br/public:avm/res/authorization/role-assignment/sub-scope:0.1.1' = if (!empty(subscriptions.development.id)) {
+  scope: subscription(subscriptions.development.id)
   params: {
     principalId: administratorGroup.id
     roleDefinitionIdOrName: 'Owner'
@@ -119,8 +108,8 @@ module administratorGroupRoleAssignment_development 'br/public:avm/res/authoriza
   }
 }
 
-module administratorGroupRoleAssignment_production 'br/public:avm/res/authorization/role-assignment/sub-scope:0.1.1' = if (!empty(productionSubscriptionId)) {
-  scope: subscription(productionSubscriptionId)
+module administratorGroupRoleAssignment_production 'br/public:avm/res/authorization/role-assignment/sub-scope:0.1.1' = if (!empty(subscriptions.production.id)) {
+  scope: subscription(subscriptions.production.id)
   params: {
     principalId: administratorGroup.id
     roleDefinitionIdOrName: 'Owner'
@@ -128,9 +117,9 @@ module administratorGroupRoleAssignment_production 'br/public:avm/res/authorizat
   }
 }
 
-// Developers Group - Subscription - Role Assignment
-module developerGroupRoleAssignment_development 'br/public:avm/res/authorization/role-assignment/sub-scope:0.1.1' = if (!empty(developmentSubscriptionId)) {
-  scope: subscription(developmentSubscriptionId)
+// Developers Group - Role Assignment
+module developerGroupRoleAssignment_development 'br/public:avm/res/authorization/role-assignment/sub-scope:0.1.1' = if (!empty(subscriptions.development.id)) {
+  scope: subscription(subscriptions.development.id)
   params: {
     principalId: developerGroup.id
     roleDefinitionIdOrName: 'Owner'
@@ -138,8 +127,8 @@ module developerGroupRoleAssignment_development 'br/public:avm/res/authorization
   }
 }
 
-module developerGroupRoleAssignment_production 'br/public:avm/res/authorization/role-assignment/sub-scope:0.1.1' = if (!empty(productionSubscriptionId)) {
-  scope: subscription(productionSubscriptionId)
+module developerGroupRoleAssignment_production 'br/public:avm/res/authorization/role-assignment/sub-scope:0.1.1' = if (!empty(subscriptions.production.id)) {
+  scope: subscription(subscriptions.production.id)
   params: {
     principalId: developerGroup.id
     roleDefinitionIdOrName: 'Contributor'
@@ -147,9 +136,9 @@ module developerGroupRoleAssignment_production 'br/public:avm/res/authorization/
   }
 }
 
-// Readers Group - Subscription - Role Assignment
-module stakeholderGroupRoleAssignment_development 'br/public:avm/res/authorization/role-assignment/sub-scope:0.1.1' = if (!empty(developmentSubscriptionId)) {
-  scope: subscription(developmentSubscriptionId)
+// Readers Group - Role Assignment
+module stakeholderGroupRoleAssignment_development 'br/public:avm/res/authorization/role-assignment/sub-scope:0.1.1' = if (!empty(subscriptions.development.id)) {
+  scope: subscription(subscriptions.development.id)
   params: {
     principalId: stakeholderGroup.id
     roleDefinitionIdOrName: 'Reader'
@@ -157,12 +146,77 @@ module stakeholderGroupRoleAssignment_development 'br/public:avm/res/authorizati
   }
 }
 
-module stakeholderGroupRoleAssignment_production 'br/public:avm/res/authorization/role-assignment/sub-scope:0.1.1' = if (!empty(productionSubscriptionId)) {
-  scope: subscription(productionSubscriptionId)
+module stakeholderGroupRoleAssignment_production 'br/public:avm/res/authorization/role-assignment/sub-scope:0.1.1' = if (!empty(subscriptions.production.id)) {
+  scope: subscription(subscriptions.production.id)
   params: {
     principalId: stakeholderGroup.id
     roleDefinitionIdOrName: 'Reader'
     principalType: 'Group'
+  }
+}
+
+// ----- //
+// TYPES //
+// ----- //
+
+@description('Security groups type containing administrator, developer, and stakeholder group configurations.')
+type securityGroupsType = {
+  @description('Required. The administrators security group configuration.')
+  administrators: {
+    @description('Required. The unique name of the administrators security group.')
+    name: string
+  }
+  @description('Required. The developers security group configuration.')
+  developers: {
+    @description('Required. The unique name of the developers security group.')
+    name: string
+  }
+  @description('Required. The stakeholders security group configuration.')
+  stakeholders: {
+    @description('Required. The unique name of the stakeholders security group.')
+    name: string
+  }
+}
+
+@description('Managed identities type containing development and production managed identity configurations.')
+type managedIdentitiesType = {
+  @description('Required. The development managed identity configuration.')
+  development: {
+    @description('Required. The name of the development managed identity.')
+    name: string
+  }
+  @description('Required. The production managed identity configuration.')
+  production: {
+    @description('Required. The name of the production managed identity.')
+    name: string
+  }
+}
+
+@description('Resource groups type containing development and production resource group configurations.')
+type resourceGroupsType = {
+  @description('Required. The development resource group configuration.')
+  development: {
+    @description('Required. The name of the development resource group.')
+    name: string
+  }
+  @description('Required. The production resource group configuration.')
+  production: {
+    @description('Required. The name of the production resource group.')
+    name: string
+  }
+}
+
+@description('Subscriptions type containing development and production subscription configurations.')
+type subscriptionsType = {
+  @description('Required. The development subscription configuration.')
+  development: {
+    @description('Required. The ID of the development subscription.')
+    id: string
+  }
+  @description('Required. The production subscription configuration.')
+  production: {
+    @description('Required. The ID of the production subscription.')
+    id: string
   }
 }
 
@@ -171,7 +225,6 @@ module stakeholderGroupRoleAssignment_production 'br/public:avm/res/authorizatio
 // ------- //
 
 // Development outputs
-
 output developmentRoleAssignmentResourceIds object = {
   managedIdentity: managedIdentityRoleAssignment_development.?outputs.resourceId
   administratorGroup: administratorGroupRoleAssignment_development.?outputs.resourceId
