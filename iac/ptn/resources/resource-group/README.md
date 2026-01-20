@@ -8,6 +8,7 @@ This module deploys resource groups used for end-to-end governance.
 
 <!-- no toc -->
 - [Resource Types](#resource-types)
+- [Usage examples](#usage-examples)
 - [Parameters](#parameters)
 - [Outputs](#outputs)
 - [Cross-referenced modules](#cross-referenced-modules)
@@ -19,6 +20,170 @@ This module deploys resource groups used for end-to-end governance.
 | `Microsoft.Authorization/locks` | [2020-05-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Authorization/2020-05-01/locks) |
 | `Microsoft.Authorization/roleAssignments` | [2022-04-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Authorization/2022-04-01/roleAssignments) |
 | `Microsoft.Resources/resourceGroups` | [2021-04-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Resources/2021-04-01/resourceGroups) |
+
+## Usage examples
+
+The following section provides usage examples for the module, which were used to validate and deploy the module successfully. For a full reference, please review the module's test folder in its repository.
+
+> **Note** <br>
+> Each example lists all the required parameters first, followed by the rest - each in alphabetical order.
+
+> **Note** <br>
+> To reference the module, please use the following syntax `iac/ptn/resources/resource-group/main.bicep`.
+
+- [Using all](#example-1-using-all)
+- [Using defaults only](#example-2-using-defaults-only)
+
+### Example 1: _Using all_
+
+This instance deploys the module with all parameters.
+
+
+<details>
+
+<summary>via Bicep module</summary>
+
+```bicep
+module resourceGroup 'iac/ptn/resources/resource-group/main.bicep' = {
+  name: 'resourceGroupDeployment'
+  params: {
+    resourceGroups: [
+      {
+        location: '<location>'
+        name: '<name>'
+        tags: {
+          public: 'false'
+          reason: 'e2e-test'
+          service: '<service>'
+        }
+      }
+    ]
+  }
+}
+```
+
+</details>
+<p>
+
+<details>
+
+<summary>via JSON parameters file</summary>
+
+```json
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "resourceGroups": {
+      "value": [
+        {
+          "location": "<location>",
+          "name": "<name>",
+          "tags": {
+            "public": "false",
+            "reason": "e2e-test",
+            "service": "<service>"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+</details>
+<p>
+
+<details>
+
+<summary>via Bicep parameters file</summary>
+
+```bicep-params
+using 'iac/ptn/resources/resource-group/main.bicep'
+
+param resourceGroups = [
+  {
+    location: '<location>'
+    name: '<name>'
+    tags: {
+      public: 'false'
+      reason: 'e2e-test'
+      service: '<service>'
+    }
+  }
+]
+```
+
+</details>
+<p>
+
+### Example 2: _Using defaults only_
+
+This instance deploys the module with the minimum set of required parameters.
+
+
+<details>
+
+<summary>via Bicep module</summary>
+
+```bicep
+module resourceGroup 'iac/ptn/resources/resource-group/main.bicep' = {
+  name: 'resourceGroupDeployment'
+  params: {
+    resourceGroups: [
+      {
+        location: '<location>'
+        name: '<name>'
+      }
+    ]
+  }
+}
+```
+
+</details>
+<p>
+
+<details>
+
+<summary>via JSON parameters file</summary>
+
+```json
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "resourceGroups": {
+      "value": [
+        {
+          "location": "<location>",
+          "name": "<name>"
+        }
+      ]
+    }
+  }
+}
+```
+
+</details>
+<p>
+
+<details>
+
+<summary>via Bicep parameters file</summary>
+
+```bicep-params
+using 'iac/ptn/resources/resource-group/main.bicep'
+
+param resourceGroups = [
+  {
+    location: '<location>'
+    name: '<name>'
+  }
+]
+```
+
+</details>
+<p>
 
 ## Parameters
 
