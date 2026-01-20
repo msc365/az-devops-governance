@@ -1,17 +1,16 @@
 ﻿[CmdletBinding(SupportsShouldProcess)]
-[OutputType([string])]
 param (
     [Parameter()]
     [string]$Location = "$($env:LOCATION)",
 
     [Parameter()]
-    [string]$SubscriptionId = "$($env:SUBSCRIPTION_ID)",
+    [String]$ManagementGroupId = "$($env:MANAGEMENT_GROUP_ID)",
 
     [Parameter()]
-    [string]$TemplateFile = 'iac\res\resources\resource-group\main.bicep',
+    [String]$TemplateFile = 'iac/ptn/authorization/role-definition/main.bicep',
 
     [Parameter()]
-    [string]$TemplateParameterFile = 'iac\res\resources\resource-group\params\main.bicepparam'
+    [string]$TemplateParameterFile = 'iac/ptn/authorization/role-definition/params/main.bicepparam'
 )
 
 begin {
@@ -27,8 +26,6 @@ begin {
 
 process {
     try {
-        # HACK: Explicitly set -WhatIf:$false, for switching targeted subscription in the context.
-        Set-AzContext -TenantId (Get-AzContext).Tenant.Id -SubscriptionId $SubscriptionId -WhatIf:$false | Out-Null
 
         $ctx = Get-AzContext
         $ctxInfo = [ordered]@{
@@ -38,18 +35,17 @@ process {
         }
         Write-Verbose "Call New-AzDeployment with context: $($ctxInfo | ConvertTo-Json -Depth 3)"
 
-        $deploymentName = -join ('dep-e2egov-rrg{0:yyyyMMdd-HHmmss}' -f (Get-Date))[0..63]
-
         $params = @{
-            Name                  = $deploymentName
+            Name                  = -join ('dep-e2egov-rdf{0:yyyyMMdd-HHmmss}' -f (Get-Date))[0..63]
             Location              = $Location
+            ManagementGroupId     = $ManagementGroupId
             TemplateFile          = $TemplateFile
             TemplateParameterFile = $TemplateParameterFile
-            WhatIf                = $WhatIfPreference
             Verbose               = $VerbosePreference
+            WhatIf                = $WhatIfPreference
         }
 
-        New-AzDeployment @params
+        New-AzManagementGroupDeployment @params -Verbose
 
     } catch {
         throw $_

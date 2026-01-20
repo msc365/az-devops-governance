@@ -2,28 +2,24 @@
 [OutputType([string])]
 param (
     [Parameter()]
-    [string]$CustomRoleDefinitionId = "$($env:CUSTOM_ROLE_DEFINITION_ID)",
-
-    [Parameter()]
     [string]$Location = "$($env:LOCATION)",
 
     [Parameter()]
     [string]$SubscriptionId = "$($env:SUBSCRIPTION_ID)",
 
     [Parameter()]
-    [string]$TemplateFile = 'iac\res\authorization\role-assignment\sub-scope\main.bicep',
+    [string]$TemplateFile = 'iac/ptn/graph/group/main.bicep',
 
     [Parameter()]
-    [string]$TemplateParameterFile = 'iac\res\authorization\role-assignment\sub-scope\params\main.bicepparam'
+    [string]$TemplateParameterFile = 'iac/ptn/graph/group/params/main.bicepparam'
 )
 
 begin {
     $params = [ordered]@{
-        CustomRoleDefinitionId = $CustomRoleDefinitionId
-        Location               = $Location
-        SubscriptionId         = $SubscriptionId
-        TemplateFile           = $TemplateFile
-        TemplateParameterFile  = $TemplateParameterFile
+        Location              = $Location
+        SubscriptionId        = $SubscriptionId
+        TemplateFile          = $TemplateFile
+        TemplateParameterFile = $TemplateParameterFile
     } | ConvertTo-Json -Depth 3
 
     Write-Verbose "[Enter]: $($MyInvocation.MyCommand.Name) with parameters: $params"
@@ -42,16 +38,15 @@ process {
         }
         Write-Verbose "Call New-AzDeployment with context: $($ctxInfo | ConvertTo-Json -Depth 3)"
 
-        $deploymentName = -join ('dep-e2egov-rasub{0:yyyyMMdd-HHmmss}' -f (Get-Date))[0..63]
+        $deploymentName = -join ('dep-e2egov-grp{0:yyyyMMdd-HHmmss}' -f (Get-Date))[0..63]
 
         $params = @{
-            Name                   = $deploymentName
-            Location               = $Location
-            TemplateFile           = $TemplateFile
-            TemplateParameterFile  = $TemplateParameterFile
-            CustomRoleDefinitionId = $CustomRoleDefinitionId
-            WhatIf                 = $WhatIfPreference
-            Verbose                = $VerbosePreference
+            Name                  = $deploymentName
+            Location              = $Location
+            TemplateFile          = $TemplateFile
+            TemplateParameterFile = $TemplateParameterFile
+            WhatIf                = $WhatIfPreference
+            Verbose               = $VerbosePreference
         }
 
         New-AzDeployment @params
