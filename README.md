@@ -109,13 +109,15 @@ The numbering reflects the order in which administrators and enterprise architec
    | `id-portugal-dev` | - | _Custom Role_ * |
    | `id-portugal-prd` | _Custom Role_ * | - |
 
-   **Naming Convention**: This implementation follows structured naming patterns defined in [schemas/abbreviations.schema.json](schemas/abbreviations.schema.json). Examples:
+   > \* In real life scenarios you should create a _Custom Role_ that prevents a managed identity from removing any [management locks](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/lock-resources) that you've placed on your resources. This helps protect resources from accidental damage, such as database deletion. See [Create a custom role for the service principal](#create-a-custom-role-for-the-service-principal) later in this document.
+
+   This implementation follows structured _naming patterns_ defined in [schemas/abbreviations.schema.json](schemas/abbreviations.schema.json).
+
+   Examples:
    - `id-*`: User-assigned managed identities
    - `sg-*`: Security groups
    - `rg-*`: Resource groups
-
-   > \* In real life scenarios you should create a _Custom Role_ that prevents a managed identity from removing any [management locks](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/lock-resources) that you've placed on your resources. This helps protect resources from accidental damage, such as database deletion. See [Create a custom role for the service principal](#create-a-custom-role-for-the-service-principal) later in this document.
-
+  
 5. **Security group assignments in Azure DevOps**  
    Security groups function like roles in Azure. Take advantage of built-in roles and default to [Contributor](https://learn.microsoft.com/en-us/azure/devops/user-guide/roles#contributor-roles) for developers. Admins get assigned to the [Project Administrator](https://learn.microsoft.com/en-us/azure/devops/user-guide/roles#project-administrators) security group for elevated permissions, allowing them to configure security permissions.
 
