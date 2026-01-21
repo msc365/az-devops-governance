@@ -2,30 +2,30 @@
 
 This article describes a **clean, practical, Azure DevOps design** for a limited cross‑project collaboration scenario:
 
-> Project `hardware` owns a repo, and needs to invite only a small subset of users from project `finishing` to collaborate on _one_ repository; without granting them full access to project `hardware`.
+> Project `portugal` owns a repo, and needs to invite only a small subset of users from project `netherlands` to collaborate on _one_ repository; without granting them full access to project `portugal`.
 
 This is a classic **limited cross‑project collaboration** scenario. Azure DevOps doesn't provide repo‑level isolation natively, but with proper permission scoping you can achieve a "least‑privileged collaboration bubble".
 
 ## Recommended Architecture
 
-## 1. Keep the repository in project `hardware`
+## 1. Keep the repository in project `portugal`
 
 - Do **not** mirror/duplicate it
-- Do **not** move the other team into project `hardware`
+- Do **not** move the other team into project `portugal`
 
 Instead:
 
-- project `hardware` keeps ownership
-- project `finishing` users get **repo-scoped permissions only**
-- All other project `hardware` content remains invisible
+- project `portugal` keeps ownership
+- project `netherlands` users get **repo-scoped permissions only**
+- All other project `portugal` content remains invisible
 
-## 2. Create a Dedicated Security Group _inside project `hardware`_
+## 2. Create a Dedicated Security Group _inside project `portugal`_
 
-In **Project Settings → Permissions** (project `hardware`):
+In **Project Settings → Permissions** (project `portugal`):
 
 1. Create a group called something like:  
-   `Repo X Collaborators from Project Finishing`
-2. Add only the specific users from project `finishing` (not the entire team, not the project).
+   `Repo X Collaborators from Project Netherlands`
+2. Add only the specific users from project `netherlands` (not the entire team, not the project).
 
 Why a DevOps group?
 
@@ -36,7 +36,7 @@ Why a DevOps group?
 
 ## 3. Break Inheritance Only on the Target Repository
 
-Inside **project `hardware` → Repos → Repo X → Security**:
+Inside **project `portugal` → Repos → Repo X → Security**:
 
 1. Give the new group **Contribute** and **Read** permission
 2. Explicitly set `Deny` or `Not set` for anything unnecessary, such as:
@@ -47,7 +47,7 @@ Inside **project `hardware` → Repos → Repo X → Security**:
     - Create tag  
       (unless required)
 
-With this, project `finishing` users only see:
+With this, project `netherlands` users only see:
 
     ✓ This repo  
     ✕ No pipelines  
@@ -60,10 +60,10 @@ With this, project `finishing` users only see:
 
 ## 4. Use Branch Policies to Prevent Unwanted Actions
 
-Since project `finishing` collaborators are external to the owning team, enforce:
+Since project `netherlands` collaborators are external to the owning team, enforce:
 
 - Require pull requests for `main`/`release` branches
-- Require at least one reviewer from project `hardware`
+- Require at least one reviewer from project `portugal`
 - Restrict who can approve PRs
 - Disable direct push to protected branches
 
@@ -75,15 +75,15 @@ If the repository is part of build/release pipelines:
 
 - Create pipeline‑specific service (managed) identities
 - Restrict pipeline permissions to **reader** for this repo
-- Do _not_ grant project `finishing` users access to Pipelines unless needed
+- Do _not_ grant project `netherlands` users access to Pipelines unless needed
 
-Often, project `finishing` doesn't need pipeline access to contribute code.
+Often, project `netherlands` doesn't need pipeline access to contribute code.
 
 ## Why This Model Works
 
 ### Least privilege
 
-    ✓ Project `finishing` users get access to exactly **one repo**, nothing else.
+    ✓ Project `netherlands` users get access to exactly **one repo**, nothing else.
 
 ### Simple to maintain
 
@@ -99,20 +99,20 @@ Often, project `finishing` doesn't need pipeline access to contribute code.
 
 ## Example Final Permission Structure
 
-### Project `hardware` – Project Level
+### Project `portugal` – Project Level
 
 | Group | Permission |
 | :-- | :-- |
-| `Repo X Collaborators from Project Finishing` | Reader (minimal visibility) |
+| `Repo X Collaborators from Project Netherlands` | Reader (minimal visibility) |
 
-### Project `hardware` – Repo Level
+### Project `portugal` – Repo Level
 
 | Repo | Permission |
 | :-- | :-- |
 | Repo X | Contribute, Read |
 | Other repos | No access / inherit deny |
 
-### Project `hardware` – Branch‑Level
+### Project `portugal` – Branch‑Level
 
 | Branch | Policy |
 | :-- | :-- |
@@ -124,9 +124,9 @@ Often, project `finishing` doesn't need pipeline access to contribute code.
 
 > The cleanest, most secure way to allow one team to collaborate on a single repo from another project is:
 
-1. Keep the repo inside project `hardware`
-2. Create a dedicated security group in project `hardware`
-3. Assign project `finishing` users into that group
+1. Keep the repo inside project `portugal`
+2. Create a dedicated security group in project `portugal`
+3. Assign project `netherlands` users into that group
 4. Break repo security inheritance and assign only repo‑specific rights
 5. Use branch policies to protect the codebase
 

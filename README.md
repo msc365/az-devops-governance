@@ -40,8 +40,8 @@ End‑to‑end governance is platform‑agnostic. This repository illustrates on
 
 Any governance model must be tied to the organization's business rules, which are reflected in any technical implementation of access controls. This example model uses a fictitious international _Building Materials_ company with the following common scenario (with business requirements):
 
-- **Align with business domains and permissions models**  
-  The international organization has many Operational Companies (OpCo's), such as "_The portugal_" and "_netherlands_," which operate largely independently. In each OpCo, there are three levels or privileges, which are mapped to distinct `*-admins`, `*-devs` or `*-stake(holder)s` Microsoft Entra groups. This allows developers and stakeholders to be targeted when configuring permissions in the cloud.
+- **Align with OpCo's and permissions models**  
+  The international organization has many Operational Companies (OpCo's), such as "_Portugal_" and "_The Netherlands_," which operate largely independently. In each OpCo, there are three levels or privileges, which are mapped to distinct `*-admins`, `*-devs` or `*-stake(holder)s` Microsoft Entra groups. This allows developers and stakeholders to be targeted when configuring permissions in the cloud.
 
 - **Staged deployment environments**  
   Every business domain has two environments:
@@ -51,7 +51,7 @@ Any governance model must be tied to the organization's business rules, which ar
   Stakeholders are granted _Reader_ permissions across both production and non-production environments, providing visibility and oversight without the ability to modify resources. This ensures business owners and project managers can monitor deployments and resource status while maintaining security boundaries.
 
 - **CI/CD automation goals**  
-  Every application should implement Azure DevOps not just for _continuous integration_ (CI), but also for _continuous deployment_ (CD). For example, deployments can be automatically triggered by changes to the Git repository See [branch strategy diagram](#branch-strategy) sample.
+  Every application should implement Azure DevOps not just for _continuous integration_ (CI), but also for _continuous deployment_ (CD). For example, deployments can be automatically triggered by changes to the Git repository, see [branch strategy diagram](#branch-strategy) sample.
 
 - **Cloud journey**  
   The organization started with an isolated project model to accelerate the OpCo's journey to the cloud. But now they are exploring options to break silos and encourage collaboration by creating an `ccoe` project; Cloud Center of Excellence (CCoE).
@@ -73,7 +73,7 @@ This diagram illustrates that connecting Azure Resource Manager (ARM) and CI/CD 
 [![e2egov-design](./.assets/e2egov-design.png)](./.assets/e2egov-design-large.png)  
 <sub>Image: End-to-end governance diagram</sub>
 
-> To make the concept easier to understand, the diagram only illustrates the `portugal` business domain. Other business domains would look similar and use the same naming conventions.
+> To make the concept easier to understand, the diagram only illustrates the `portugal` OpCo domain. Other OpCo domains would look similar and use the same naming conventions.
 
 ### Workflow
 The numbering reflects the order in which administrators and enterprise architects think about and configure their cloud resources.
@@ -125,7 +125,7 @@ The numbering reflects the order in which administrators and enterprise architec
    | `sg-portugal-stakes` | `rg-portugal-prd` | Reader | Reader |
    | `sg-portugal-devs` | `rg-portugal-dev` | Contributor | Contributor |
    | `sg-portugal-admins` | `rg-portugal-prd` | Owner | Project Administrators |
-   | `sg-netherlands-stakes` | `rg-portugal-prd` | Reader | Reader |
+   | `sg-netherlands-stakes` | `rg-netherlands-prd` | Reader | Reader |
    | `sg-netherlands-devs` | `rg-netherlands-dev` | Contributor | Contributor |
    | `sg-netherlands-admins` | `rg-netherlands-prd` | Owner | Project Administrators |
    | `sg-shared-devs` | `rg-shared-dev` | Contributor | Contributor |
