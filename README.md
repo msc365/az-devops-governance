@@ -273,7 +273,9 @@ If that removes too many permissions for your purposes, refer to the full list i
 
 This scenario extends beyond Azure Resource Manager. This is way we use **Bicep templates** for Azure infrastructure provisioning and Microsoft Entra ID group management, and **PowerShell scripts** for Azure DevOps bootstrapping. This combination provides declarative infrastructure-as-code for Azure resources and identity while leveraging PowerShell's flexibility for DevOps operations in a declarative DSC like approach.
 
-For deployment examples and instructions, explore the template files in the [iac](iac/) and [src](src/) directories. Also take notice of the [Understanding this demo](docs/understanding-this-demo.md) documentation for more details.
+### Quick Start
+
+🚧 Sorry, we're working on it.
 
 ## Support
 
