@@ -16,21 +16,6 @@ This repository includes _Bicep templates_ and _PowerShell scripts_ that demonst
 - Secure authentication with workload identity federation
 
 <!-- omit from toc -->
-<!-- ## Use Cases
-
-- Automate DevOps workflows and resource deployments
-- Enforce governance policies across environments
-- Integrate Azure DevOps with PowerShell and infrastructure-as-code practices
-- Accelerate onboarding and standardization for cloud teams -->
-
-<!-- omit from toc -->
-<!-- ## 🚧 Under construction
-
-The following features are being considered or under construction.
-
-- Use app-only authentication with the `Microsoft Graph PowerShell SDK`. -->
-
-<!-- omit from toc -->
 ## What it does?
 
 When designing a governance model, _Azure Resource Manager_ should be treated as one of several control planes for resources, not the only one. Azure DevOps and CI/CD automation can create unintended security gaps if they aren't properly secured, so pipeline and project artifacts must be protected by applying the same _Role‑based Access Control_ (RBAC) principles used for Azure Resource Manager.
@@ -42,6 +27,7 @@ End‑to‑end governance is platform‑agnostic. This repository illustrates on
 - [Use cases](#use-cases)
 - [Architecture](#architecture)
 - [Considerations](#considerations)
+- [Components](#components)
 - [Deploy this scenario](#deploy-this-scenario)
 - [Support](#support)
 - [License](#license)
@@ -109,9 +95,15 @@ The numbering reflects the order in which administrators and enterprise architec
 
 4. **Role assignments in Azure**  
    While these Entra group names suggest specific roles, access control is only enforced once a role assignment is set up. This process involves assigning a role to a Microsoft Entra principal within a defined scope. For instance, _Developers_ are granted the _Contributor_ role in the production environment.
+   While these Entra group names suggest specific roles, access control is only enforced once a role assignment is set up. This process involves assigning a role to a Microsoft Entra principal within a defined scope. For instance, _Developers_ are granted the _Contributor_ role in the production environment.
 
    | Principal | Production | Development |
    | :-- | :-- | :-- |
+   | `sg-hardware-stakes` | _Reader_ | _Reader_ |
+   | `sg-hardware-devs` | _Contributor_ | _Owner_ |
+   | `sg-hardware-admins` | _Owner_ | _Owner_ |
+   | `id-hardware-dev` | - | _Custom Role_ * |
+   | `id-hardware-prd` | _Custom Role_ * | - |
    | `sg-hardware-stakes` | _Reader_ | _Reader_ |
    | `sg-hardware-devs` | _Contributor_ | _Owner_ |
    | `sg-hardware-admins` | _Owner_ | _Owner_ |
@@ -148,7 +140,6 @@ The numbering reflects the order in which administrators and enterprise architec
 
    - Admins must configure [pipeline permissions](https://learn.microsoft.com/en-us/azure/devops/pipelines/security/resources#permissions) to control which pipelines can access the credentials.
    - Admins must also configure a [branch control](https://learn.microsoft.com/en-us/azure/devops/pipelines/process/approvals#branch-control) check so that only pipelines running in the context of the `production` branch might use the `prod-connection`.
-
 
 7. **Git repositories**  
    Because service connections are tied to branches via [branch controls](https://learn.microsoft.com/en-us/azure/devops/pipelines/process/approvals#branch-control), it's critical to configure permissions to the Git repositories and apply [branch policies](https://learn.microsoft.com/en-us/azure/devops/repos/git/branch-policies). In addition to requiring CI builds to pass, we also require pull requests to have at least two approvers.
@@ -250,6 +241,14 @@ To do this, we create a custom role and remove the `Microsoft.Authorization/*/De
 ```
 
 If that removes too many permissions for your purposes, refer to the full list in the [official documentation for Azure RBAC resource provider operations](https://learn.microsoft.com/en-us/azure/role-based-access-control/resource-provider-operations) and adjust your role definition as needed.
+
+## Components
+
+- [Azure DevOps](https://azure.microsoft.com/en-us/products/devops/)
+- [Microsoft Entra ID](https://learn.microsoft.com/en-us/entra/)
+- [Azure Resource Manager](https://learn.microsoft.com/en-us/azure)
+- [Azure Repos](https://azure.microsoft.com/en-us/products/devops/repos/)
+- [Azure Pipelines](https://azure.microsoft.com/en-us/products/devops/pipelines/)
 
 ## Deploy this scenario
 
