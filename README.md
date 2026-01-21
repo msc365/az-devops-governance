@@ -127,7 +127,7 @@ The numbering reflects the order in which administrators and enterprise architec
    | `sg-shared-devs` | `rg-shared-dev` | Contributor | Contributor |
    | `sg-shared-admins` | `rg-shared-prd` | Owner | Project Administrators |
 
-   ¹ In a scenario of limited cross‑project collaboration, such as the `hardware` team inviting the `finishing` team to collaborate on a _single_ repository, they would use a specific `*-hardware-collab-on-repo-a` group with limited repo-scoped permissions only, all other content remains invisible. Please see [A Cross-project Collaboration Scenario](docs/cross-project-collaboration-scenario.md) for detailed information.
+   ¹ In a scenario of limited cross‑project collaboration, such as the `hardware` team inviting the `finishing` team to collaborate on a _single_ repository, they would use a specific `*-hardware-collab-on-repo-a` group with limited repo-scoped permissions only, all other content remains invisible. Please read [A Cross-project Collaboration Scenario](docs/cross-project-collaboration-scenario.md) for more details.
 
 6. **Service connections**  
    In Azure DevOps, a [Service Connection](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints) is a generic wrapper around a credential. This demo creates a service connection that holds the [App Registration](https://learn.microsoft.com/en-us/azure/devops/pipelines/release/configure-workload-identity?view=azure-devops&tabs=app-registration) and [Workload Identity Federation](https://learn.microsoft.com/en-us/azure/devops/pipelines/release/configure-workload-identity?view=azure-devops&tabs=managed-identity) configuration. Project Administrators can configure access to this [protected resource](https://learn.microsoft.com/en-us/azure/devops/pipelines/security/resources#protected-resources) when needed, such as when requiring human approval before deploying. This reference architecture has two minimum protections on the service connection:
@@ -246,9 +246,9 @@ If that removes too many permissions for your purposes, refer to the full list i
 
 ## Deploy this scenario
 
-This scenario extends beyond Resource Manager. This repository uses **Bicep templates** for Azure infrastructure provisioning and **PowerShell scripts** for Microsoft Entra ID group management and Azure DevOps bootstrapping. This combination provides declarative infrastructure-as-code for Azure resources while leveraging PowerShell's flexibility for identity and DevOps operations.
+This scenario extends beyond Azure Resource Manager. This is way we use **Bicep templates** for Azure infrastructure provisioning and Microsoft Entra ID group management, and **PowerShell scripts** for Azure DevOps bootstrapping. This combination provides declarative infrastructure-as-code for Azure resources and identity while leveraging PowerShell's flexibility for DevOps operations in a declarative DSC like approach.
 
-For deployment instructions and examples, explore the template files in the [iac/](iac/) and [src/](src/) directories of this repository.
+For deployment instructions and examples, explore the template files in the [iac](iac/) and [src](src/) directories or read the [Understanding this demo](docs/understanding-this-demo.md) article in this repository.
 
 ## Support
 
