@@ -65,7 +65,7 @@ This simplified diagram shows how branches in a Git repository map to developmen
 ## Architecture
 
 > [!NOTE]
-> This project is based on the concepts described in [end-to-end governance in Azure when using CI/CD](https://learn.microsoft.com/en-us/devops/operate/governance-cicd) (by Julie Ng, Senior Service Engineer at Microsoft), which illustrates the approach using _Terraform_ as the infrastructure-as-code (IaC) tool.
+> This project is based on the concepts described in "[End-to-end governance in Azure when using CI/CD](https://learn.microsoft.com/en-us/devops/operate/governance-cicd)" by Julie Ng (Microsoft Corporation), which illustrates the approach using _Terraform_ as the infrastructure-as-code (IaC) tool.
 
 This diagram illustrates that connecting Azure Resource Manager (ARM) and CI/CD to Microsoft Entra ID is crucial for establishing a comprehensive governance model.
 
