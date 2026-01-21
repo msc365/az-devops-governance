@@ -13,7 +13,7 @@
 #region PARAMETERS
 
 $params = [hashtable]@{
-    ProjectId       = 'e2egov-prjHb72x9'
+    Project         = 'e2egov-prjHb72x9'
     TeamId          = 'Test Team'
     Description     = 'Test team description'
     TeamSettings    = @{

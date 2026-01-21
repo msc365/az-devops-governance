@@ -29,8 +29,8 @@ It also creates the necessary role assignments for the MSI to access Azure resou
 | :-- | :-- | :-- | :-- | :-- |
 | `ManagedServiceIdentity` | `Object` | Yes | - | Required. An object containing details of the Managed Service Identity to be used. The object should contain: `name`, `resourceGroupName`, `subscriptionId`, `location`, `tags`, and `roleAssignments` (an array of role assignment definitions). See [Example 4](#example-4) for more information. |
 | `Organization` | `String` | Yes | - | Required. The Azure DevOps organization name. |
-| `ProjectId` | `String` | Yes | - | Required. The Azure DevOps project ID or Name where the service connection will be created. |
-| `Scope` | `String` | Yes | - | Required. The scope for the service connection (e.g., /subscriptions/00000000-0000-0000-0000-000000000000). |
+| `Project` | `String` | Yes | - | Required. The Azure DevOps project ID or Name where the service connection will be created. |
+| `Scope` | `String` | Yes | - | Required. The scope for the service connection (e.g.: /subscriptions/00000000-0000-0000-0000-000000000000). |
 | `ServiceEndpointName` | `String` | Yes | - | Required. The name of the service connection to be created. |
 | `Force` | `Switch` | No | - | Optional. Switch to force deletion without confirmation during rollback. |
 | `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (delete) the service connection and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing a service connection is irreversible and may affect teams relying on it. See [Notes](#notes) for more information. |
@@ -92,7 +92,7 @@ Rolls back (deletes) the service connection and related resources without confir
 ```powershell
 $paramSplat = @{
     Organization           = 'e2egov-org'
-    ProjectId              = 'e2egov-prjHb72x9'
+    Project              = 'e2egov-prjHb72x9'
     ServiceEndpointName    = 'rg-e2egov-prjHb72x9-tst-weu'
     Scope                  = '/subscriptions/00000000-0000-0000-0000-000000000000'
     ManagedServiceIdentity = @{

@@ -69,6 +69,7 @@
         "COMPANYNAME",
         "EXTERNALMODULEDEPENDENCIES",
         "Hashtable",
+        "hashtables",
         "ICONURI",
         "LICENSEURI",
         "microsoftgraph",

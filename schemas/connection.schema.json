@@ -3,9 +3,9 @@
     "$id": "https://raw.githubusercontent.com/msc365/az-devops-governance/main/schemas/connection.schema.json",
     "type": "object",
     "required": [
-        "organization",
-        "projectId",
-        "serviceEndpointName",
+        "collectionUri",
+        "projectName",
+        "name",
         "scope",
         "managedServiceIdentity"
     ],
@@ -14,17 +14,21 @@
             "type": "string",
             "description": "JSON Schema reference"
         },
-        "organization": {
+        "collectionUri": {
             "type": "string",
-            "description": "The Azure DevOps organization name"
+            "description": "The Azure DevOps collection URI"
         },
-        "projectId": {
+        "projectName": {
             "type": "string",
-            "description": "The Azure DevOps project Id or name"
+            "description": "The Azure DevOps project name"
         },
-        "serviceEndpointName": {
+        "name": {
             "type": "string",
             "description": "The name of the service endpoint/connection"
+        },
+        "description": {
+            "type": "string",
+            "description": "The description of the service connection"
         },
         "scope": {
             "type": "string",

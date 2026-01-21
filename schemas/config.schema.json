@@ -4,6 +4,12 @@
     "title": "Configuration Schema",
     "description": "Schema for main configuration file",
     "type": "object",
+    "required": [
+        "uniqueId",
+        "prefix",
+        "location",
+        "collectionUri"
+    ],
     "properties": {
         "$schema": {
             "type": "string",
@@ -21,15 +27,14 @@
             "maxLength": 10,
             "description": "A prefix to be used in resource names (max 10 lowercase alphanumeric characters)"
         },
+        "location": {
+            "type": "string",
+            "description": "The Azure location for resource deployment"
+        },
         "collectionUri": {
             "type": "string",
             "description": "The Azure DevOps collection URI"
         }
     },
-    "required": [
-        "uniqueId",
-        "prefix",
-        "organization"
-    ],
     "additionalProperties": false
 }

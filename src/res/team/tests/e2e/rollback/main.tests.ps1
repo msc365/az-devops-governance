@@ -13,10 +13,10 @@
 #region PARAMETERS
 
 $params = @{
-    ProjectId = 'e2egov-prjHb72x9'
-    TeamId    = 'Test Team'
-    Rollback  = $true
-    Force     = $true
+    Project  = 'e2egov-prjHb72x9'
+    TeamId   = 'Test Team'
+    Rollback = $true
+    Force    = $true
 }
 
 # endregion

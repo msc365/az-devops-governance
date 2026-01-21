@@ -28,7 +28,7 @@ $params = @{
             security    = 'rbac'
             iac         = 'bicep'
             ci          = 'azure-pipelines'
-            updated     = (Get-Date).ToString('yyyy-MM-dd HH:mm:ss')
+            updated     = (Get-Date).ToString('yyyy-MM-dd')
         }
     }
 }
@@ -46,6 +46,6 @@ $params['SubscriptionId'] = $subscriptionId
 
 #region TEST EXECUTION
 
-& (Join-Path $rootPath -ChildPath 'main.ps1') @params -Confirm:$false -Verbose | Format-List *
+& (Join-Path $rootPath -ChildPath 'main.ps1') @params -Confirm:$false | Format-List *
 
 #endregion

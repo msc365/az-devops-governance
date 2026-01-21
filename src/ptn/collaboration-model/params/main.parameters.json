@@ -20,7 +20,7 @@
     "teams": [
         {
             "organization": "msc365",
-            "projectId": "e2egov-fantastic4",
+            "Project": "e2egov-fantastic4",
             "teamId": "Mister Fantastic Team",
             "name": "",
             "description": "Mister Fantastic team description",
@@ -44,7 +44,7 @@
         },
         {
             "organization": "msc365",
-            "projectId": "e2egov-fantastic4",
+            "Project": "e2egov-fantastic4",
             "teamId": "Invisible Woman Team",
             "name": "",
             "description": "Invisible Woman team description",
@@ -68,7 +68,7 @@
         },
         {
             "organization": "msc365",
-            "projectId": "e2egov-fantastic4",
+            "Project": "e2egov-fantastic4",
             "teamId": "Human Torch Team",
             "name": "",
             "description": "Human Torch team description",
@@ -92,7 +92,7 @@
         },
         {
             "organization": "msc365",
-            "projectId": "e2egov-fantastic4",
+            "Project": "e2egov-fantastic4",
             "teamId": "The Thing Team",
             "name": "",
             "description": "The Thing team description",
@@ -116,7 +116,7 @@
         },
         {
             "organization": "msc365",
-            "projectId": "e2egov-fantastic4",
+            "Project": "e2egov-fantastic4",
             "teamId": "Fantastic 4 Team",
             "name": "",
             "description": "Fantastic Four team description",

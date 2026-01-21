@@ -13,8 +13,8 @@
     Required. The Azure DevOps team object.
 
 .EXAMPLE
-    $project = Get-AdoProject -ProjectId 'e2egov-prjHb72x9'
-    $team = Get-AdoTeam -ProjectId $project.Id -TeamId 'Default Team'
+    $project = Get-AdoProject -Project 'e2egov-prjHb72x9'
+    $team = Get-AdoTeam -Project $project.Id -TeamId 'Default Team'
 
     .\modules\nested_iterationPaths.ps1 -Project $project -Team $team
 
@@ -45,8 +45,8 @@ process {
 
         # Team Iterations
         $teamIterationSplat = @{
-            ProjectId = $Project.Id
-            TeamId    = $Team.Name
+            Project = $Project.Id
+            TeamId  = $Team.Name
         }
 
         Write-Verbose 'Processing: team\iterationPaths'
@@ -59,7 +59,7 @@ process {
 
         if ($null -eq $teamIterations -or $teamIterations.Count -eq 0) {
             # Get project iterations as default to add to team
-            $projectIteration = Get-AdoTeamIterationList -ProjectId $Project.Id -ErrorAction Stop
+            $projectIteration = Get-AdoTeamIterationList -Project $Project.Id -ErrorAction Stop
 
             if ($null -ne $projectIteration.Value) {
 
@@ -69,7 +69,7 @@ process {
                         Write-Debug "Setting: team\iterationPath\$($_.Path)"
 
                         $setIterationSplat = @{
-                            ProjectId   = $Project.Id
+                            Project     = $Project.Id
                             TeamId      = $Team.Name
                             IterationId = $_.Id
                             Verbose     = $VerbosePreference
@@ -99,7 +99,7 @@ process {
             }
 
             $output = [PSCustomObject]@{
-                ProjectId      = $Project.Id
+                Project        = $Project.Id
                 TeamId         = $Team.Id
                 TeamIterations = $teamIterations
                 Status         = $status

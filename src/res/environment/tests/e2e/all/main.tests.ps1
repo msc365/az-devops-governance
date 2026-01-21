@@ -45,6 +45,6 @@ $params['SubscriptionId'] = $subscriptionId
 
 #region TEST EXECUTION
 
-& (Join-Path $rootPath -ChildPath 'main.ps1') @params -Verbose -Confirm:$false | Format-List *
+& (Join-Path $rootPath -ChildPath 'main.ps1') @params -Confirm:$false | Format-List *
 
 #endregion

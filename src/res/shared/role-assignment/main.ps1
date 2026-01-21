@@ -294,14 +294,14 @@ process {
                 $existing = $currentLookup[$key]
 
                 if ($existing) {
-                    if ($PSCmdlet.ShouldProcess($ObjectId, "Rollback role assignment: $($existing.RoleDefinitionName)")) {
+                    if ($PSCmdlet.ShouldProcess($ObjectId, "Remove role assignment: $($existing.RoleDefinitionName)")) {
 
                         Remove-AzRoleAssignment -InputObject $existing -Confirm:$false -Verbose:$false -ErrorAction Stop | Out-Null
 
                         $resultObj = New-RoleAssignmentResult -Assignment $existing -Status 'Removed'
                         $results += $resultObj
 
-                        Write-Verbose "[ROLLBACK] Role assignment: '$($existing.RoleDefinitionName)' for '$($existing.DisplayName)' at scope: $($existing.Scope)"
+                        Write-Verbose "[REMOVE] Role assignment: '$($existing.RoleDefinitionName)' for '$($existing.DisplayName)' at scope: $($existing.Scope)"
                     } else {
 
                         $resultObj = New-RoleAssignmentResult -Assignment $existing -Status 'WouldRemove'

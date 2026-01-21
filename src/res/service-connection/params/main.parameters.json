@@ -1,8 +1,9 @@
 {
     "$schema": "../../../../schemas/connection.schema.json",
-    "organization": "{organization}",
-    "projectId": "{prefix}-prj{uniqueId}",
-    "serviceEndpointName": "rg-{prefix}-prj{uniqueId}-tst-weu",
+    "collectionUri": "{collectionUri}",
+    "projectName": "{prefix}-prj{uniqueId}",
+    "name": "rg-{prefix}-prj{uniqueId}-tst-weu",
+    "description": "Service Connection for Managed Identity 'id-{prefix}-prj{uniqueId}-tst' to access resources in subscription '00000000-0000-0000-0000-000000000000'",
     "scope": "/subscriptions/00000000-0000-0000-0000-000000000000",
     "managedServiceIdentity": {
         "name": "id-{prefix}-prj{uniqueId}-tst",

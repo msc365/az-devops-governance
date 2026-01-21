@@ -13,8 +13,8 @@
     Required. The Azure DevOps team object.
 
 .EXAMPLE
-    $project = Get-AdoProject -ProjectId 'e2egov-prjHb72x9'
-    $team = Get-AdoTeam -ProjectId $project.Id -TeamId 'Default Team'
+    $project = Get-AdoProject -Project 'e2egov-prjHb72x9'
+    $team = Get-AdoTeam -Project $project.Id -TeamId 'Default Team'
 
     .\modules\nested_areaPaths.ps1 -Project $project -Team $team
 
@@ -55,7 +55,7 @@ process {
 
         if (-not $Rollback.IsPresent) {
             # Team area path
-            $fieldValue = Get-AdoTeamFieldValue -ProjectId $Project.Id -Team $Team.Id -ErrorAction Stop
+            $fieldValue = Get-AdoTeamFieldValue -Project $Project.Id -Team $Team.Id -ErrorAction Stop
 
             if ($null -eq $fieldValue.DefaultValue) {
                 if ($PSCmdlet.ShouldProcess("team\areaPath\$($Project.Name)\$($Team.Name)", 'Set')) {
@@ -71,7 +71,7 @@ process {
                     )
 
                     $teamFieldSplat = @{
-                        ProjectId    = $Project.Id
+                        Project      = $Project.Id
                         Team         = $Team.Id
                         DefaultValue = $defaultValue
                         Values       = $values
@@ -93,7 +93,7 @@ process {
         #region OUTPUTS
 
         $output = [PSCustomObject]@{
-            ProjectId    = $Project.Id
+            Project      = $Project.Id
             TeamId       = $Team.Id
             DefaultValue = $fieldValue.DefaultValue
             Values       = $fieldValue.Values | ForEach-Object { $_ | Select-Object -Property * }

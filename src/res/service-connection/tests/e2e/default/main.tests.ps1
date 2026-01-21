@@ -1,9 +1,9 @@
 ﻿#region PARAMETERS
 
 $params = @{
-    Organization           = 'e2egov-org'
-    ProjectId              = 'e2egov-prjHb72x9'
-    serviceEndpointName    = 'rg-e2egov-prjHb72x9-tst-weu'
+    CollectionUri          = 'https://dev.azure.com/e2egov-org'
+    ProjectName            = 'e2egov-prjHb72x9'
+    Name                   = 'rg-e2egov-prjHb72x9-tst-weu'
     Scope                  = '/subscriptions/00000000-0000-0000-0000-000000000000'
     ManagedServiceIdentity = @{
         Name              = 'id-e2egov-prjHb72x9-tst'

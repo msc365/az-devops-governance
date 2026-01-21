@@ -137,7 +137,7 @@ process {
                     $status = 'Created'
                     Write-Verbose "[CREATE] Resource group: '$Name'"
                 } else {
-                    $status = 'Skipped'
+                    $status = 'WouldCreate'
                     Write-Verbose "[WHATIF] Call New-AzResourceGroup with parameters: $($rgSplat | ConvertTo-Json -Depth 5)"
                 }
             } else {
@@ -166,7 +166,7 @@ process {
                         $status = 'Updated'
                         Write-Verbose "[UPDATE] Resource group: '$Name'"
                     } else {
-                        $status = 'Skipped'
+                        $status = 'WouldUpdate'
                         Write-Verbose "[WHATIF] Call Set-AzResourceGroup with parameters: $($rgSplat | ConvertTo-Json -Depth 5)"
                     }
                 } else {

@@ -28,7 +28,7 @@ If the team already exists, it updates the properties and settings as needed.
 
 | Parameter | Type | Required | Default | Description |
 | :-- | :-- | :-- | :-- | :-- |
-| `ProjectId` | `String` | Yes | - | Required. The Azure DevOps project ID or Name where the environment will be created. |
+| `Project` | `String` | Yes | - | Required. The Azure DevOps project ID or Name where the environment will be created. |
 | `TeamId` | `String` | Yes | - | Optional. The ID or Name of the Azure DevOps team to create, update or rollback. |
 | `Description` | `String` | No | - | Optional. A description for the Azure DevOps team. |
 | `Force` | `Switch` | No | - | Optional. Switch to force deletion without confirmation during rollback. |
@@ -51,7 +51,8 @@ $deploySplat = @{
 .\deploy.ps1 @deploySplat -Verbose
 ```
 
-Deploys the team using the specified template and parameters.
+Deploys the team using the specified template and parameters.
+
 
 ### Example 2
 
@@ -66,7 +67,8 @@ $customSplat = @{
 .\deploy.ps1 @customSplat -Verbose
 ```
 
-Deploys the team using the specified template and custom parameters.
+Deploys the team using the specified template and custom parameters.
+
 
 ### Example 3
 
@@ -81,7 +83,8 @@ $rollbackSplat = @{
 .\deploy.ps1 @rollbackSplat -Rollback -Force -Verbose
 ```
 
-Rolls back (deletes) the team and related resources without confirmation.
+Rolls back (deletes) the team and related resources without confirmation.
+
 
 ### Example 4
 
@@ -89,7 +92,7 @@ Rolls back (deletes) the team and related resources without confirmation.
 
 ```powershell
 $paramSplat = @{
-    ProjectId = 'e2egov-prjHb72x9'
+    Project = 'e2egov-prjHb72x9'
     TeamId = 'Other Team'
     TeamSettings = @{
         BugsBehavior = "asRequirements"
@@ -105,7 +108,8 @@ $paramSplat = @{
 .\src\res\team\main.ps1 @paramSplat -Verbose
 ```
 
-Deploys or updates a team in the specified Azure DevOps project using the provided parameters in code.
+Deploys or updates a team in the specified Azure DevOps project using the provided parameters in code.
+
 
 ## Outputs
 

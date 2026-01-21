@@ -29,7 +29,7 @@
 
     If the team already exists, it updates the properties and settings as needed.
 
-.PARAMETER ProjectId
+.PARAMETER Project
     Required. The Azure DevOps project ID or Name where the environment will be created.
 
 .PARAMETER TeamId
@@ -79,7 +79,7 @@
 
 .EXAMPLE
     $paramSplat = @{
-        ProjectId = 'e2egov-prjHb72x9'
+        Project = 'e2egov-prjHb72x9'
         TeamId = 'Other Team'
         TeamSettings = @{
             BugsBehavior = "asRequirements"
@@ -104,7 +104,7 @@
 [OutputType([PSCustomObject])]
 param (
     [Parameter(Mandatory)]
-    [string]$ProjectId,
+    [string]$Project,
 
     [Parameter(Mandatory)]
     [string]$TeamId,
@@ -157,18 +157,18 @@ process {
         $prj, $team, $settings, $area, $set, $get = $null
 
         # Project
-        $prj = Get-AdoProject -ProjectId $ProjectId -ErrorAction SilentlyContinue
+        $prj = Get-AdoProject -Project $Project -ErrorAction SilentlyContinue
 
         if ($null -eq $prj) {
-            throw "NotFound: 'project\$($ProjectId)'"
+            throw "NotFound: 'project\$($Project)'"
         }
 
         # Team
-        $team = Get-AdoTeam -ProjectId $prj.Id -TeamId $TeamId -Verbose:$VerbosePreference
+        $team = Get-AdoTeam -Project $prj.Id -TeamId $TeamId -Verbose:$VerbosePreference
 
         # Root Area path
         $rootAreaSplat = @{
-            ProjectId     = $prj.Id
+            Project       = $prj.Id
             StructureType = 'Areas'
             Depth         = 2
         }
@@ -193,9 +193,9 @@ process {
                     Write-Debug "Creating: team\$($TeamId)"
 
                     $teamSplat = @{
-                        ProjectId = $prj.Id
-                        Name      = $TeamId
-                        Verbose   = $VerbosePreference
+                        Project = $prj.Id
+                        Name    = $TeamId
+                        Verbose = $VerbosePreference
                     }
 
                     if ($PSBoundParameters.ContainsKey('Description')) {
@@ -215,10 +215,10 @@ process {
                 $set = $false
 
                 $teamSplat = @{
-                    ProjectId = $prj.Id
-                    TeamId    = $team.Id
-                    Name      = $team.Name
-                    Verbose   = $VerbosePreference
+                    Project = $prj.Id
+                    TeamId  = $team.Id
+                    Name    = $team.Name
+                    Verbose = $VerbosePreference
                 }
 
                 if ($PSBoundParameters.ContainsKey('Description') -and ($team.Description -ne $Description)) {
@@ -272,7 +272,7 @@ process {
                         Write-Debug "Creating: project\areaPath\$($team.Name)"
 
                         $areaSplat = @{
-                            ProjectId     = $prj.Id
+                            Project       = $prj.Id
                             Name          = $team.Name
                             StructureType = 'Areas'
                             Verbose       = $VerbosePreference
@@ -325,7 +325,7 @@ process {
                     Write-Debug "Removing: 'project\areaPath\$($area.Name)\ReclassifyId\$($rootArea.Id)'"
 
                     $areaSplat = @{
-                        ProjectId     = $prj.Id
+                        Project       = $prj.Id
                         StructureType = 'Areas'
                         Path          = $area.Name
                         ReclassifyId  = $rootArea.Id
@@ -364,9 +364,9 @@ process {
                     Write-Debug "Removing: 'team\$($team.Name)'"
 
                     $teamSplat = @{
-                        ProjectId = $prj.Id
-                        TeamId    = $team.Id
-                        Verbose   = $VerbosePreference
+                        Project = $prj.Id
+                        TeamId  = $team.Id
+                        Verbose = $VerbosePreference
                     }
 
                     Remove-AdoTeam @teamSplat | Out-Null
@@ -381,9 +381,9 @@ process {
 
             if (-not $WhatIfPreference -and $status -ne 'NotFound') {
                 $output = [PSCustomObject]@{
-                    ProjectId = $prj.Id
-                    TeamId    = $team.Id ?? $TeamId
-                    Status    = $status
+                    Project = $prj.Id
+                    TeamId  = $team.Id ?? $TeamId
+                    Status  = $status
                 }
 
                 return $output
@@ -398,14 +398,14 @@ process {
 
         if (-not $WhatIfPreference) {
             if ($get) {
-                $team = Get-AdoTeam -ProjectId $prj.Id -TeamId $team.Id -ErrorAction Stop
+                $team = Get-AdoTeam -Project $prj.Id -TeamId $team.Id -ErrorAction Stop
             }
 
             $output = [PSCustomObject]@{
-                ProjectId = $prj.Id
-                TeamId    = $team.Id
-                Team      = ($team | Select-Object -Property *)
-                Status    = $status
+                Project = $prj.Id
+                TeamId  = $team.Id
+                Team    = ($team | Select-Object -Property *)
+                Status  = $status
             }
 
             return $output

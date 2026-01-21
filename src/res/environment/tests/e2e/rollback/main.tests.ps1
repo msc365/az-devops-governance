@@ -29,6 +29,6 @@ $rootPath = (Get-Item $PSScriptRoot).Parent.Parent.Parent.FullName
 
 #region TEST EXECUTION
 
-& (Join-Path $rootPath -ChildPath 'main.ps1') @params -Confirm:$false -Verbose
+& (Join-Path $rootPath -ChildPath 'main.ps1') @params -Confirm:$false | Format-List *
 
 #endregion

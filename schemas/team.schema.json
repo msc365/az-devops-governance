@@ -17,7 +17,7 @@
         "team": {
             "type": "object",
             "required": [
-                "projectId",
+                "Project",
                 "teamId"
             ],
             "properties": {
@@ -25,13 +25,13 @@
                     "type": "string",
                     "description": "JSON Schema reference"
                 },
-                "projectId": {
+                "Project": {
                     "type": "string",
-                    "description": "The ID or name of the project containing the team"
+                    "description": "The ID or Name of the project containing the team"
                 },
                 "teamId": {
                     "type": "string",
-                    "description": "The ID or name of the team"
+                    "description": "The ID or Name of the team"
                 },
                 "description": {
                     "type": "string",
@@ -42,15 +42,23 @@
                     "description": "Team settings configuration",
                     "oneOf": [
                         {
-                            "required": ["defaultIterationMacro"],
+                            "required": [
+                                "defaultIterationMacro"
+                            ],
                             "not": {
-                                "required": ["defaultIteration"]
+                                "required": [
+                                    "defaultIteration"
+                                ]
                             }
                         },
                         {
-                            "required": ["defaultIteration"],
+                            "required": [
+                                "defaultIteration"
+                            ],
                             "not": {
-                                "required": ["defaultIterationMacro"]
+                                "required": [
+                                    "defaultIterationMacro"
+                                ]
                             }
                         }
                     ],

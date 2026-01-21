@@ -2253,7 +2253,7 @@ function Get-CrossReferencedModuleList {
 
         $moduleFolderPath = Split-Path $moduleTemplatePath -Parent
 
-        ## iac/res/<provider>/<resourceType>
+        ## iac/ptn/<provider>/<resourceType>
         $resourceTypeIdentifier = ($moduleFolderPath -split '[\/|\\]iac[\/|\\](res|ptn|utl)[\/|\\]')[2] -replace '\\', '/'
 
         # if ($moduleFolderPath -like '*iac*') {

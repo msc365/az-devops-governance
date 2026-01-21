@@ -41,8 +41,11 @@ End‑to‑end governance is platform‑agnostic. This repository illustrates on
 
 - [Use cases](#use-cases)
 - [Architecture](#architecture)
+- [Azure resources](#azure-resources)
+- [Azure DevOps Projects](#azure-devops-projects)
+- [Entra ID Groups](#entra-id-groups)
+- [Components](#components)
 - [Considerations](#considerations)
-- [Deploy this scenario](#deploy-this-scenario)
 - [Support](#support)
 - [License](#license)
 
@@ -79,7 +82,7 @@ This simplified diagram shows how branches in a Git repository map to developmen
 
 This diagram illustrates that connecting Azure Resource Manager (ARM) and CI/CD to Microsoft Entra ID is crucial for establishing a comprehensive governance model.
 
-[![e2egov-design](./.assets/e2egov-design.png)](./.assets/e2egov-design-large.png)  
+![e2egov-design](./.assets/e2egov-design.png)  
 <sub>Image: End-to-end governance diagram</sub>
 
 > [!NOTE]  
@@ -132,10 +135,8 @@ The numbering reflects the order in which administrators and enterprise architec
    | Group name | Scope | Azure role | Azure DevOps role |
    | :-- | :-- | :-- | :-- |
    | `sg-hardware-collab-on-repo-a` ¹ | - | - | Gets repo-scoped permissions only, all other content remains invisible. |
-   | `sg-hardware-stakes` | `rg-hardware-prd` | Reader | Reader |
    | `sg-hardware-devs` | `rg-hardware-dev` | Contributor | Contributor |
    | `sg-hardware-admins` | `rg-hardware-prd` | Owner | Project Administrators |
-   | `sg-finishing-stakes` | `rg-hardware-prd` | Reader | Reader |
    | `sg-finishing-devs` | `rg-finishing-dev` | Contributor | Contributor |
    | `sg-finishing-admins` | `rg-finishing-prd` | Owner | Project Administrators |
    | `sg-shared-devs` | `rg-shared-dev` | Contributor | Contributor |
@@ -153,13 +154,81 @@ The numbering reflects the order in which administrators and enterprise architec
 7. **Git repositories**  
    Because service connections are tied to branches via [branch controls](https://learn.microsoft.com/en-us/azure/devops/pipelines/process/approvals#branch-control), it's critical to configure permissions to the Git repositories and apply [branch policies](https://learn.microsoft.com/en-us/azure/devops/repos/git/branch-policies). In addition to requiring CI builds to pass, we also require pull requests to have at least two approvers.
 
+## Azure resources
+
+To simplify the demo deployment, this reference implementation uses _Resource Groups_ to represent the `environments`. In practice, you should use different _Subscriptions_.
+
+- `rg-e2egov-avengers-dev`
+- `rg-e2egov-avengers-prd`
+- `rg-e2egov-guardians-dev`
+- `rg-e2egov-guardians-prd`
+- `rg-e2egov-galaxy-shared`
+
+## Azure DevOps Projects
+
+The project demo structure illustrates different governance models and their trade-offs.
+
+![e2egov-projects](.assets/e2egov-projects.png)  
+<sub>Image: Azure DevOps organization created with scripts form this repo</sub>
+
+- The isolated model with the `avengers` and `guardians` projects means less governance management - at the cost of less collaboration.
+- The `fantastic-four` project prioritizes collaboration via multiple shared Azure Boards - but requires more governance management, especially for repositories and pipelines.
+
+| Project | Boards | Repos | Pipelines | Description |
+| :-- | :-- | :-- | :-- | :-- |
+| `avengers` |  Yes | Yes | Yes | Isolated by project scope |
+| `guardians` | Yes | Yes | Yes | Isolated by project scope |
+| `galaxy` | No | Yes | Yes | Shared resources |
+| `fantastic-four` | Yes | Yes | Yes | One project multiple teams, prioritizes collaboration |
+
+## Entra ID Groups
+
+The key to en-to-end governance is to have multiple role assignments (with different role definitions and different resource scopes to the same Entra ID Groups).
+
+![e2egov-rbac](./.assets/e2egov-rbac.png)  
+<sub>Image: Role Assignment diagram</sub>
+
+### Isolated governance model
+
+| Group name | Scope | Azure role | Azure DevOps role |
+|:--|:--|:--|:--|
+| `sg-e2egov-avengers-all` ¹ | - | - | - |
+| `sg-e2egov-avengers-devs` | `rg-e2egov-avengers-dev` | Contributor | Contributor |
+| `sg-e2egov-avengers-admins` | `rg-e2egov-avengers-prd` | Owner | Project Administrators |
+| `sg-e2egov-guardians-all` | - | - | - |
+| `sg-e2egov-guardians-devs` | `rg-e2egov-guardians-dev` | Contributor | Contributor |
+| `sg-e2egov-guardians-admins` | `rg-e2egov-guardians-prd` | Owner | Project Administrators |
+| `sg-e2egov-galaxy-all` | - | - | - |
+| `sg-e2egov-galaxy-devs` | `rg-e2egov-galaxy-dev` | Contributor | Contributor |
+| `sg-e2egov-galaxy-admins` | `rg-e2egov-galaxy-prd` | Owner | Project Administrators |
+
+¹ In a scenario of limited collaboration, such as the `avengers` team inviting the `guardians` team to collaborate on a _single_ repository, they would use the `*-avenger-all` group.
+
+### Collaboration governance model
+
+| Group name | Scope | Azure role | Azure DevOps role |
+|:--|:--|:--|:--|
+| `sg-e2egov-fantastic-four-all` | - | - | - |
+| `sg-e2egov-fantastic-four-devs` | `rg-e2egov-fantastic-four-dev` | Contributor | Contributor |
+| `sg-e2egov-fantastic-four-admins` | `rg-e2egov-fantastic-four-prd` | Owner | Project Administrators |
+
+To understand the reasoning behind the individual role assignments, refer to the [Considerations](#considerations) section.
+
+## Components
+
+- [Azure DevOps](https://azure.microsoft.com/en-us/products/devops/)
+- [Microsoft Entra ID](https://learn.microsoft.com/en-us/entra/)
+- [Azure Resource Manager](https://learn.microsoft.com/en-us/azure)
+- [Azure Repos](https://azure.microsoft.com/en-us/products/devops/repos/)
+- [Azure Pipelines](https://azure.microsoft.com/en-us/products/devops/pipelines/)
+
 ## Considerations
 
 To achieve end-to-end governance in Azure, it's important to understand the security and permissions profile of the path from developer's computer to production. The following diagram illustrates a baseline CI/CD workflow with Azure DevOps. The red configuration ![workflow config](.assets/e2egov-config.png) icon indicates security permissions that must be configured by the user. Not configuring or misconfigured permissions will leave your workloads vulnerable.
 
 To successfully secure your workloads, you must use a combination of security permission configurations and human checks in your workflow. It's important that any RBAC model must also extend to both pipelines and code. These often run with privileged identities and will destroy your workloads if instructed to do so. To prevent this from happening, you should configure [branch policies](https://learn.microsoft.com/en-us/azure/devops/repos/git/branch-policies) on your repository to require human approval before accepting changes that trigger automation pipelines.
 
-[![workflow](.assets/e2egov-workflow.png)](.assets/e2egov-workflow-large.png)  
+![workflow](.assets/e2egov-workflow.png)  
 <sub>Image: Baseline CI/CD workflow</sub>
 
 <!-- omit from toc -->
@@ -212,50 +281,13 @@ Once the code has been accepted into a protected branch, the next layer of acces
 
 ![bullet 3](.assets/e2egov-no3.png)
 
-In Azure, a [security principal](https://learn.microsoft.com/en-us/azure/role-based-access-control/overview#security-principal) can be either a _user principal_ or a _headless principal_, such as a service principal or managed identity. In all environments, security principals should follow the [principle of least privilege](https://learn.microsoft.com/en-us/azure/role-based-access-control/best-practices#only-grant-the-access-users-need). While security principals might have expanded access in pre-production environments, production Azure environments should minimize standing permissions, favoring just-in-time (JIT) access and Microsoft Entra Conditional Access. Craft your Azure RBAC role assignments for user principals to align with these least privilege principals.
-
-It's also important to model Azure RBAC distinctly from Azure DevOps RBAC. The purpose of the pipeline is to minimize direct access to Azure. Except for special cases like innovation, learning, and issue resolution, most interactions with Azure should be conducted through purpose-built and gated pipelines.
-
-For Azure Pipeline service principals, consider using a [custom role](https://learn.microsoft.com/en-us/azure/role-based-access-control/custom-roles) that prevents it from removing resource locks and performing other destructive actions out of scope for its purpose.
+🚧 Todo → Description
 
 ### Create a custom role for the service principal
 
 ![bullet 4](.assets/e2egov-no4.png)
 
-It's a common mistake to give CI/CD build agents Owner roles and permissions. Contributor permissions are not enough if your pipeline also needs to perform identity role assignments or other privileged operations like Key Vault policy management.
-
-But a CI/CD Build Agent will delete your entire production environment if told to do so. To avoid **irreversible destructive changes**, we create a custom role that:
-
-- Removes Key Vault access policies
-- Removes [management locks](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/lock-resources) that by design should prevent resources from being deleted (a common requirement in regulated industries)
-
-To do this, we create a custom role and remove the `Microsoft.Authorization/*/Delete` actions.
-
-```json
-{
-  "Name": "Headless Owner",
-  "Description": "Can manage infrastructure.",
-  "actions": [
-    "*"
-  ],
-  "notActions": [
-    "Microsoft.Authorization/*/Delete"
-  ],
-  "AssignableScopes": [
-    "/subscriptions/{subscriptionId1}",
-    "/subscriptions/{subscriptionId2}",
-    "/providers/Microsoft.Management/managementGroups/{groupId1}"
-  ]
-}
-```
-
-If that removes too many permissions for your purposes, refer to the full list in the [official documentation for Azure RBAC resource provider operations](https://learn.microsoft.com/en-us/azure/role-based-access-control/resource-provider-operations) and adjust your role definition as needed.
-
-## Deploy this scenario
-
-This scenario extends beyond Resource Manager. This repository uses **Bicep templates** for Azure infrastructure provisioning and **PowerShell scripts** for Microsoft Entra ID group management and Azure DevOps bootstrapping. This combination provides declarative infrastructure-as-code for Azure resources while leveraging PowerShell's flexibility for identity and DevOps operations.
-
-For deployment instructions and examples, explore the template files in the [iac/](iac/) and [src/](src/) directories of this repository.
+🚧 Todo → Description
 
 ## Support
 

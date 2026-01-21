@@ -1,6 +1,6 @@
 {
     "$schema": "../../../../schemas/team.schema.json",
-    "projectId": "{prefix}-prj{uniqueId}",
+    "Project": "{prefix}-prj{uniqueId}",
     "teamId": "Other Team",
     "description": "Other team description",
     "teamSettings": {

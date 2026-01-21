@@ -16,9 +16,9 @@
     Required. A hashtable of team settings to apply.
 
 .EXAMPLE
-    $project = Get-AdoProject -ProjectId 'e2egov-prjHb72x9'
+    $project = Get-AdoProject -Project 'e2egov-prjHb72x9'
 
-    $team = Get-AdoTeam -ProjectId $project.Id -TeamId 'Default Team'
+    $team = Get-AdoTeam -Project $project.Id -TeamId 'Default Team'
 
     $teamSettings = @{
         backlogVisibilities = @{
@@ -69,12 +69,12 @@ process {
 
         # Team settings
         Write-Verbose 'Processing: team\teamSettings'
-        $settings = Get-AdoTeamSettings -ProjectId $Project.Id -TeamId $Team.Id -ErrorAction Stop
+        $settings = Get-AdoTeamSettings -Project $Project.Id -TeamId $Team.Id -ErrorAction Stop
 
         if ($settings.backlogIteration.id -eq '00000000-0000-0000-0000-000000000000') {
             Write-Debug 'Getting: Default team settings for backlogIteration restoration.'
 
-            $defaultSettings = Get-AdoTeamSettings -ProjectId $Project.Id -TeamId $Project.DefaultTeam.Id -ErrorAction Stop
+            $defaultSettings = Get-AdoTeamSettings -Project $Project.Id -TeamId $Project.DefaultTeam.Id -ErrorAction Stop
         }
 
         # Prepare current settings as hashtable
@@ -191,7 +191,7 @@ process {
                 Write-Debug "Updating: teamSettings\$($Team.Name)"
 
                 $settingsSplat = @{
-                    ProjectId    = $Project.Id
+                    Project      = $Project.Id
                     TeamId       = $Team.Id
                     TeamSettings = ($mergedSettings | ConvertTo-Json -Depth 5 -Compress)
                     Verbose      = $VerbosePreference
@@ -212,7 +212,7 @@ process {
 
         if (-not $WhatIfPreference) {
             $output = [PSCustomObject]@{
-                ProjectId    = $Project.Id
+                Project      = $Project.Id
                 TeamId       = $Team.Id
                 TeamSettings = $settings
                 Status       = $status

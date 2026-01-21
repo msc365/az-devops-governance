@@ -8,38 +8,32 @@
 .PARAMETER IdentityName
     Required. The name of the Managed Identity to create.
 
+.PARAMETER SubscriptionId
+    Required. The Subscription ID where the resources will be created.
+
 .PARAMETER ResourceGroupName
     Required. The name of the Resource Group to create.
 
 .PARAMETER Location
-    Optional. The Azure region where the resources will be created (e.g., 'westeurope', 'northeurope').
+    Optional. The Azure region where the resources will be created (e.g.: 'westeurope', 'northeurope').
 
 .PARAMETER Tags
     Optional. A hashtable of tags to assign to the resources. Default is an empty hashtable.
 
-.PARAMETER SubscriptionId
-    Required. The Subscription ID where the resources will be created.
-
 .PARAMETER Rollback
     Optional. If specified, the script will delete the created resources.
-
-.PARAMETER Force
-    Optional. If specified, the script will not prompt for confirmation during rollback.
 
 .EXAMPLE
     $depSplat = @{
         IdentityName      = 'id-e2egov-prjHb72x9-tst'
-        ResourceGroupName = 'rg-e2egov-prjHb72x9-tst-weu'
         SubscriptionId    = '00000000-0000-0000-0000-000000000000'
+        ResourceGroupName = 'rg-e2egov-prjHb72x9-tst-weu'
         Location          = 'westeurope'
         Tags              = @{ environment = 'tst'; service = 'e2egov' }
     }
     .\dependencies.ps1 @depSplat
 
     Deploys the dependencies in the specified subscription.
-
-.NOTES
-    Ensure you are logged in to Azure using Connect-AzAccount before running this script.
 #>
 [CmdletBinding(SupportsShouldProcess)]
 [OutputType([PSCustomObject])]
@@ -48,22 +42,19 @@ param (
     [string]$IdentityName,
 
     [Parameter(Mandatory)]
-    [string]$ResourceGroupName,
-
-    [Parameter(Mandatory = $false)]
-    [string]$Location,
-
-    [Parameter(Mandatory = $false)]
-    [object]$Tags = @{},
-
-    [Parameter(Mandatory)]
     [string]$SubscriptionId,
 
-    [Parameter()]
-    [switch]$Rollback,
+    [Parameter(Mandatory)]
+    [string]$ResourceGroupName,
 
     [Parameter()]
-    [switch]$Force
+    [string]$Location,
+
+    [Parameter()]
+    [object]$Tags,
+
+    [Parameter()]
+    [switch]$Rollback
 )
 
 begin {
@@ -76,62 +67,58 @@ process {
 
         #region INITIALIZE
 
+        # Status
+        $status = 'Unknown'
+
         # Variables #
-        $ctx, $sub, $rg, $msi = $null
+        $ctx, $rg, $msi = $null
 
-        # Subscription Context
-        $ctx = Get-AzContext -ErrorAction Stop
-
-        if ($ctx.Subscription.Id -ne $SubscriptionId) {
-            $subSplat = @{
-                TenantId       = $ctx.Tenant.Id
-                SubscriptionId = $SubscriptionId
-                WhatIf         = $false
-            }
-
-            $sub = Set-AzContext @subSplat -ErrorAction Stop
-        }
-
-        # Resource Group #
+        # Resource Group
         $rgSplat = @{
-            Name     = $ResourceGroupName
-            Location = $Location
-            Tags     = $Tags
-            Rollback = $Rollback.IsPresent
-            WhatIf   = $WhatIfPreference
-            Verbose  = $VerbosePreference
+            Name           = $ResourceGroupName
+            Location       = $Location
+            SubscriptionId = $SubscriptionId
+            Tags           = $Tags
+            Rollback       = $Rollback.IsPresent
+            WhatIf         = $WhatIfPreference
+            Verbose        = $VerbosePreference
         }
 
-        $rg = & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\shared\resource-group\main.ps1') @rgSplat
+        $rg = & (Join-Path -Path $PSScriptRoot -ChildPath '..\..\shared\resource-group\main.ps1') @rgSplat -Confirm:$false
 
         # Managed Identity #
         $msiSplat = @{
             Name              = $IdentityName
             ResourceGroupName = $ResourceGroupName
             SubscriptionId    = $SubscriptionId
-            Verbose           = $VerbosePreference
         }
 
-        $msi = Get-AzUserAssignedIdentity @msiSplat -ErrorAction SilentlyContinue
+        $msi = Get-AzUserAssignedIdentity @msiSplat -Verbose:$false -ErrorAction SilentlyContinue
 
         #endregion
 
         #region DEPLOYMENTS
 
-        # Managed Identity #
         if (-not $Rollback.IsPresent) {
+            # Managed service identity
             if ($null -eq $msi) {
-                if ($PSCmdlet.ShouldProcess(('managedServiceIdentity/{0}' -f $IdentityName), 'Create')) {
-
+                if ($PSCmdlet.ShouldProcess($ResourceGroupName, "Create managed identity: $($IdentityName)")) {
                     $msiSplat += @{
                         Location = $Location
                         Tag      = $Tags
                     }
 
-                    $msi = New-AzUserAssignedIdentity @msiSplat
+                    $msi = New-AzUserAssignedIdentity -Confirm:$false -Verbose:$false @msiSplat
+
+                    $status = 'Created'
+                    Write-Verbose "[CREATE] Managed identity: '$IdentityName' (PrincipalId: $($msi.principalId))"
+                } else {
+                    $status = 'Skipped'
+                    Write-Verbose "[WHATIF] Call New-AzUserAssignedIdentity with parameters: $($msiSplat | ConvertTo-Json -Depth 5)"
                 }
             } else {
-                Write-Verbose ("Exists: 'managedServiceIdentity/{0}'" -f $msi.Name)
+                $status = 'NoChange'
+                Write-Verbose "[NOCHANGE] Managed identity: '$IdentityName' (PrincipalId: $($msi.principalId))"
             }
         }
 
@@ -141,30 +128,19 @@ process {
 
         if ($Rollback.IsPresent) {
             if ($null -ne $msi) {
-                if ($PSCmdlet.ShouldProcess(('{0}' -f $IdentityName), 'Remove')) {
-                    if (-not $Force.IsPresent) {
-                        $prompt = @(
-                            "This will delete '/managedServiceIdentity/$($IdentityName)'."
-                            "All related resources like 'federatedIdentityCredentials' will be lost."
-                            "Do you want to continue? 'Yes [Y]' 'No [N]'"
-                        ) -join "`n"
+                if ($PSCmdlet.ShouldProcess($ResourceGroupName, "Remove managed identity: $IdentityName")) {
 
-                        $result = Read-Host -Prompt $prompt
-                        $result = $result.ToLower()
+                    $msi | Remove-AzUserAssignedIdentity -Confirm:$false -Verbose:$false | Out-Null
 
-                        if ($result -ne 'y' -and $result -ne 'yes') {
-                            Write-Warning 'Operation cancelled by user'
-                            return
-                        }
-                    }
-
-                    Write-Verbose ("Removing 'managedServiceIdentity/{0}' dependencies..." -f $msi.Name)
-
-                    $msi | Remove-AzUserAssignedIdentity | Out-Null
-                    Write-Verbose ("Deleted: 'managedServiceIdentity/{0}'" -f $IdentityName)
+                    $status = 'Removed'
+                    Write-Verbose "[REMOVE] Managed identity: '$IdentityName' (PrincipalId: $($msi.principalId))"
+                } else {
+                    $status = 'Skipped'
+                    Write-Verbose "[WHATIF] Call Remove-AzUserAssignedIdentity with parameters: $($msiSplat | ConvertTo-Json -Depth 5)"
                 }
             } else {
-                Write-Warning ("Doesn't exist: 'managedServiceIdentity/{0}'" -f $IdentityName)
+                $status = 'NotFound'
+                Write-Warning "[NOTFOUND] Managed identity: '$IdentityName' (PrincipalId: UNKNOWN)"
             }
         }
 
@@ -172,28 +148,22 @@ process {
 
         #region OUTPUTS
 
-        $output = [PSCustomObject]@{
-            Identity      = ($msi | Select-Object *) ?? $null
-            ResourceGroup = ($rg | Select-Object *) ?? $null
+        $obj = [ordered]@{
+            id                = if ($msi) { $msi.id } else { $null }
+            name              = if ($msi) { $msi.name } else { $null }
+            clientId          = if ($msi) { $msi.clientId } else { $null }
+            principalId       = if ($msi) { $msi.principalId } else { $null }
+            tenantId          = if ($msi) { $msi.tenantId } else { $null }
+            resourceGroupName = if ($msi) { $msi.resourceGroupName } else { $null }
+            type              = if ($msi) { $msi.type } else { $null }
         }
-
-        return $output
+        $obj['status'] = $status
+        [PSCustomObject]$obj
 
         #endregion
 
     } catch {
         throw $_
-    }
-
-    finally {
-        if ($null -ne $ctx -and $null -ne $sub) {
-            $ctxSplat = @{
-                TenantId       = $ctx.Tenant.Id
-                SubscriptionId = $ctx.Subscription.Id
-                WhatIf         = $false
-            }
-            Set-AzContext @ctxSplat | Out-Null
-        }
     }
 }
 
