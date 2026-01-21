@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0" version="29.2.9" pages="5">
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36 Edg/143.0.0.0" version="29.3.4" pages="5">
   <diagram id="HPmT7H-rFY5g5NkxKbqG" name="design">
-    <mxGraphModel dx="1720" dy="923" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="2064" dy="1108" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -64,7 +64,7 @@
         <mxCell id="j0xa_gd_GFn0QrkNhJ5U-14" parent="xSFHQlk0UT29rJPxlxQf-5" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/identity/Entra_Managed_Identities.svg;" value="" vertex="1">
           <mxGeometry height="24.89" width="28" x="56.620000000000005" y="24" as="geometry" />
         </mxCell>
-        <mxCell id="j0xa_gd_GFn0QrkNhJ5U-15" parent="xSFHQlk0UT29rJPxlxQf-5" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;fontStyle=0;fontColor=#CCCCCC;" value="&lt;font style=&quot;font-size: 11px; color: rgb(194, 194, 194);&quot;&gt;id-hardware-dev&lt;/font&gt;" vertex="1">
+        <mxCell id="j0xa_gd_GFn0QrkNhJ5U-15" parent="xSFHQlk0UT29rJPxlxQf-5" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;fontStyle=0;fontColor=#CCCCCC;" value="&lt;font style=&quot;font-size: 11px; color: rgb(194, 194, 194);&quot;&gt;id-portugal-dev&lt;/font&gt;" vertex="1">
           <mxGeometry height="20" width="128.74" x="6.25" y="48.889999999999986" as="geometry" />
         </mxCell>
         <mxCell id="xSFHQlk0UT29rJPxlxQf-8" parent="xSFHQlk0UT29rJPxlxQf-5" style="sketch=0;points=[[0.5,0,0],[1,0.5,0],[0.5,1,0],[0,0.5,0],[0.145,0.145,0],[0.8555,0.145,0],[0.855,0.8555,0],[0.145,0.855,0]];verticalLabelPosition=bottom;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco19.lock;fillColor=#FF8000;strokeColor=none;" value="" vertex="1">
@@ -82,7 +82,7 @@
         <mxCell id="j0xa_gd_GFn0QrkNhJ5U-18" parent="xSFHQlk0UT29rJPxlxQf-6" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/identity/Entra_Managed_Identities.svg;" value="" vertex="1">
           <mxGeometry height="24.89" width="28" x="56.620000000000005" y="24.149999999999977" as="geometry" />
         </mxCell>
-        <mxCell id="j0xa_gd_GFn0QrkNhJ5U-19" parent="xSFHQlk0UT29rJPxlxQf-6" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;fontStyle=0;fontColor=#CCCCCC;" value="&lt;font style=&quot;font-size: 11px; color: rgb(194, 194, 194);&quot;&gt;id-hardware-prd&lt;/font&gt;" vertex="1">
+        <mxCell id="j0xa_gd_GFn0QrkNhJ5U-19" parent="xSFHQlk0UT29rJPxlxQf-6" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;fontStyle=0;fontColor=#CCCCCC;" value="&lt;font style=&quot;font-size: 11px; color: rgb(194, 194, 194);&quot;&gt;id-portugal-prd&lt;/font&gt;" vertex="1">
           <mxGeometry height="20" width="128.74" x="6.25" y="49.04000000000008" as="geometry" />
         </mxCell>
         <mxCell id="xSFHQlk0UT29rJPxlxQf-9" parent="xSFHQlk0UT29rJPxlxQf-6" style="sketch=0;points=[[0.5,0,0],[1,0.5,0],[0.5,1,0],[0,0.5,0],[0.145,0.145,0],[0.8555,0.145,0],[0.855,0.8555,0],[0.145,0.855,0]];verticalLabelPosition=bottom;html=1;verticalAlign=top;aspect=fixed;align=center;pointerEvents=1;shape=mxgraph.cisco19.lock;fillColor=#FF8000;strokeColor=none;" value="" vertex="1">
@@ -106,7 +106,7 @@
         <mxCell id="1xqLb6txPPCePPIYuSe5-2" parent="1" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#CCCCCC;fillColor=none;arcSize=2;container=0;perimeterSpacing=0;" value="" vertex="1">
           <mxGeometry height="69" width="142.5" x="627.08" y="376.76" as="geometry" />
         </mxCell>
-        <mxCell id="1xqLb6txPPCePPIYuSe5-3" parent="1" style="text;strokeColor=none;fillColor=default;html=1;fontSize=12;fontStyle=1;verticalAlign=middle;align=center;container=0;fontColor=#007FFF;" value="sub-hardware-dev" vertex="1">
+        <mxCell id="1xqLb6txPPCePPIYuSe5-3" parent="1" style="text;strokeColor=none;fillColor=default;html=1;fontSize=12;fontStyle=1;verticalAlign=middle;align=center;container=0;fontColor=#007FFF;" value="sub-portugal-dev" vertex="1">
           <mxGeometry height="24" width="125.95" x="634.725" y="365.76" as="geometry" />
         </mxCell>
         <mxCell id="mnZV8fw8imqkBi4VTgMK-3" edge="1" parent="1" source="mnZV8fw8imqkBi4VTgMK-1" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;rounded=0;exitX=0.057;exitY=0.477;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.973;entryY=0.483;entryDx=0;entryDy=0;endArrow=none;startFill=0;strokeColor=#CCCCCC;strokeWidth=1;entryPerimeter=0;" target="1xqLb6txPPCePPIYuSe5-7" value="">
@@ -133,7 +133,7 @@
         <mxCell id="mnZV8fw8imqkBi4VTgMK-5" parent="1" style="rounded=1;whiteSpace=wrap;html=1;strokeColor=#CCCCCC;fillColor=none;arcSize=2;container=0;perimeterSpacing=0;" value="" vertex="1">
           <mxGeometry height="69" width="142.5" x="626.83" y="520.8200000000002" as="geometry" />
         </mxCell>
-        <mxCell id="mnZV8fw8imqkBi4VTgMK-6" parent="1" style="text;strokeColor=none;fillColor=default;html=1;fontSize=12;fontStyle=1;verticalAlign=middle;align=center;container=0;fontColor=#CC0000;" value="sub-hardware-prd" vertex="1">
+        <mxCell id="mnZV8fw8imqkBi4VTgMK-6" parent="1" style="text;strokeColor=none;fillColor=default;html=1;fontSize=12;fontStyle=1;verticalAlign=middle;align=center;container=0;fontColor=#CC0000;" value="sub-portugal-prd" vertex="1">
           <mxGeometry height="24" width="125.95" x="635.475" y="509.82000000000016" as="geometry" />
         </mxCell>
         <mxCell id="mnZV8fw8imqkBi4VTgMK-7" edge="1" parent="1" source="mnZV8fw8imqkBi4VTgMK-10" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;rounded=0;exitX=0.057;exitY=0.477;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.973;entryY=0.483;entryDx=0;entryDy=0;endArrow=none;startFill=0;strokeColor=#CCCCCC;strokeWidth=1;entryPerimeter=0;" target="mnZV8fw8imqkBi4VTgMK-9" value="">
@@ -166,19 +166,19 @@
         <mxCell id="mnZV8fw8imqkBi4VTgMK-16" parent="1" style="text;strokeColor=none;fillColor=default;html=1;fontSize=12;fontStyle=1;verticalAlign=middle;align=center;container=0;fontColor=#808080;" value="Role Assignments" vertex="1">
           <mxGeometry height="24" width="127.19" x="739.04" y="478.86000000000007" as="geometry" />
         </mxCell>
-        <mxCell id="NnCqVAgimiNTFqk3L1YP-44" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;font-size: 10px; color: rgb(194, 194, 194);&quot;&gt;sg-hardware-devs&lt;/font&gt;" vertex="1">
+        <mxCell id="NnCqVAgimiNTFqk3L1YP-44" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;font-size: 10px; color: rgb(194, 194, 194);&quot;&gt;sg-portugal-devs&lt;/font&gt;" vertex="1">
           <mxGeometry height="20" width="95.25" x="157.61" y="468.83" as="geometry" />
         </mxCell>
         <mxCell id="NnCqVAgimiNTFqk3L1YP-45" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;fontStyle=1" value="&lt;font style=&quot;color: rgb(0, 127, 255); font-size: 11px;&quot;&gt;Contributors&lt;/font&gt;" vertex="1">
           <mxGeometry height="20" width="95.25" x="157.61" y="455.96" as="geometry" />
         </mxCell>
-        <mxCell id="NnCqVAgimiNTFqk3L1YP-49" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;font-size: 10px; color: rgb(194, 194, 194);&quot;&gt;sg-hardware-admins&lt;/font&gt;" vertex="1">
+        <mxCell id="NnCqVAgimiNTFqk3L1YP-49" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;font-size: 10px; color: rgb(194, 194, 194);&quot;&gt;sg-portugal-admins&lt;/font&gt;" vertex="1">
           <mxGeometry height="20" width="95.25" x="157.61" y="504.20000000000005" as="geometry" />
         </mxCell>
         <mxCell id="NnCqVAgimiNTFqk3L1YP-50" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;fontStyle=1" value="&lt;font style=&quot;font-size: 11px; color: rgb(204, 0, 0);&quot;&gt;Project Admins&lt;/font&gt;" vertex="1">
           <mxGeometry height="20" width="95.25" x="157.61" y="491.15999999999997" as="geometry" />
         </mxCell>
-        <mxCell id="mnZV8fw8imqkBi4VTgMK-17" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;font-size: 10px; color: rgb(194, 194, 194);&quot;&gt;sg-hardware-admins&lt;/font&gt;" vertex="1">
+        <mxCell id="mnZV8fw8imqkBi4VTgMK-17" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;font-size: 10px; color: rgb(194, 194, 194);&quot;&gt;sg-portugal-admins&lt;/font&gt;" vertex="1">
           <mxGeometry height="20" width="134.75" x="845.39" y="378.63" as="geometry" />
         </mxCell>
         <mxCell id="mnZV8fw8imqkBi4VTgMK-18" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;fontStyle=1" value="&lt;font style=&quot;font-size: 11px; color: rgb(204, 0, 0);&quot;&gt;Owner&lt;/font&gt;" vertex="1">
@@ -187,7 +187,7 @@
         <mxCell id="mnZV8fw8imqkBi4VTgMK-19" parent="1" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/identity/Groups.svg;" value="" vertex="1">
           <mxGeometry height="23.94" width="29.07" x="810.14" y="367.69" as="geometry" />
         </mxCell>
-        <mxCell id="mnZV8fw8imqkBi4VTgMK-20" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;font-size: 10px; color: rgb(194, 194, 194);&quot;&gt;sg-hardware-devs&lt;/font&gt;" vertex="1">
+        <mxCell id="mnZV8fw8imqkBi4VTgMK-20" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;font-size: 10px; color: rgb(194, 194, 194);&quot;&gt;sg-portugal-devs&lt;/font&gt;" vertex="1">
           <mxGeometry height="20" width="124.75" x="846.11" y="411.49999999999994" as="geometry" />
         </mxCell>
         <mxCell id="mnZV8fw8imqkBi4VTgMK-21" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;fontStyle=1" value="&lt;font style=&quot;color: rgb(0, 127, 255); font-size: 11px;&quot;&gt;Owner&lt;/font&gt;" vertex="1">
@@ -196,7 +196,7 @@
         <mxCell id="mnZV8fw8imqkBi4VTgMK-22" parent="1" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/identity/Groups.svg;" value="" vertex="1">
           <mxGeometry height="23.94" width="29.07" x="810.86" y="400.56" as="geometry" />
         </mxCell>
-        <mxCell id="mnZV8fw8imqkBi4VTgMK-23" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;font-size: 10px; color: rgb(194, 194, 194);&quot;&gt;id-hardware-dev&lt;/font&gt;" vertex="1">
+        <mxCell id="mnZV8fw8imqkBi4VTgMK-23" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;font-size: 10px; color: rgb(194, 194, 194);&quot;&gt;id-portugal-dev&lt;/font&gt;" vertex="1">
           <mxGeometry height="20" width="124.75" x="845.86" y="442.62999999999994" as="geometry" />
         </mxCell>
         <mxCell id="mnZV8fw8imqkBi4VTgMK-24" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;fontStyle=1" value="&lt;font style=&quot;color: rgb(0, 127, 255); font-size: 11px;&quot;&gt;Owner *&lt;/font&gt;" vertex="1">
@@ -205,7 +205,7 @@
         <mxCell id="mnZV8fw8imqkBi4VTgMK-26" parent="1" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/identity/Entra_Managed_Identities.svg;" value="" vertex="1">
           <mxGeometry height="24.89" width="28" x="810.61" y="432.74" as="geometry" />
         </mxCell>
-        <mxCell id="mnZV8fw8imqkBi4VTgMK-27" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;font-size: 10px; color: rgb(194, 194, 194);&quot;&gt;sg-hardware-admins&lt;/font&gt;" vertex="1">
+        <mxCell id="mnZV8fw8imqkBi4VTgMK-27" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;font-size: 10px; color: rgb(194, 194, 194);&quot;&gt;sg-portugal-admins&lt;/font&gt;" vertex="1">
           <mxGeometry height="20" width="134.75" x="846.11" y="522.69" as="geometry" />
         </mxCell>
         <mxCell id="mnZV8fw8imqkBi4VTgMK-28" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;fontStyle=1" value="&lt;font style=&quot;font-size: 11px; color: rgb(204, 0, 0);&quot;&gt;Owner&lt;/font&gt;" vertex="1">
@@ -214,7 +214,7 @@
         <mxCell id="mnZV8fw8imqkBi4VTgMK-29" parent="1" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/identity/Groups.svg;" value="" vertex="1">
           <mxGeometry height="23.94" width="29.07" x="810.86" y="511.75" as="geometry" />
         </mxCell>
-        <mxCell id="mnZV8fw8imqkBi4VTgMK-30" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;color: rgb(194, 194, 194);&quot;&gt;&lt;font style=&quot;font-size: 10px; color: rgb(204, 204, 204);&quot;&gt;id-hardware-&lt;/font&gt;&lt;span style=&quot;font-size: 10px; background-color: transparent;&quot;&gt;prd&lt;/span&gt;&lt;/font&gt;" vertex="1">
+        <mxCell id="mnZV8fw8imqkBi4VTgMK-30" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;color: rgb(194, 194, 194);&quot;&gt;&lt;font style=&quot;font-size: 10px; color: rgb(204, 204, 204);&quot;&gt;id-portugal-&lt;/font&gt;&lt;span style=&quot;font-size: 10px; background-color: transparent;&quot;&gt;prd&lt;/span&gt;&lt;/font&gt;" vertex="1">
           <mxGeometry height="20" width="124.75" x="846.83" y="588.4300000000001" as="geometry" />
         </mxCell>
         <mxCell id="mnZV8fw8imqkBi4VTgMK-31" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;fontStyle=1" value="&lt;font style=&quot;font-size: 11px; color: rgb(204, 0, 0);&quot;&gt;Owner *&lt;/font&gt;" vertex="1">
@@ -223,7 +223,7 @@
         <mxCell id="mnZV8fw8imqkBi4VTgMK-32" parent="1" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/identity/Groups.svg;" value="" vertex="1">
           <mxGeometry height="23.94" width="29.07" x="810.86" y="545.69" as="geometry" />
         </mxCell>
-        <mxCell id="mnZV8fw8imqkBi4VTgMK-33" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;font-size: 10px; color: rgb(194, 194, 194);&quot;&gt;sg-hardware-prd&lt;/font&gt;" vertex="1">
+        <mxCell id="mnZV8fw8imqkBi4VTgMK-33" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;font-size: 10px; color: rgb(194, 194, 194);&quot;&gt;sg-portugal-prd&lt;/font&gt;" vertex="1">
           <mxGeometry height="20" width="124.75" x="846.11" y="555.56" as="geometry" />
         </mxCell>
         <mxCell id="mnZV8fw8imqkBi4VTgMK-34" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;fontStyle=1" value="&lt;font style=&quot;color: rgb(0, 127, 255); font-size: 11px;&quot;&gt;Contributor&lt;/font&gt;" vertex="1">
@@ -273,7 +273,7 @@
         <mxCell id="NnCqVAgimiNTFqk3L1YP-2" parent="-vyCarmnMaLizQyABUQC-2" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;font-size: 10px; color: rgb(194, 194, 194);&quot;&gt;Microsoft Entra Group&lt;/font&gt;" vertex="1">
           <mxGeometry height="12" width="113.33571428571429" x="44.70000000000003" y="5" as="geometry" />
         </mxCell>
-        <mxCell id="NnCqVAgimiNTFqk3L1YP-3" parent="-vyCarmnMaLizQyABUQC-2" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;fontStyle=1" value="&lt;font style=&quot;color: rgb(0, 127, 255); font-size: 11px;&quot;&gt;sg-hardware-devs&lt;/font&gt;" vertex="1">
+        <mxCell id="NnCqVAgimiNTFqk3L1YP-3" parent="-vyCarmnMaLizQyABUQC-2" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;fontStyle=1" value="&lt;font style=&quot;color: rgb(0, 127, 255); font-size: 11px;&quot;&gt;sg-portugal-devs&lt;/font&gt;" vertex="1">
           <mxGeometry height="18" width="113.33571428571429" x="44.70000000000003" y="17" as="geometry" />
         </mxCell>
         <mxCell id="NnCqVAgimiNTFqk3L1YP-34" parent="-vyCarmnMaLizQyABUQC-2" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/identity/Groups.svg;" value="" vertex="1">
@@ -288,7 +288,7 @@
         <mxCell id="-vyCarmnMaLizQyABUQC-6" parent="-vyCarmnMaLizQyABUQC-4" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;font-size: 10px; color: rgb(194, 194, 194);&quot;&gt;Microsoft Entra Group&lt;/font&gt;" vertex="1">
           <mxGeometry height="12" width="105.78" x="41.72000000000003" y="5" as="geometry" />
         </mxCell>
-        <mxCell id="-vyCarmnMaLizQyABUQC-7" parent="-vyCarmnMaLizQyABUQC-4" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;fontStyle=1" value="&lt;font style=&quot;font-size: 11px; color: rgb(204, 0, 0);&quot;&gt;sg-hardware-admins&lt;/font&gt;" vertex="1">
+        <mxCell id="-vyCarmnMaLizQyABUQC-7" parent="-vyCarmnMaLizQyABUQC-4" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;fontStyle=1" value="&lt;font style=&quot;font-size: 11px; color: rgb(204, 0, 0);&quot;&gt;sg-portugal-admins&lt;/font&gt;" vertex="1">
           <mxGeometry height="18" width="118.28" x="41.72" y="17" as="geometry" />
         </mxCell>
         <mxCell id="-vyCarmnMaLizQyABUQC-8" parent="-vyCarmnMaLizQyABUQC-4" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/identity/Groups.svg;" value="" vertex="1">
@@ -303,7 +303,7 @@
         <mxCell id="-vyCarmnMaLizQyABUQC-11" parent="-vyCarmnMaLizQyABUQC-24" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;font-size: 10px; color: rgb(194, 194, 194);&quot;&gt;Managed Identity&lt;/font&gt;" vertex="1">
           <mxGeometry height="12" width="111.65666666666667" x="44.037777777777805" y="5" as="geometry" />
         </mxCell>
-        <mxCell id="-vyCarmnMaLizQyABUQC-12" parent="-vyCarmnMaLizQyABUQC-24" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;fontStyle=1" value="&lt;font style=&quot;color: rgb(0, 127, 255); font-size: 11px;&quot;&gt;id-hardware-dev&lt;/font&gt;" vertex="1">
+        <mxCell id="-vyCarmnMaLizQyABUQC-12" parent="-vyCarmnMaLizQyABUQC-24" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;fontStyle=1" value="&lt;font style=&quot;color: rgb(0, 127, 255); font-size: 11px;&quot;&gt;id-portugal-dev&lt;/font&gt;" vertex="1">
           <mxGeometry height="18" width="111.65666666666667" x="44.037777777777805" y="17" as="geometry" />
         </mxCell>
         <mxCell id="-vyCarmnMaLizQyABUQC-16" parent="-vyCarmnMaLizQyABUQC-24" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/identity/Entra_Managed_Identities.svg;container=0;" value="" vertex="1">
@@ -318,7 +318,7 @@
         <mxCell id="-vyCarmnMaLizQyABUQC-21" parent="-vyCarmnMaLizQyABUQC-25" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;font-size: 10px; color: rgb(194, 194, 194);&quot;&gt;Managed Identity&lt;/font&gt;" vertex="1">
           <mxGeometry height="12" width="111.65666666666667" x="44.037777777777805" y="5" as="geometry" />
         </mxCell>
-        <mxCell id="-vyCarmnMaLizQyABUQC-22" parent="-vyCarmnMaLizQyABUQC-25" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;fontStyle=1" value="&lt;font style=&quot;font-size: 11px; color: rgb(204, 0, 0);&quot;&gt;id-hardware-prd&lt;/font&gt;" vertex="1">
+        <mxCell id="-vyCarmnMaLizQyABUQC-22" parent="-vyCarmnMaLizQyABUQC-25" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;fontStyle=1" value="&lt;font style=&quot;font-size: 11px; color: rgb(204, 0, 0);&quot;&gt;id-portugal-prd&lt;/font&gt;" vertex="1">
           <mxGeometry height="18" width="111.65666666666667" x="44.037777777777805" y="17" as="geometry" />
         </mxCell>
         <mxCell id="-vyCarmnMaLizQyABUQC-23" parent="-vyCarmnMaLizQyABUQC-25" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/identity/Entra_Managed_Identities.svg;container=0;" value="" vertex="1">
@@ -397,7 +397,7 @@
         <mxCell id="krLkdD5JKyQbhazUMCLc-22" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;color: rgb(0, 127, 255); font-size: 11px;&quot;&gt;Project Administrator&lt;/font&gt;" vertex="1">
           <mxGeometry height="20" width="120" x="400" y="440" as="geometry" />
         </mxCell>
-        <mxCell id="krLkdD5JKyQbhazUMCLc-24" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;font-size: 11px; color: rgb(128, 128, 128);&quot;&gt;hardware-project&lt;/font&gt;" vertex="1">
+        <mxCell id="krLkdD5JKyQbhazUMCLc-24" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;font-size: 11px; color: rgb(128, 128, 128);&quot;&gt;portugal-project&lt;/font&gt;" vertex="1">
           <mxGeometry height="20" width="150" x="400" y="490" as="geometry" />
         </mxCell>
         <mxCell id="krLkdD5JKyQbhazUMCLc-1" parent="1" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/devops/Azure_DevOps.svg;container=0;" value="" vertex="1">
@@ -415,7 +415,7 @@
         <mxCell id="krLkdD5JKyQbhazUMCLc-23" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;color: rgb(0, 127, 255); font-size: 11px;&quot;&gt;Owner&lt;/font&gt;" vertex="1">
           <mxGeometry height="20" width="88.79" x="601.21" y="440" as="geometry" />
         </mxCell>
-        <mxCell id="krLkdD5JKyQbhazUMCLc-25" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;font-size: 11px; color: rgb(128, 128, 128);&quot;&gt;sub-hardware-dev&lt;/font&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px; color: rgb(128, 128, 128);&quot;&gt;sub-hardware-prd&lt;/font&gt;&lt;/div&gt;" vertex="1">
+        <mxCell id="krLkdD5JKyQbhazUMCLc-25" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;font-size: 11px; color: rgb(128, 128, 128);&quot;&gt;sub-portugal-dev&lt;/font&gt;&lt;div&gt;&lt;font style=&quot;font-size: 11px; color: rgb(128, 128, 128);&quot;&gt;sub-portugal-prd&lt;/font&gt;&lt;/div&gt;" vertex="1">
           <mxGeometry height="30" width="150" x="601.21" y="490" as="geometry" />
         </mxCell>
         <mxCell id="krLkdD5JKyQbhazUMCLc-5" parent="1" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/other/Azure_A.svg;container=0;" value="" vertex="1">
@@ -424,7 +424,7 @@
         <mxCell id="krLkdD5JKyQbhazUMCLc-3" parent="1" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/identity/Groups.svg;container=0;" value="" vertex="1">
           <mxGeometry height="30.29" width="36.78" x="556.61" y="340" as="geometry" />
         </mxCell>
-        <mxCell id="krLkdD5JKyQbhazUMCLc-15" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="sg-e2egov-admins" vertex="1">
+        <mxCell id="krLkdD5JKyQbhazUMCLc-15" parent="1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="sg-portugal-admins" vertex="1">
           <mxGeometry height="30" width="180" x="482.5" y="370.29" as="geometry" />
         </mxCell>
         <mxCell id="krLkdD5JKyQbhazUMCLc-42" parent="1" style="text;strokeColor=none;fillColor=none;html=1;fontSize=24;fontStyle=1;verticalAlign=middle;align=center;container=0;" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;Role Definition&lt;/font&gt;" vertex="1">
@@ -480,7 +480,7 @@
     </mxGraphModel>
   </diagram>
   <diagram id="SVKEG54hRfFTCbWjxPKR" name="git">
-    <mxGraphModel dx="983" dy="528" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="826" dy="443" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -517,23 +517,23 @@
         <mxCell id="gjVMwzmamcarG6SYkGfv-14" parent="1" style="text;strokeColor=none;fillColor=none;html=1;fontSize=14;fontStyle=1;verticalAlign=middle;align=center;container=0;" value="&lt;font&gt;Subscriptions&lt;/font&gt;" vertex="1">
           <mxGeometry height="20" width="120" x="234.75" y="105" as="geometry" />
         </mxCell>
-        <mxCell id="gjVMwzmamcarG6SYkGfv-15" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;color: rgb(128, 128, 128); font-size: 11px;&quot;&gt;sub-e2egov-&lt;/font&gt;" vertex="1">
-          <mxGeometry height="20" width="66" x="254.75" y="161" as="geometry" />
+        <mxCell id="gjVMwzmamcarG6SYkGfv-15" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;color: rgb(128, 128, 128); font-size: 11px;&quot;&gt;sub-portugal-&lt;/font&gt;" vertex="1">
+          <mxGeometry height="20" width="75.25" x="254.75" y="161" as="geometry" />
         </mxCell>
         <mxCell id="gjVMwzmamcarG6SYkGfv-16" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#007FFF;container=0;labelBorderColor=none;" value="&lt;font style=&quot;font-size: 11px;&quot;&gt;dev&lt;/font&gt;" vertex="1">
-          <mxGeometry height="20" width="24" x="316.75" y="161" as="geometry" />
+          <mxGeometry height="20" width="24" x="319.75" y="161" as="geometry" />
         </mxCell>
-        <mxCell id="gjVMwzmamcarG6SYkGfv-17" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;color: rgb(128, 128, 128); font-size: 11px;&quot;&gt;sub-e2egov-&lt;/font&gt;" vertex="1">
-          <mxGeometry height="20" width="66" x="254.75" y="181" as="geometry" />
+        <mxCell id="gjVMwzmamcarG6SYkGfv-17" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;color: rgb(128, 128, 128); font-size: 11px;&quot;&gt;sub-portugal-&lt;/font&gt;" vertex="1">
+          <mxGeometry height="20" width="75.25" x="254.75" y="181" as="geometry" />
         </mxCell>
         <mxCell id="gjVMwzmamcarG6SYkGfv-18" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#FF8000;container=0;" value="&lt;font style=&quot;font-size: 11px;&quot;&gt;stg&lt;/font&gt;" vertex="1">
-          <mxGeometry height="20" width="24" x="316.75" y="181" as="geometry" />
+          <mxGeometry height="20" width="24" x="319.75" y="181" as="geometry" />
         </mxCell>
-        <mxCell id="gjVMwzmamcarG6SYkGfv-19" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;color: rgb(128, 128, 128); font-size: 11px;&quot;&gt;sub-e2egov-&lt;/font&gt;" vertex="1">
-          <mxGeometry height="20" width="66" x="254.75" y="201" as="geometry" />
+        <mxCell id="gjVMwzmamcarG6SYkGfv-19" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;container=0;" value="&lt;font style=&quot;color: rgb(128, 128, 128); font-size: 11px;&quot;&gt;sub-portugal-&lt;/font&gt;" vertex="1">
+          <mxGeometry height="20" width="75.25" x="254.75" y="201" as="geometry" />
         </mxCell>
         <mxCell id="gjVMwzmamcarG6SYkGfv-20" parent="1" style="text;html=1;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontColor=#CC0000;container=0;" value="&lt;font style=&quot;font-size: 11px;&quot;&gt;prd&lt;/font&gt;" vertex="1">
-          <mxGeometry height="20" width="24" x="316.75" y="201" as="geometry" />
+          <mxGeometry height="20" width="24" x="319.75" y="201" as="geometry" />
         </mxCell>
         <mxCell id="gjVMwzmamcarG6SYkGfv-21" edge="1" parent="1" source="gjVMwzmamcarG6SYkGfv-11" style="endArrow=classicThin;html=1;rounded=0;endFill=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="gjVMwzmamcarG6SYkGfv-15" value="">
           <mxGeometry height="50" relative="1" width="50" as="geometry">
@@ -721,15 +721,15 @@
     </mxGraphModel>
   </diagram>
   <diagram id="qXqr2RHTJ5LEPTlJ_Qna" name="logos">
-    <mxGraphModel dx="1216" dy="1108" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+    <mxGraphModel dx="2064" dy="1108" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="smEKu2lHDr3OIIGkYam6-1" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/other/Azure_A.svg;" vertex="1" parent="1">
-          <mxGeometry x="140" y="140" width="397.11" height="374.41" as="geometry" />
+        <mxCell id="smEKu2lHDr3OIIGkYam6-1" parent="1" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/other/Azure_A.svg;" value="" vertex="1">
+          <mxGeometry height="374.41" width="397.11" x="140" y="140" as="geometry" />
         </mxCell>
-        <mxCell id="DppK2Nn1DVxyMh5agr22-1" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/devops/Azure_DevOps.svg;container=0;" vertex="1" parent="1">
-          <mxGeometry x="660" y="140" width="376.8" height="376.8" as="geometry" />
+        <mxCell id="DppK2Nn1DVxyMh5agr22-1" parent="1" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/devops/Azure_DevOps.svg;container=0;" value="" vertex="1">
+          <mxGeometry height="376.8" width="376.8" x="660" y="140" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

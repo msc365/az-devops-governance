@@ -38,10 +38,10 @@ End‑to‑end governance is platform‑agnostic. This repository illustrates on
 > [!IMPORTANT]
 > Please read this scenario carefully to understand the decisions behind the model used in this sample repository.
 
-Any governance model must be tied to the organization's business rules, which are reflected in any technical implementation of access controls. This example model uses a fictitious _Building Materials_ company with the following common scenario (with business requirements):
+Any governance model must be tied to the organization's business rules, which are reflected in any technical implementation of access controls. This example model uses a fictitious international _Building Materials_ company with the following common scenario (with business requirements):
 
 - **Align with business domains and permissions models**  
-  The organization has many vertical business domains, such as "_hardware_" and "_finishing_," which operate largely independently. In each business domain, there are three levels or privileges, which are mapped to distinct `*-admins`, `*-devs` or `*-stake(holder)s` Microsoft Entra groups. This allows developers and stakeholders to be targeted when configuring permissions in the cloud.
+  The international organization has many Operational Companies (OpCo's), such as "_The portugal_" and "_netherlands_," which operate largely independently. In each OpCo, there are three levels or privileges, which are mapped to distinct `*-admins`, `*-devs` or `*-stake(holder)s` Microsoft Entra groups. This allows developers and stakeholders to be targeted when configuring permissions in the cloud.
 
 - **Staged deployment environments**  
   Every business domain has two environments:
@@ -54,7 +54,7 @@ Any governance model must be tied to the organization's business rules, which ar
   Every application should implement Azure DevOps not just for _continuous integration_ (CI), but also for _continuous deployment_ (CD). For example, deployments can be automatically triggered by changes to the Git repository See [branch strategy diagram](#branch-strategy) sample.
 
 - **Cloud journey**  
-  The organization started with an isolated project model to accelerate the journey to the cloud. But now they are exploring options to break silos and encourage collaboration by creating the "_collaboration_" and "_building materials_" projects.
+  The organization started with an isolated project model to accelerate the OpCo's journey to the cloud. But now they are exploring options to break silos and encourage collaboration by creating an `ccoe` project; Cloud Center of Excellence (CCoE).
 
 ### Branch strategy
 
@@ -73,7 +73,7 @@ This diagram illustrates that connecting Azure Resource Manager (ARM) and CI/CD 
 [![e2egov-design](./.assets/e2egov-design.png)](./.assets/e2egov-design-large.png)  
 <sub>Image: End-to-end governance diagram</sub>
 
-> To make the concept easier to understand, the diagram only illustrates the `hardware` business domain. Other business domains would look similar and use the same naming conventions.
+> To make the concept easier to understand, the diagram only illustrates the `portugal` business domain. Other business domains would look similar and use the same naming conventions.
 
 ### Workflow
 The numbering reflects the order in which administrators and enterprise architects think about and configure their cloud resources.
@@ -102,11 +102,11 @@ The numbering reflects the order in which administrators and enterprise architec
 
    | Principal | Production | Development |
    | :-- | :-- | :-- |
-   | `sg-hardware-stakes` | _Reader_ | _Reader_ |
-   | `sg-hardware-devs` | _Contributor_ | _Owner_ |
-   | `sg-hardware-admins` | _Owner_ | _Owner_ |
-   | `id-hardware-dev` | - | _Custom Role_ * |
-   | `id-hardware-prd` | _Custom Role_ * | - |
+   | `sg-portugal-stakes` | _Reader_ | _Reader_ |
+   | `sg-portugal-devs` | _Contributor_ | _Owner_ |
+   | `sg-portugal-admins` | _Owner_ | _Owner_ |
+   | `id-portugal-dev` | - | _Custom Role_ * |
+   | `id-portugal-prd` | _Custom Role_ * | - |
 
    > \* In real life scenarios you should create a _Custom Role_ that prevents a managed identity from removing any [management locks](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/lock-resources) that you've placed on your resources. This helps protect resources from accidental damage, such as database deletion. This can be easily done with the Bicep [avm/ptn/authorization/role-definition](https://github.com/Azure/bicep-registry-modules/tree/main/avm/ptn/authorization/role-definition) template from the [Azure Verified Modules](https://github.com/Azure/bicep-registry-modules) repo. An [example](iac/authorization/role-definition/main.bicep) is included in this demo project.
 
@@ -121,17 +121,17 @@ The numbering reflects the order in which administrators and enterprise architec
 
    | Group name | Scope | Azure role | Azure DevOps role |
    | :-- | :-- | :-- | :-- |
-   | `sg-hardware-collab-on-repo-a` ¹ | - | - | Repo-scoped permissions only |
-   | `sg-hardware-stakes` | `rg-hardware-prd` | Reader | Reader |
-   | `sg-hardware-devs` | `rg-hardware-dev` | Contributor | Contributor |
-   | `sg-hardware-admins` | `rg-hardware-prd` | Owner | Project Administrators |
-   | `sg-finishing-stakes` | `rg-hardware-prd` | Reader | Reader |
-   | `sg-finishing-devs` | `rg-finishing-dev` | Contributor | Contributor |
-   | `sg-finishing-admins` | `rg-finishing-prd` | Owner | Project Administrators |
+   | `sg-portugal-collab-on-repo-a` ¹ | - | - | Repo-scoped permissions only |
+   | `sg-portugal-stakes` | `rg-portugal-prd` | Reader | Reader |
+   | `sg-portugal-devs` | `rg-portugal-dev` | Contributor | Contributor |
+   | `sg-portugal-admins` | `rg-portugal-prd` | Owner | Project Administrators |
+   | `sg-netherlands-stakes` | `rg-portugal-prd` | Reader | Reader |
+   | `sg-netherlands-devs` | `rg-netherlands-dev` | Contributor | Contributor |
+   | `sg-netherlands-admins` | `rg-netherlands-prd` | Owner | Project Administrators |
    | `sg-shared-devs` | `rg-shared-dev` | Contributor | Contributor |
    | `sg-shared-admins` | `rg-shared-prd` | Owner | Project Administrators |
 
-   ¹ In a scenario of limited cross‑project collaboration, such as the `hardware` team inviting the `finishing` team to collaborate on a _single_ repository, they would use a specific `*-hardware-collab-on-repo-a` group with limited repo-scoped permissions only, all other content remains invisible. Please read [A Cross-project Collaboration Scenario](docs/cross-project-collaboration-scenario.md) for more details.
+   ¹ In a scenario of limited cross‑project collaboration, such as the `portugal` team inviting the `netherlands` team to collaborate on a _single_ repository, they would use a specific `*-portugal-collab-on-repo-a` group with limited repo-scoped permissions only, all other content remains invisible. Please read [A Cross-project Collaboration Scenario](docs/cross-project-collaboration-scenario.md) for more details.
 
 6. **Service connections**  
    In Azure DevOps, a [Service Connection](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints) is a generic wrapper around a credential. This demo creates a service connection that holds the [App Registration](https://learn.microsoft.com/en-us/azure/devops/pipelines/release/configure-workload-identity?view=azure-devops&tabs=app-registration) and [Workload Identity Federation](https://learn.microsoft.com/en-us/azure/devops/pipelines/release/configure-workload-identity?view=azure-devops&tabs=managed-identity) configuration. Project Administrators can configure access to this [protected resource](https://learn.microsoft.com/en-us/azure/devops/pipelines/security/resources#protected-resources) when needed, such as when requiring human approval before deploying. This reference architecture has two minimum protections on the service connection:
