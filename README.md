@@ -111,7 +111,7 @@ The numbering reflects the order in which administrators and enterprise architec
 
    > \* In real life scenarios you should create a _Custom Role_ that prevents a managed identity from removing any [management locks](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/lock-resources) that you've placed on your resources. This helps protect resources from accidental damage, such as database deletion. See [Create a custom role for the service principal](#create-a-custom-role-for-the-service-principal) later in this document.
 
-   This implementation follows structured _naming patterns_ defined in [schemas/abbreviations.schema.json](schemas/abbreviations.schema.json).
+   This implementation follows structured _naming patterns_ defined in [src/cfg/main.abbreviations.json](src/cfg/main.abbreviations.json).
 
    Examples:
    - `id-*`: User-assigned managed identities
