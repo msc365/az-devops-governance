@@ -95,15 +95,9 @@ The numbering reflects the order in which administrators and enterprise architec
 
 4. **Role assignments in Azure**  
    While these Entra group names suggest specific roles, access control is only enforced once a role assignment is set up. This process involves assigning a role to a Microsoft Entra principal within a defined scope. For instance, _Developers_ are granted the _Contributor_ role in the production environment.
-   While these Entra group names suggest specific roles, access control is only enforced once a role assignment is set up. This process involves assigning a role to a Microsoft Entra principal within a defined scope. For instance, _Developers_ are granted the _Contributor_ role in the production environment.
 
    | Principal | Production | Development |
    | :-- | :-- | :-- |
-   | `sg-hardware-stakes` | _Reader_ | _Reader_ |
-   | `sg-hardware-devs` | _Contributor_ | _Owner_ |
-   | `sg-hardware-admins` | _Owner_ | _Owner_ |
-   | `id-hardware-dev` | - | _Custom Role_ * |
-   | `id-hardware-prd` | _Custom Role_ * | - |
    | `sg-hardware-stakes` | _Reader_ | _Reader_ |
    | `sg-hardware-devs` | _Contributor_ | _Owner_ |
    | `sg-hardware-admins` | _Owner_ | _Owner_ |
@@ -123,7 +117,7 @@ The numbering reflects the order in which administrators and enterprise architec
 
    | Group name | Scope | Azure role | Azure DevOps role |
    | :-- | :-- | :-- | :-- |
-   | `sg-hardware-collab-on-repo-a` ¹ | - | - | Gets repo-scoped permissions only, all other content remains invisible. |
+   | `sg-hardware-collab-on-repo-a` ¹ | - | - | Repo-scoped permissions only |
    | `sg-hardware-stakes` | `rg-hardware-prd` | Reader | Reader |
    | `sg-hardware-devs` | `rg-hardware-dev` | Contributor | Contributor |
    | `sg-hardware-admins` | `rg-hardware-prd` | Owner | Project Administrators |
@@ -133,7 +127,7 @@ The numbering reflects the order in which administrators and enterprise architec
    | `sg-shared-devs` | `rg-shared-dev` | Contributor | Contributor |
    | `sg-shared-admins` | `rg-shared-prd` | Owner | Project Administrators |
 
-   ¹ In a scenario of limited cross‑project collaboration, such as the `hardware` team inviting the `finishing` team to collaborate on a _single_ repository, they would use a specific `*-hardware-collab-on-repo-a` security group with limited permissions.
+   ¹ In a scenario of limited cross‑project collaboration, such as the `hardware` team inviting the `finishing` team to collaborate on a _single_ repository, they would use a specific `*-hardware-collab-on-repo-a` group with limited repo-scoped permissions only, all other content remains invisible. Please see [A Cross-project Collaboration Scenario](docs/cross-project-collaboration-scenario.md) for detailed information.
 
 6. **Service connections**  
    In Azure DevOps, a [Service Connection](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints) is a generic wrapper around a credential. This demo creates a service connection that holds the [App Registration](https://learn.microsoft.com/en-us/azure/devops/pipelines/release/configure-workload-identity?view=azure-devops&tabs=app-registration) and [Workload Identity Federation](https://learn.microsoft.com/en-us/azure/devops/pipelines/release/configure-workload-identity?view=azure-devops&tabs=managed-identity) configuration. Project Administrators can configure access to this [protected resource](https://learn.microsoft.com/en-us/azure/devops/pipelines/security/resources#protected-resources) when needed, such as when requiring human approval before deploying. This reference architecture has two minimum protections on the service connection:
