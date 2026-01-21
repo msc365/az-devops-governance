@@ -35,7 +35,8 @@ End‑to‑end governance is platform‑agnostic. This repository illustrates on
 
 ## Use cases
 
-Please read this scenario carefully to understand the decisions behind the model used in this sample repository.
+> [!IMPORTANT]
+> Please read this scenario carefully to understand the decisions behind the model used in this sample repository.
 
 Any governance model must be tied to the organization's business rules, which are reflected in any technical implementation of access controls. This example model uses a fictitious _Building Materials_ company with the following common scenario (with business requirements):
 
