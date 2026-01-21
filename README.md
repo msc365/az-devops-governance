@@ -29,6 +29,7 @@ End‑to‑end governance is platform‑agnostic. This repository illustrates on
 - [Architecture](#architecture)
 - [Considerations](#considerations)
 - [Components](#components)
+- [Prerequisites](#prerequisites)
 - [Deploy this scenario](#deploy-this-scenario)
 - [Support](#support)
 - [License](#license)
@@ -108,7 +109,12 @@ The numbering reflects the order in which administrators and enterprise architec
    | `id-portugal-dev` | - | _Custom Role_ * |
    | `id-portugal-prd` | _Custom Role_ * | - |
 
-   > \* In real life scenarios you should create a _Custom Role_ that prevents a managed identity from removing any [management locks](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/lock-resources) that you've placed on your resources. This helps protect resources from accidental damage, such as database deletion. This can be easily done with the Bicep [avm/ptn/authorization/role-definition](https://github.com/Azure/bicep-registry-modules/tree/main/avm/ptn/authorization/role-definition) template from the [Azure Verified Modules](https://github.com/Azure/bicep-registry-modules) repo. An [example](iac/authorization/role-definition/main.bicep) is included in this demo project.
+   **Naming Convention**: This implementation follows structured naming patterns defined in [schemas/abbreviations.schema.json](schemas/abbreviations.schema.json). Examples:
+   - `id-*`: User-assigned managed identities
+   - `sg-*`: Security groups
+   - `rg-*`: Resource groups
+
+   > \* In real life scenarios you should create a _Custom Role_ that prevents a managed identity from removing any [management locks](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/lock-resources) that you've placed on your resources. This helps protect resources from accidental damage, such as database deletion. See [Create a custom role for the service principal](#create-a-custom-role-for-the-service-principal) later in this document.
 
 5. **Security group assignments in Azure DevOps**  
    Security groups function like roles in Azure. Take advantage of built-in roles and default to [Contributor](https://learn.microsoft.com/en-us/azure/devops/user-guide/roles#contributor-roles) for developers. Admins get assigned to the [Project Administrator](https://learn.microsoft.com/en-us/azure/devops/user-guide/roles#project-administrators) security group for elevated permissions, allowing them to configure security permissions.
@@ -131,7 +137,7 @@ The numbering reflects the order in which administrators and enterprise architec
    | `sg-shared-devs` | `rg-shared-dev` | Contributor | Contributor |
    | `sg-shared-admins` | `rg-shared-prd` | Owner | Project Administrators |
 
-   ¹ In a scenario of limited cross‑project collaboration, such as the `portugal` team inviting the `netherlands` team to collaborate on a _single_ repository, they would use a specific `*-portugal-collab-on-repo-a` group with limited repo-scoped permissions only, all other content remains invisible. Please read [A Cross-project Collaboration Scenario](docs/cross-project-collaboration-scenario.md) for more details.
+   ¹ Limited collaboration group. For cross-project scenarios where the Portugal team needs to share a single repository with Netherlands team. See [Cross-project Collaboration Scenario](docs/cross-project-collaboration-scenario.md) for details.
 
 6. **Service connections**  
    In Azure DevOps, a [Service Connection](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints) is a generic wrapper around a credential. This demo creates a service connection that holds the [App Registration](https://learn.microsoft.com/en-us/azure/devops/pipelines/release/configure-workload-identity?view=azure-devops&tabs=app-registration) and [Workload Identity Federation](https://learn.microsoft.com/en-us/azure/devops/pipelines/release/configure-workload-identity?view=azure-devops&tabs=managed-identity) configuration. Project Administrators can configure access to this [protected resource](https://learn.microsoft.com/en-us/azure/devops/pipelines/security/resources#protected-resources) when needed, such as when requiring human approval before deploying. This reference architecture has two minimum protections on the service connection:
@@ -154,11 +160,11 @@ To successfully secure your workloads, you must use a combination of security pe
 <!-- omit from toc -->
 ## Baseline CI/CD workflow breakdown
 
-| No <br><br> | Development stages | Responsibility <br><br> | Description <br><br> |
+| No | Development stages | Responsibility | Description |
 | :-- | :-- | :-- | :-- |
 | ![bullet 1](.assets/e2egov-no1.png) | Pull Requests | User | Engineers should peer review their work, including the Pipeline code itself. |
 | ![bullet 2](.assets/e2egov-no2.png) | Branch Protection | Shared | Configure [Azure DevOps](https://learn.microsoft.com/en-us/azure/devops/repos/git/branch-policies) to reject changes that do not meet certain standards, such as CI checks and peer reviews (via pull requests). |
-| ![bullet 3](.assets/e2egov-no3.png) | Pipeline as Code | User  | A build server will delete your entire production environment if the pipeline code instructs it to do so. Help prevent this by using a combination of pull requests and branch protection rules, such as human approval. |
+| ![bullet 3](.assets/e2egov-no3.png) | Pipeline as Code | User | A build server will delete your entire production environment if the pipeline code instructs it to do so. Help prevent this by using a combination of pull requests and branch protection rules, such as human approval. |
 | ![bullet 4](.assets/e2egov-no4.png) | Service Connections | Shared | Configure Azure DevOps to restrict access to these credentials. |
 | ![bullet 5](.assets/e2egov-no5.png) | Azure Resources | Shared | Configure RBAC in Resource Manager. |
 
@@ -218,7 +224,8 @@ But a CI/CD Build Agent will delete your entire production environment if told t
 - Removes Key Vault access policies
 - Removes [management locks](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/lock-resources) that by design should prevent resources from being deleted (a common requirement in regulated industries)
 
-To do this, we create a custom role and remove the `Microsoft.Authorization/*/Delete` actions.
+To do this, we create a custom role that removes destructive permissions.  
+See [iac/ptn/authorization/role-definition/main.bicep](iac/ptn/authorization/role-definition/main.bicep) for a working example that removes `Microsoft.Authorization/*/Delete` actions.
 
 ```json
 {
@@ -248,6 +255,18 @@ If that removes too many permissions for your purposes, refer to the full list i
 - [Azure Repos](https://azure.microsoft.com/en-us/products/devops/repos/)
 - [Azure Pipelines](https://azure.microsoft.com/en-us/products/devops/pipelines/)
 
+
+## Prerequisites
+
+- Azure subscription with appropriate permissions
+- Azure DevOps organization
+- Microsoft Entra ID tenant
+- PowerShell 7.x or later
+- Azure PowerShell modules
+- PSake module for build tasks
+- Required Azure RBAC permissions  
+  (Subscription Owner or User Access Administrator)
+
 ## Deploy this scenario
 
 This scenario extends beyond Azure Resource Manager. This is way we use **Bicep templates** for Azure infrastructure provisioning and Microsoft Entra ID group management, and **PowerShell scripts** for Azure DevOps bootstrapping. This combination provides declarative infrastructure-as-code for Azure resources and identity while leveraging PowerShell's flexibility for DevOps operations in a declarative DSC like approach.
@@ -268,7 +287,7 @@ new issues to avoid duplicates.
 ![logo small martin swinkels cloud](.assets/logo-small.png)  
 Part of Martin's Cloud on GitHub
 
-Copyright (c) 2026 MSc365.eu by Martin Swinkels
+Copyright (c) 2025 MSc365.eu by Martin Swinkels
 
 Portions of the documentation in this repository are adapted from Microsoft Corporation's
 documentation and the article "End-to-end governance in Azure when using CI/CD" by Julie Ng
