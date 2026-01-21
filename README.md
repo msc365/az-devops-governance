@@ -3,10 +3,11 @@
 
 [![GitHub release (latest)](https://img.shields.io/github/v/release/msc365/az-devops-governance?include_prereleases&logo=github)](https://github.com/msc365/az-devops-governance/releases) [![License](https://img.shields.io/badge/license-MIT-purple)](https://github.com/msc365/az-devops-governance/blob/main/LICENSE)
 
-This repository includes _Bicep templates_ and _PowerShell scripts_ that demonstrate a complete **Azure governance model**. The template examples showcase how to implement end-to-end governance from _Azure DevOps_ and CI/CD pipelines to _Azure_ deployments, aligning with best practices for enterprise-grade cloud architecture.
+This repository demonstrates a complete **Azure governance model** using _Bicep templates_ and _PowerShell scripts_. It shows how to implement end-to-end governance from _Azure DevOps_ and CI/CD pipelines through to _Azure_ deployments, following enterprise-grade cloud architecture best practices.
 
-> [!NOTE]
-> This project is based on the concepts described in [End-to-end governance in Azure when using CI/CD](https://learn.microsoft.com/en-us/devops/operate/governance-cicd) (Julie Ng, Microsoft), which illustrates the approach using _Terraform_ as the infrastructure-as-code (IaC) tool. As an alternative, this repository uses **Bicep templates** for Azure IaC where applicable and provides **PowerShell scripts** for Azure DevOps resource, built on the [Azure.DevOps.PSModule](https://github.com/msc365/az-devops-psmodule). The repository also adopts modern best practices by using [workload identity federation](https://devblogs.microsoft.com/devops/workload-identity-federation-for-azure-deployments-is-now-generally-available/) for Azure Pipelines instead of traditional service principals, improving both security and manageability.
+While Terraform and Bicep excel at Azure infrastructure provisioning, they, _like the Azure DevOps REST API_, lack a cohesive approach for provisioning complete Azure DevOps projects with all necessary configurations. Simple tasks like creating a team require multiple sequential API calls to configure area paths, iteration paths, and group memberships separately. This repository solves these challenges with fully functional PowerShell scripts built on the [Azure.DevOps.PSModule](https://github.com/msc365/az-devops-psmodule), providing a streamlined, declarative approach to Azure DevOps resource management.
+
+The implementation combines **Bicep templates** for Azure infrastructure and Microsoft Entra ID group management with **PowerShell scripts** for Azure DevOps automation. It adopts modern security practices including [workload identity federation](https://devblogs.microsoft.com/devops/workload-identity-federation-for-azure-deployments-is-now-generally-available/) for Azure Pipelines, replacing traditional service principals to improve security and manageability.
 
 <!-- omit from toc -->
 ## Key features
@@ -63,12 +64,14 @@ This simplified diagram shows how branches in a Git repository map to developmen
 
 ## Architecture
 
+> [!NOTE]
+> This project is based on the concepts described in [end-to-end governance in Azure when using CI/CD](https://learn.microsoft.com/en-us/devops/operate/governance-cicd) (by Julie Ng, Senior Service Engineer at Microsoft), which illustrates the approach using _Terraform_ as the infrastructure-as-code (IaC) tool.
+
 This diagram illustrates that connecting Azure Resource Manager (ARM) and CI/CD to Microsoft Entra ID is crucial for establishing a comprehensive governance model.
 
 [![e2egov-design](./.assets/e2egov-design.png)](./.assets/e2egov-design-large.png)  
 <sub>Image: End-to-end governance diagram</sub>
 
-> [!NOTE]  
 > To make the concept easier to understand, the diagram only illustrates the `hardware` business domain. Other business domains would look similar and use the same naming conventions.
 
 ### Workflow
@@ -264,7 +267,14 @@ new issues to avoid duplicates.
 ![logo small martin swinkels cloud](.assets/logo-small.png)  
 Part of Martin's Cloud on GitHub
 
-[MIT License](LICENSE) | Copyright (c) 2025-2026 MSc365.eu by Martin Swinkels
+Copyright (c) 2026 MSc365.eu by Martin Swinkels
+
+Portions of the documentation in this repository are adapted from Microsoft Corporation's
+documentation and the article "End-to-end governance in Azure when using CI/CD" by Julie Ng
+(Microsoft Corporation), used under the MIT License.
+
+This project is published under the MIT license.  
+See [MIT License](LICENSE) for details.
 
 <!-- omit from toc -->
 ## Disclaimer
