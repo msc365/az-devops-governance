@@ -31,26 +31,34 @@ process {
         # Replace placeholders in parameters using utility function
         $paramsAsJson = Set-PlaceholderValue -ParamsJson $paramsAsJson -ConfigJson $configAsJson
 
-        # Convert JSON string to Hashtable
-        $params = $paramsAsJson | ConvertFrom-Json -AsHashtable
-
-        # Remove $schema key if it exists
-        if ($params.ContainsKey('$schema')) {
-            $params.Remove('$schema') | Out-Null
-        }
+        # Convert JSON string to PSCustomObject to preserve pipeline property binding
+        $params = $paramsAsJson | ConvertFrom-Json
 
         Write-Verbose "Using params: $($params | ConvertTo-Json -Depth 5)"
 
-        # Execute the deployment template with parameters
-        $params += @{
-            Rollback = $Rollback.IsPresent
-            WhatIf   = $WhatIfPreference
-            Confirm  = $ConfirmPreference
-            Verbose  = $VerbosePreference
+        # Extract common parameters
+        $collectionUri = $params.collectionUri
+        $projectName = $params.projectName
+        $environments = $params.environments
+
+        if ($null -eq $environments -or $environments.Count -eq 0) {
+            throw 'No environments found in parameter file. At least one environment is required.'
         }
 
-        & (Join-Path $PSScriptRoot -ChildPath $TemplateFile) @params
+        Write-Verbose "Processing $($environments.Count) environment(s) via pipeline..."
 
+        # Prepare script parameters for common values
+        $scriptParams = @{
+            CollectionUri = $collectionUri
+            ProjectName   = $projectName
+            Rollback      = $Rollback.IsPresent
+            WhatIf        = $WhatIfPreference
+            Confirm       = $ConfirmPreference
+            Verbose       = $VerbosePreference
+        }
+
+        # Pipe environments to main.ps1
+        $environments | & (Join-Path $PSScriptRoot -ChildPath $TemplateFile) @scriptParams
     } catch {
         throw $_
     }

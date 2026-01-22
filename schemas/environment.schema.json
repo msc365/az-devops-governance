@@ -1,39 +1,42 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "$id": "https://raw.githubusercontent.com/msc365/az-devops-governance/main/schemas/environment.schema.json",
-    "oneOf": [
-        {
-            "$ref": "#/definitions/environment"
+    "type": "object",
+    "required": [
+        "collectionUri",
+        "projectName",
+        "environments"
+    ],
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "JSON Schema reference"
         },
-        {
+        "collectionUri": {
+            "type": "string",
+            "description": "The Azure DevOps collection URI"
+        },
+        "projectName": {
+            "type": "string",
+            "description": "The Azure DevOps project ID or Name"
+        },
+        "environments": {
             "type": "array",
+            "description": "Array of environments to create",
             "items": {
                 "$ref": "#/definitions/environment"
             },
             "minItems": 1
         }
-    ],
+    },
+    "additionalProperties": false,
     "definitions": {
         "environment": {
             "type": "object",
             "required": [
-                "collectionUri",
-                "projectName",
                 "name"
             ],
             "properties": {
-                "$schema": {
-                    "type": "string",
-                    "description": "JSON Schema reference"
-                },
-                "collectionUri": {
-                    "type": "string",
-                    "description": "The Azure DevOps collection URI"
-                },
-                "projectName": {
-                    "type": "string",
-                    "description": "The Azure DevOps project ID or Name"
-                },
                 "name": {
                     "type": "string",
                     "description": "The name of the environment"

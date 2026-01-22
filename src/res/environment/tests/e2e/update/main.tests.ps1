@@ -25,9 +25,6 @@ $params = @{
 
 $rootPath = (Get-Item $PSScriptRoot).Parent.Parent.Parent.FullName
 
-$subscriptionId = (Get-AzContext).Subscription.Id
-$params['SubscriptionId'] = $subscriptionId
-
 #endregion
 
 #region TEST EXECUTION

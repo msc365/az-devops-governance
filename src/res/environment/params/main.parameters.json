@@ -2,6 +2,14 @@
     "$schema": "../../../../schemas/environment.schema.json",
     "collectionUri": "{collectionUri}",
     "projectName": "{prefix}-prj{uniqueId}",
-    "name": "env-{prefix}-prj{uniqueId}-tst",
-    "description": ""
+    "environments": [
+        {
+            "name": "env-{prefix}-prj{uniqueId}-dev",
+            "description": ""
+        },
+        {
+            "name": "env-{prefix}-prj{uniqueId}-prd",
+            "description": ""
+        }
+    ]
 }

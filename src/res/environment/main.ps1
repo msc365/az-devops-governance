@@ -27,8 +27,7 @@
 .DESCRIPTION
     This PowerShell script creates, updates or rolls back an Azure DevOps Environment.
 
-    It provides comprehensive environment management capabilities including configuration of an optional resource group
-    and its properties as a scoped environment.
+    It provides comprehensive environment management capabilities including creation, updating properties, and removal of environments.
 
 .PARAMETER CollectionUri
     Optional. The collection URI of the Azure DevOps collection/organization, e.g., `https://dev.azure.com/my-org`.
@@ -57,7 +56,7 @@
         lastModifiedOn = Timestamp of last modification
         projectName    = Azure DevOps Project Name
         collectionUri  = Azure DevOps Collection URI
-        status         = Operation Status (Created, Updated, NoChange, Removed, NotFound, Skipped)
+        status         = Operation Status (Created, Updated, NoChange, Removed, NotFound)
     }
 
 .EXAMPLE
@@ -125,10 +124,10 @@ param (
     [Parameter()]
     [string]$ProjectName = $env:DefaultAdoProjectName,
 
-    [Parameter(Mandatory)]
+    [Parameter(Mandatory, ValueFromPipelineByPropertyName)]
     [string]$Name,
 
-    [Parameter()]
+    [Parameter(ValueFromPipelineByPropertyName)]
     [string]$Description,
 
     [Parameter()]
