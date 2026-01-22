@@ -58,7 +58,7 @@ param (
 )
 
 begin {
-    Write-Verbose ('[Enter]: .\src\res\service-connection\modules\{0}' -f $MyInvocation.MyCommand.Name)
+    Write-Verbose ('[Enter]: ./src\res\service-connection\modules\{0}' -f $MyInvocation.MyCommand.Name)
 }
 
 process {
@@ -168,5 +168,5 @@ process {
 }
 
 end {
-    Write-Verbose ('[Exit]: .\src\res\service-connection\modules\{0}' -f $MyInvocation.MyCommand.Name)
+    Write-Verbose ('[Exit]: ./src\res\service-connection\modules\{0}' -f $MyInvocation.MyCommand.Name)
 }

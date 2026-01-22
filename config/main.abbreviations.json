@@ -1,5 +1,5 @@
 {
-    "$schema": "../../schemas/abbreviations.schema.json",
+    "$schema": "../schemas/abbreviations.schema.json",
     "azure": {
         "automationAccounts": "aa",
         "azureFirewallPolicies": "afwp",

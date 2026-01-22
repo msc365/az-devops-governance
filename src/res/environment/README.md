@@ -45,7 +45,7 @@ and its properties as a scoped environment.
 ```powershell
 $deploySplat = @{
     TemplateFile          = 'main.ps1'
-    TemplateParameterFile = 'params\main.parameters.json'
+    TemplateParameterFile = 'params/main.parameters.json'
 }
 
 .\deploy.ps1 @deploySplat -Verbose
@@ -77,7 +77,7 @@ Deploys the environment using the specified template and custom parameters.
 ```powershell
 $rollbackSplat = @{
     TemplateFile          = 'main.ps1'
-    TemplateParameterFile = 'params\main.parameters.json'
+    TemplateParameterFile = 'params/main.parameters.json'
 }
 
 .\deploy.ps1 @rollbackSplat -Rollback -Confirm:$false -Verbose

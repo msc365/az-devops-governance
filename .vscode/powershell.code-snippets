@@ -32,7 +32,7 @@
 			"    )",
 			"",
 			"    begin {",
-			"        Write-Verbose (\"[Enter]: .\\\\$(\\$MyInvocation.MyCommand.Name)\")",
+			"        Write-Verbose (\"[Enter]: ./\\\$(\\$MyInvocation.MyCommand.Name)\")",
 			"    }",
 			"",
 			"    process {",
@@ -69,7 +69,7 @@
 			"    }",
 			"",
 			"    end {",
-			"        Write-Verbose (\"[Exit]: .\\\\$(\\$MyInvocation.MyCommand.Name)\")",
+			"        Write-Verbose (\"[Exit]: ./\\\$(\\$MyInvocation.MyCommand.Name)\")",
 			"    }",
 			"}"
 		]

@@ -44,7 +44,7 @@ It also creates the necessary role assignments for the MSI to access Azure resou
 ```powershell
 $deploySplat = @{
     TemplateFile          = 'main.ps1'
-    TemplateParameterFile = 'params\main.parameters.json'
+    TemplateParameterFile = 'params/main.parameters.json'
 }
 
 .\deploy.ps1 @deploySplat -Verbose
@@ -76,7 +76,7 @@ Deploys the service connection using the specified template and custom parameter
 ```powershell
 $rollbackSplat = @{
     TemplateFile          = 'main.ps1'
-    TemplateParameterFile = 'params\main.parameters.json'
+    TemplateParameterFile = 'params/main.parameters.json'
 }
 
 .\deploy.ps1 @rollbackSplat -Rollback -Force -Verbose

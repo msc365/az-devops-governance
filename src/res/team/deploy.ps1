@@ -4,10 +4,10 @@ param (
     [string]$templateFile = 'main.ps1',
 
     [Parameter()]
-    [string]$templateParameterFile = 'params\main.parameters.json',
+    [string]$templateParameterFile = 'params/main.parameters.json',
 
     [Parameter()]
-    [string]$ConfigFile = '..\..\cfg\main.config.json',
+    [string]$ConfigFile = '../../../config/main.config.json',
 
     [Parameter()]
     [switch]$Rollback,
@@ -17,10 +17,10 @@ param (
 )
 
 begin {
-    Write-Verbose "[Enter]: .\$($MyInvocation.MyCommand.Name)"
+    Write-Verbose "[Enter]: ./src/res/team/$($MyInvocation.MyCommand.Name)"
 
     # Import utility functions
-    . (Join-Path $PSScriptRoot -ChildPath '..\..\utl\Set-PlaceholderValue.ps1' -ErrorAction Stop)
+    . (Join-Path $PSScriptRoot -ChildPath '../../utl/Set-PlaceholderValue.ps1' -ErrorAction Stop)
 }
 
 process {
@@ -61,5 +61,5 @@ process {
 }
 
 end {
-    Write-Verbose "[Exit]: .\$($MyInvocation.MyCommand.Name)"
+    Write-Verbose "[Exit]: ./src/res/team/$($MyInvocation.MyCommand.Name)"
 }

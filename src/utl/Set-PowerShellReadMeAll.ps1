@@ -34,7 +34,7 @@
 [CmdletBinding()]
 param (
     [Parameter(Mandatory = $false)]
-    [string] $Path = '.\src\res',
+    [string] $Path = './src/res',
 
     [Parameter(Mandatory = $false)]
     [string] $ScriptFilter = 'main.ps1',

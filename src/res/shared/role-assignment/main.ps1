@@ -100,7 +100,7 @@ param (
 )
 
 begin {
-    Write-Verbose "[Enter]: .\src\res\shared\role-assignment\$($MyInvocation.MyCommand.Name)"
+    Write-Verbose "[Enter]: ./src/res/shared/role-assignment/$($MyInvocation.MyCommand.Name)"
 }
 
 process {
@@ -333,5 +333,5 @@ process {
 }
 
 end {
-    Write-Verbose "[Exit]: .\src\res\shared\role-assignment\$($MyInvocation.MyCommand.Name)"
+    Write-Verbose "[Exit]: ./src/res/shared/role-assignment/$($MyInvocation.MyCommand.Name)"
 }

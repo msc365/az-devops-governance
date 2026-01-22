@@ -31,7 +31,7 @@ param (
 )
 
 begin {
-    Write-Verbose ("[Enter]: .\$($MyInvocation.MyCommand.Name)")
+    Write-Verbose ("[Enter]: ./modules/$($MyInvocation.MyCommand.Name)")
 }
 
 process {
@@ -118,6 +118,6 @@ process {
 }
 
 end {
-    Write-Verbose ("[Exit]: .\$($MyInvocation.MyCommand.Name)")
+    Write-Verbose ("[Exit]: ./modules/$($MyInvocation.MyCommand.Name)")
 }
 

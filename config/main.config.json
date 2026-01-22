@@ -1,5 +1,5 @@
 {
-    "$schema": "../../schemas/config.schema.json",
+    "$schema": "../schemas/config.schema.json",
     "uniqueId": "Hb72x9",
     "prefix": "e2egov",
     "location": "westeurope",

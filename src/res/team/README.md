@@ -45,7 +45,7 @@ If the team already exists, it updates the properties and settings as needed.
 ```powershell
 $deploySplat = @{
     TemplateFile          = 'main.ps1'
-    TemplateParameterFile = 'params\main.parameters.json'
+    TemplateParameterFile = 'params/main.parameters.json'
 }
 
 .\deploy.ps1 @deploySplat -Verbose
@@ -77,7 +77,7 @@ Deploys the team using the specified template and custom parameters.
 ```powershell
 $rollbackSplat = @{
     TemplateFile          = 'main.ps1'
-    TemplateParameterFile = 'params\main.parameters.json'
+    TemplateParameterFile = 'params/main.parameters.json'
 }
 
 .\deploy.ps1 @rollbackSplat -Rollback -Force -Verbose

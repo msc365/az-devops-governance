@@ -69,7 +69,7 @@ param (
 )
 
 begin {
-    Write-Verbose "[Enter]: .\$($MyInvocation.MyCommand.Name)"
+    Write-Verbose "[Enter]: ./src/res/group/$($MyInvocation.MyCommand.Name)"
 
     if ($null -eq (Get-AzContext)) {
         throw 'No Azure context found. Please login using Connect-AzAccount.'
@@ -354,5 +354,5 @@ process {
 }
 
 end {
-    Write-Verbose "[Exit]: .\$($MyInvocation.MyCommand.Name)"
+    Write-Verbose "[Exit]: ./src/res/group/$($MyInvocation.MyCommand.Name)"
 }

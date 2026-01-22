@@ -4,7 +4,7 @@ using '../main.bicep'
 // VARIABLES //
 // --------- //
 
-var config = loadJsonContent('../../../../../src/cfg/main.config.json')
+var config = loadJsonContent('../../../../../config/main.config.json')
 
 var serviceShort = '${config.prefix}-prj${config.uniqueId}'
 

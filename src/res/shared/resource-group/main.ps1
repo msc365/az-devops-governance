@@ -76,7 +76,7 @@ param (
 )
 
 begin {
-    Write-Verbose "[Enter]: .\src\res\shared\resource-group\$($MyInvocation.MyCommand.Name)"
+    Write-Verbose "[Enter]: ./src/res/shared/resource-group/$($MyInvocation.MyCommand.Name)"
 
     # Variables
     $ctxInfo = $null
@@ -85,8 +85,7 @@ begin {
     if ($PSBoundParameters.ContainsKey('SubscriptionId') -and
         -not [string]::IsNullOrWhiteSpace($SubscriptionId)) {
 
-        . (Join-Path -Path $PSScriptRoot -ChildPath '..\..\..\utl\Set-AzContextInfo.ps1')
-
+        . (Join-Path -Path $PSScriptRoot -ChildPath '../../../utl/Set-AzContextInfo.ps1')
         $ctxInfo = Set-AzContextInfo -SubscriptionId $SubscriptionId -Verbose:$VerbosePreference
     }
 
@@ -241,5 +240,5 @@ process {
 }
 
 end {
-    Write-Verbose "[Exit]: .\src\res\shared\resource-group\$($MyInvocation.MyCommand.Name)"
+    Write-Verbose "[Exit]: ./src/res/shared/resource-group/$($MyInvocation.MyCommand.Name)"
 }

@@ -4,7 +4,7 @@ param (
     [string]$templateFile = 'main.ps1',
 
     [Parameter()]
-    [string]$templateParameterFile = 'params\main.parameters.json',
+    [string]$templateParameterFile = 'params/main.parameters.json',
 
     [Parameter()]
     [switch]$Remove,
@@ -14,7 +14,7 @@ param (
 )
 
 begin {
-    Write-Verbose "[Enter]: .\$($MyInvocation.MyCommand.Name)"
+    Write-Verbose "[Enter]: ./$($MyInvocation.MyCommand.Name)"
 }
 
 process {
@@ -49,5 +49,5 @@ process {
 }
 
 end {
-    Write-Verbose "[Exit]: .\$($MyInvocation.MyCommand.Name)"
+    Write-Verbose "[Exit]: ./$($MyInvocation.MyCommand.Name)"
 }

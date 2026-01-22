@@ -50,7 +50,7 @@
     .EXAMPLE
     $deploySplat = @{
         TemplateFile          = 'main.ps1'
-        TemplateParameterFile = 'params\main.parameters.json'
+        TemplateParameterFile = 'params/main.parameters.json'
     }
 
     .\deploy.ps1 @deploySplat -Verbose
@@ -70,7 +70,7 @@
 .EXAMPLE
     $rollbackSplat = @{
         TemplateFile          = 'main.ps1'
-        TemplateParameterFile = 'params\main.parameters.json'
+        TemplateParameterFile = 'params/main.parameters.json'
     }
 
     .\deploy.ps1 @rollbackSplat -Rollback -Force -Verbose
@@ -126,7 +126,7 @@ param (
 )
 
 begin {
-    Write-Verbose "[Enter]: .\src\res\team\$($MyInvocation.MyCommand.Name)"
+    Write-Verbose "[Enter]: ./src\res\team\$($MyInvocation.MyCommand.Name)"
 
     if ($null -eq (Get-AzContext)) {
         throw 'No Azure context found. Please login using Connect-AzAccount.'
@@ -421,5 +421,5 @@ process {
 }
 
 end {
-    Write-Verbose "[Exit]: .\src\res\team\$($MyInvocation.MyCommand.Name)"
+    Write-Verbose "[Exit]: ./src\res\team\$($MyInvocation.MyCommand.Name)"
 }

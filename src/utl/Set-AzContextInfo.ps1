@@ -66,7 +66,7 @@ function Set-AzContextInfo {
     )
 
     begin {
-        Write-Verbose "[Enter]: .\src\utl\$($MyInvocation.MyCommand.Name)"
+        Write-Verbose "[Enter]: ./src/utl/$($MyInvocation.MyCommand.Name)"
     }
 
     process {
@@ -118,7 +118,7 @@ function Set-AzContextInfo {
     }
 
     end {
-        Write-Verbose "[Exit]: .\src\utl\$($MyInvocation.MyCommand.Name)"
+        Write-Verbose "[Exit]: ./src\utl\$($MyInvocation.MyCommand.Name)"
     }
 }
 
@@ -157,7 +157,7 @@ function Restore-AzContextInfo {
     )
 
     begin {
-        Write-Verbose "[Enter]: .\src\utl\$($MyInvocation.MyCommand.Name)"
+        Write-Verbose "[Enter]: ./src\utl\$($MyInvocation.MyCommand.Name)"
     }
 
     process {
@@ -179,6 +179,6 @@ function Restore-AzContextInfo {
     }
 
     end {
-        Write-Verbose "[Exit]: .\src\utl\$($MyInvocation.MyCommand.Name)"
+        Write-Verbose "[Exit]: ./src/utl/$($MyInvocation.MyCommand.Name)"
     }
 }

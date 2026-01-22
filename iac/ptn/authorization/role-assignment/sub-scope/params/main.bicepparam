@@ -8,7 +8,7 @@ import {
 // VARIABLES //
 // --------- //
 
-var config = loadJsonContent('../../../../../../src/cfg/main.config.json')
+var config = loadJsonContent('../../../../../../config/main.config.json')
 
 var location = config.location
 var geoCode = getLocationCode(location)
