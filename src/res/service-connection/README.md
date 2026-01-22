@@ -107,7 +107,24 @@ Deploys a service connection using the specified parameters in code.
 
 ## OUTPUTS
 
-### `PSCustomObject`
+```text
+[PSCustomObject]@{
+    id                               = Service endpoint ID
+    name                             = Service endpoint name
+    type                             = Type of service endpoint (e.g., AzureRM)
+    description                      = Service endpoint description
+    authorization                    = Authorization details
+    url                              = URL of the service endpoint
+    isShared                         = Indicates if the service endpoint is shared
+    isReady                          = Indicates if the service endpoint is ready
+    owner                            = Owner of the service endpoint
+    data                             = Additional data related to the service endpoint
+    serviceEndpointProjectReferences = Project references for the service endpoint
+    projectName                      = Name of the project
+    collectionUri                    = URI of the collection
+    status                           = Status of the service endpoint deployment
+}
+```
 
 ## SUPPORT
 
@@ -131,7 +148,6 @@ This script requires the following PowerShell modules:
 
 - `Az.Accounts`
 - `Az.ManagedServiceIdentity`
-- `Az.Resources`
 - `Azure.DevOps.PSModule`
 
 ## RESOURCES

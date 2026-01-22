@@ -18,7 +18,7 @@
 
     .ICONURI https://raw.githubusercontent.com/msc365/az-devops-governance/main/.assets/icon.png
 
-    .EXTERNALMODULEDEPENDENCIES Az.Accounts, Az.Resources, Az.ManagedServiceIdentity, Azure.DevOps.PSModule
+    .EXTERNALMODULEDEPENDENCIES Az.Accounts, Az.ManagedServiceIdentity, Azure.DevOps.PSModule
 #>
 <#
 .SYNOPSIS
@@ -45,6 +45,24 @@
 .PARAMETER Rollback
     Optional. Switch to indicate if the operation should rollback (remove) the service connection and related resources.
     ⚠️ WARNING: Use with caution! Removing a service connection is irreversible and may affect teams relying on it.
+
+.OUTPUTS
+    [PSCustomObject]@{
+        id                               = Service endpoint ID
+        name                             = Service endpoint name
+        type                             = Type of service endpoint (e.g., AzureRM)
+        description                      = Service endpoint description
+        authorization                    = Authorization details
+        url                              = URL of the service endpoint
+        isShared                         = Indicates if the service endpoint is shared
+        isReady                          = Indicates if the service endpoint is ready
+        owner                            = Owner of the service endpoint
+        data                             = Additional data related to the service endpoint
+        serviceEndpointProjectReferences = Project references for the service endpoint
+        projectName                      = Name of the project
+        collectionUri                    = URI of the collection
+        status                           = Status of the service endpoint deployment
+    }
 
 .EXAMPLE
     $deploySplat = @{
