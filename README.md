@@ -42,7 +42,7 @@ End‑to‑end governance is platform‑agnostic. This repository illustrates on
 Any governance model must be tied to the organization's business rules, which are reflected in any technical implementation of access controls. This example model uses a fictitious international _Building Materials_ company with the following common scenario (with business requirements):
 
 - **Align with OpCo's and permissions models**  
-  The international organization has many Operational Companies (OpCo's), such as "_Portugal_" and "_The Netherlands_," which operate largely independently. In each OpCo, there are three levels or privileges, which are mapped to distinct `*-admins`, `*-devs` or `*-stake(holder)s` Microsoft Entra groups. This allows developers and stakeholders to be targeted when configuring permissions in the cloud.
+  The international organization has multiple Operational Companies (OpCos) across Europe, including countries such as "_Portugal_" and the "Netherlands_", which operate largely independently. In each OpCo, there are three levels or privileges, which are mapped to distinct `*-admin(istrator)s`, `*-dev(eloper)s` or `*-stake(holder)s` Microsoft Entra groups. This allows developers and stakeholders to be targeted when configuring permissions in the cloud.
 
 - **Staged deployment environments**  
   Every business domain has two environments:
