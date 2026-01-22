@@ -13,23 +13,10 @@
 #region PARAMETERS
 
 $params = @{
-    CollectionUri  = 'https://dev.azure.com/e2egov-org'
-    ProjectName    = 'e2egov-prjHb72x9'
-    Name           = 'env-e2egov-prjHb72x9-tst'
-    Description    = 'Default environment description'
-    SubscriptionId = '00000000-0000-0000-0000-000000000000'
-    ResourceGroup  = @{
-        Name     = 'rg-e2egov-prjHb72x9-tst-weu'
-        Location = 'westeurope'
-        Tags     = @{
-            public      = 'false'
-            service     = 'e2egov'
-            environment = 'tst'
-            security    = 'rbac'
-            iac         = 'bicep'
-            ci          = 'azure-pipelines'
-        }
-    }
+    CollectionUri = 'https://dev.azure.com/e2egov-org'
+    ProjectName   = 'e2egov-prjHb72x9'
+    Name          = 'env-e2egov-prjHb72x9-tst'
+    Description   = 'Default environment description'
 }
 
 # endregion

@@ -30,11 +30,10 @@ and its properties as a scoped environment.
 | Parameter | Type | Required | Default | Description |
 | :-- | :-- | :-- | :-- | :-- |
 | `Name` | `String` | Yes | - | Required. The name of the environment to create, update, or remove. |
-| `CollectionUri` | `String` | No | `$env:DefaultAdoCollectionUri` | Optional. The collection URI of the Azure DevOps collection/organization, e.g.: `https://dev.azure.com/my-org`, `https://vssps.dev.azure.com/my-org`. |
+| `CollectionUri` | `String` | No | `$env:DefaultAdoCollectionUri` | Optional. The collection URI of the Azure DevOps collection/organization, e.g., `https://dev.azure.com/my-org`. |
 | `Description` | `String` | No | - | Optional. A description for the environment. |
 | `ProjectName` | `String` | No | `$env:DefaultAdoProjectName` | Optional. The Azure DevOps project ID or Name where the environment will be created. |
-| `ResourceGroup` | `Hashtable` | No | - | Optional. An optional object defining the resource group properties: `Name`, `Location`, `SubscriptionId`, `Tags`. See [Notes](#notes) for more information. |
-| `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (remove) the environment and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing an environment is irreversible and may affect teams relying on it. See [Notes](#notes) for more information. |
+| `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (remove) the environment and related resources. <br> ⚠️ WARNING: Use with caution! Removing an environment is irreversible and may affect teams relying on it. |
 
 ## EXAMPLES
 
@@ -51,8 +50,7 @@ $deploySplat = @{
 .\deploy.ps1 @deploySplat -Verbose
 ```
 
-Deploys the environment using the specified template and parameters.
-
+Deploys the environment using the specified template and parameters.
 
 ### Example 2
 
@@ -67,8 +65,7 @@ $customSplat = @{
 .\deploy.ps1 @customSplat -Verbose
 ```
 
-Deploys the environment using the specified template and custom parameters.
-
+Deploys the environment using the specified template and custom parameters.
 
 ### Example 3
 
@@ -83,8 +80,7 @@ $rollbackSplat = @{
 .\deploy.ps1 @rollbackSplat -Rollback -Confirm:$false -Verbose
 ```
 
-Rolls back (removes) the environment and related resources without confirmation.
-
+Rolls back (removes) the environment and related resources without confirmation.
 
 ### Example 4
 
@@ -92,24 +88,15 @@ Rolls back (removes) the environment and related resources without confirmation.
 
 ```powershell
 $paramSplat = @{
-    CollectionUri = 'https://dev.azure.com/e2egov-org'
-    ProjectName   = 'e2egov-prjHb72x9'
-    Name          = 'env-e2egov-prjHb72x9-tst'
-    Description   = 'Default environment description'
-    ResourceGroup = @{
-        Name           = 'rg-e2egov-prjHb72x9-tst-weu'
-        Location       = 'westeurope'
-        SubscriptionId = '00000000-0000-0000-0000-000000000000'
-        Tags           = @{ environment = 'tst'; service = 'e2egov' }
-    }
+    CollectionUri  = 'https://dev.azure.com/e2egov-org'
+    ProjectName    = 'e2egov-prjHb72x9'
+    Name           = 'env-e2egov-prjHb72x9-tst'
+    Description    = 'Default environment description'
 }
 .\main.ps1 @paramSplat -Verbose
 ```
 
-Deploys a new environment including the configuration of an optional resource group
-and its properties as a (least privileged) scoped environment using the specified parameters in code. <br><br>
-See [Service Connection](../service-connection) deployment for creating a service connection with least privileged access to the resource group.
-
+Deploys a new environment with the specified parameters.
 
 ## OUTPUTS
 
@@ -118,16 +105,10 @@ See [Service Connection](../service-connection) deployment for creating a servic
     id             = Environment ID
     name           = Environment Name
     description    = Environment Description
-    resourceGroup  = @{
-        name       = Resource Group Name
-        location   = Resource Group Location
-        resourceId = Resource Group Resource ID
-    }
     createdBy      = User who created the environment
     createdOn      = Timestamp of environment creation
     lastModifiedBy = User who last modified the environment
     lastModifiedOn = Timestamp of last modification
-    resourceType   = Resource Type (Environment)
     projectName    = Azure DevOps Project Name
     collectionUri  = Azure DevOps Collection URI
     status         = Operation Status (Created, Updated, NoChange, Removed, NotFound, Skipped)
@@ -162,10 +143,6 @@ This script requires the following PowerShell modules:
 
 - [deploy](deploy.ps1)
 
-### Shared
-
-- [resource-group](../shared/resource-group)
-
 ### Tests
 
 - [all](tests/e2e/all)
@@ -180,9 +157,3 @@ This script requires the following PowerShell modules:
 - Operations are idempotent (safe to run multiple times).
 - Ensure you are logged in to Azure using Connect-AzAccount before running this script.
 - User confirmation is required unless `-Confirm:$false` is specified.
-
-> [!IMPORTANT]
-> **Rollback does not perform actual Resource group deletion**. Resource groups may contain shared resources that are not part of this implementation but could be deployed by other systems or requirements over time. Deleting the Resource group could impact other services and operations relying on those resources.
-
-> [!TIP]
-> To simplify deployments or enforce least privilege, this script can **deploy a resource group** to represent an environment. In practice, it is recommended to use a separate subscription for each environment. Also see [Service Connection](../service-connection) deployment for creating a service connection with least privileged access to the resource group.

@@ -41,36 +41,6 @@
                 "description": {
                     "type": "string",
                     "description": "The description of the environment"
-                },
-                "subscriptionId": {
-                    "type": "string",
-                    "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
-                    "description": "The subscription ID (must be a valid GUID)"
-                },
-                "resourceGroup": {
-                    "type": "object",
-                    "required": [
-                        "name",
-                        "location"
-                    ],
-                    "properties": {
-                        "name": {
-                            "type": "string",
-                            "description": "The name of the resource group"
-                        },
-                        "location": {
-                            "type": "string",
-                            "description": "The location/region of the resource group"
-                        },
-                        "tags": {
-                            "type": "object",
-                            "description": "Tags to apply to the resource group",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "additionalProperties": false
                 }
             },
             "additionalProperties": false

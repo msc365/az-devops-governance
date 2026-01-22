@@ -31,7 +31,7 @@
     and its properties as a scoped environment.
 
 .PARAMETER CollectionUri
-    Optional. The collection URI of the Azure DevOps collection/organization, e.g.: `https://dev.azure.com/my-org`, `https://vssps.dev.azure.com/my-org`.
+    Optional. The collection URI of the Azure DevOps collection/organization, e.g., `https://dev.azure.com/my-org`.
 
 .PARAMETER ProjectName
     Optional. The Azure DevOps project ID or Name where the environment will be created.
@@ -42,32 +42,19 @@
 .PARAMETER Description
     Optional. A description for the environment.
 
-.PARAMETER ResourceGroup
-    Optional. An optional object defining the resource group properties: `Name`, `Location`, `Tags`. See [Notes](#notes) for more information.
-
-.PARAMETER SubscriptionId
-    Optional. The Azure subscription ID where the resource group will be created. Required when ResourceGroup is specified.
-
 .PARAMETER Rollback
     Optional. Switch to indicate if the operation should rollback (remove) the environment and related resources.
-    ⚠️ <b> WARNING! </b>
-    Use with caution! Removing an environment is irreversible and may affect teams relying on it. See [Notes](#notes) for more information.
+    ⚠️ WARNING: Use with caution! Removing an environment is irreversible and may affect teams relying on it.
 
 .OUTPUTS
     [PSCustomObject]@{
         id             = Environment ID
         name           = Environment Name
         description    = Environment Description
-        resourceGroup  = @{
-            name       = Resource Group Name
-            location   = Resource Group Location
-            resourceId = Resource Group Resource ID
-        }
         createdBy      = User who created the environment
         createdOn      = Timestamp of environment creation
         lastModifiedBy = User who last modified the environment
         lastModifiedOn = Timestamp of last modification
-        resourceType   = Resource Type (Environment)
         projectName    = Azure DevOps Project Name
         collectionUri  = Azure DevOps Collection URI
         status         = Operation Status (Created, Updated, NoChange, Removed, NotFound, Skipped)
@@ -109,18 +96,10 @@
         ProjectName    = 'e2egov-prjHb72x9'
         Name           = 'env-e2egov-prjHb72x9-tst'
         Description    = 'Default environment description'
-        SubscriptionId = '00000000-0000-0000-0000-000000000000'
-        ResourceGroup  = @{
-            Name     = 'rg-e2egov-prjHb72x9-tst-weu'
-            Location = 'westeurope'
-            Tags     = @{ environment = 'tst'; service = 'e2egov' }
-        }
     }
     .\main.ps1 @paramSplat -Verbose
 
-    Deploys a new environment including the configuration of an optional resource group
-    and its properties as a (least privileged) scoped environment using the specified parameters in code. <br><br>
-    See [Service Connection](../service-connection) deployment for creating a service connection with least privileged access to the resource group.
+    Deploys a new environment with the specified parameters.
 
 .NOTES
     ## Declarative (DSC-like) Design
@@ -151,12 +130,6 @@ param (
 
     [Parameter()]
     [string]$Description,
-
-    [Parameter()]
-    [string]$SubscriptionId,
-
-    [Parameter()]
-    [hashtable]$ResourceGroup,
 
     [Parameter()]
     [switch]$Rollback
@@ -198,8 +171,7 @@ process {
         $status = 'Unknown'
 
         # Variables
-        $env, $rg = $null
-        $changes = @()
+        $env = $null
 
         # Environment - Lookup by Name (DSC-like declarative approach)
 
@@ -210,239 +182,6 @@ process {
         }
 
         $env = Get-AdoEnvironment @envSplat -ErrorAction SilentlyContinue
-
-        if ($PSBoundParameters.ContainsKey('ResourceGroup') -and ($null -ne $ResourceGroup)) {
-            # Validate required properties
-            $requiredProps = @('name', 'location')
-
-            foreach ($prop in $requiredProps) {
-                if (-not $ResourceGroup.ContainsKey($prop) -or
-                    [string]::IsNullOrWhiteSpace($ResourceGroup.$prop)) {
-                    throw "ResourceGroup parameter is missing required property: '$prop'"
-                }
-            }
-
-            # Validate SubscriptionId is provided when ResourceGroup is specified
-            if ([string]::IsNullOrWhiteSpace($SubscriptionId)) {
-                throw 'SubscriptionId parameter is required when ResourceGroup is specified.'
-            }
-
-            # Verify tags
-            $tags = if ($ResourceGroup.ContainsKey('tags')) { $ResourceGroup.tags } else { $null }
-
-            # Resource Group
-            $rgSplat = @{
-                Name           = $ResourceGroup.name
-                Location       = $ResourceGroup.location
-                SubscriptionId = $SubscriptionId
-                Tags           = $tags
-                Rollback       = $Rollback.IsPresent
-                WhatIf         = $WhatIfPreference
-                Verbose        = $VerbosePreference
-            }
-
-            $rg = & (Join-Path -Path $PSScriptRoot -ChildPath '..\shared\resource-group\main.ps1') @rgSplat -Confirm:$false
-        }
-
-        #endregion
-
-        #region PLAN CHANGES
-
-        if ($WhatIfPreference) {
-            # Determine what changes will be made
-            if (-not $Rollback.IsPresent) {
-                # Check Environment changes
-                if ($null -eq $env) {
-                    $changes += [PSCustomObject]@{
-                        ResourceType = 'Azure.DevOps/Environment'
-                        ResourceName = $Name
-                        Operation    = 'Create'
-                        PropertyName = $null
-                        OldValue     = $null
-                        NewValue     = $null
-                    }
-                } else {
-                    # Check for property changes
-                    if ($PSBoundParameters.ContainsKey('Description')) {
-                        $currentDesc = $env.Description ?? ''
-                        $newDesc = $Description ?? ''
-
-                        if ($newDesc -ne $currentDesc) {
-                            $changes += [PSCustomObject]@{
-                                ResourceType = 'Azure.DevOps/Environment'
-                                ResourceName = $Name
-                                Operation    = 'Modify'
-                                PropertyName = 'Description'
-                                OldValue     = $currentDesc
-                                NewValue     = $newDesc
-                            }
-                        }
-                    }
-                }
-
-                # Check Resource Group changes
-                if ($null -ne $rg) {
-                    if ($rg.status -eq 'Created' -or $rg.status -eq 'WouldCreate') {
-                        $changes += [PSCustomObject]@{
-                            ResourceType = 'Microsoft.Resources/resourceGroups'
-                            ResourceName = $ResourceGroup.name
-                            Operation    = 'Create'
-                            PropertyName = $null
-                            OldValue     = $null
-                            NewValue     = $null
-                        }
-
-                        # Show all tags as being created
-                        if ($tags) {
-                            foreach ($tagKey in $tags.Keys) {
-                                $changes += [PSCustomObject]@{
-                                    ResourceType = 'Microsoft.Resources/resourceGroups'
-                                    ResourceName = $ResourceGroup.name
-                                    Operation    = 'Create'
-                                    PropertyName = "Tags.$tagKey"
-                                    OldValue     = $null
-                                    NewValue     = $tags[$tagKey]
-                                }
-                            }
-                        }
-                    } elseif ($rg.status -eq 'Updated' -or $rg.status -eq 'WouldUpdate') {
-                        # Analyze tag changes using current state (from $rg) and desired state (from $tags)
-                        $currentTags = if ($rg.tags) { $rg.tags } else { @{} }
-                        $newTags = if ($tags) { $tags } else { @{} }
-
-                        # Find tags to add (in new but not in current)
-                        foreach ($key in $newTags.Keys) {
-                            if (-not $currentTags.ContainsKey($key)) {
-                                $changes += [PSCustomObject]@{
-                                    ResourceType = 'Microsoft.Resources/resourceGroups'
-                                    ResourceName = $ResourceGroup.name
-                                    Operation    = 'Create'
-                                    PropertyName = "Tags.$key"
-                                    OldValue     = $null
-                                    NewValue     = $newTags[$key]
-                                }
-                            } elseif ($currentTags[$key] -ne $newTags[$key]) {
-                                # Tag exists but value changed
-                                $changes += [PSCustomObject]@{
-                                    ResourceType = 'Microsoft.Resources/resourceGroups'
-                                    ResourceName = $ResourceGroup.name
-                                    Operation    = 'Modify'
-                                    PropertyName = "Tags.$key"
-                                    OldValue     = $currentTags[$key]
-                                    NewValue     = $newTags[$key]
-                                }
-                            }
-                        }
-
-                        # Find tags to remove (in current but not in new)
-                        foreach ($key in $currentTags.Keys) {
-                            if (-not $newTags.ContainsKey($key)) {
-                                $changes += [PSCustomObject]@{
-                                    ResourceType = 'Microsoft.Resources/resourceGroups'
-                                    ResourceName = $ResourceGroup.name
-                                    Operation    = 'Delete'
-                                    PropertyName = "Tags.$key"
-                                    OldValue     = $currentTags[$key]
-                                    NewValue     = $null
-                                }
-                            }
-                        }
-                    }
-                }
-            } else {
-                # Rollback mode
-                if ($null -ne $env) {
-                    $changes += [PSCustomObject]@{
-                        ResourceType = 'Azure.DevOps/Environment'
-                        ResourceName = $Name
-                        Operation    = 'Delete'
-                        PropertyName = $null
-                        OldValue     = $null
-                        NewValue     = $null
-                    }
-                }
-
-                if ($null -ne $rg -and ($rg.status -eq 'Removed' -or $rg.status -eq 'WouldRemove')) {
-                    $changes += [PSCustomObject]@{
-                        ResourceType = 'Microsoft.Resources/resourceGroups'
-                        ResourceName = $ResourceGroup.name
-                        Operation    = 'Delete'
-                        PropertyName = $null
-                        OldValue     = $null
-                        NewValue     = $null
-                    }
-                }
-            }
-
-            # Display change summary
-            if ($changes.Count -gt 0) {
-                Write-Host ''
-                Write-Host 'Resource and property changes are indicated with these symbols:'
-                Write-Host '  - ' -ForegroundColor DarkRed -NoNewline
-                Write-Host 'Delete'
-                Write-Host '  + ' -ForegroundColor Green -NoNewline
-                Write-Host 'Create'
-                Write-Host '  ~ ' -ForegroundColor Magenta -NoNewline
-                Write-Host 'Modify'
-                Write-Host ''
-                Write-Host 'The deployment will update the following scope:'
-                Write-Host ''
-                Write-Host "Scope: $CollectionUri/$ProjectName"
-                Write-Host ''
-
-                $groupedChanges = $changes | Group-Object -Property ResourceType, ResourceName
-
-                foreach ($group in $groupedChanges) {
-                    $operation = $group.Group[0].Operation
-                    $symbol = switch ($operation) {
-                        'Create' { '+' }
-                        'Delete' { '-' }
-                        'Modify' { '~' }
-                    }
-                    $color = switch ($operation) {
-                        'Create' { 'Green' }
-                        'Delete' { 'DarkRed' }
-                        'Modify' { 'Magenta' }
-                    }
-
-                    Write-Host "  $symbol $($group.Group[0].ResourceType) '$($group.Group[0].ResourceName)'" -ForegroundColor $color
-
-                    # Show property-level changes for Modify operations
-                    $propertyChanges = $group.Group | Where-Object { $null -ne $_.PropertyName }
-                    if ($propertyChanges) {
-                        foreach ($change in $propertyChanges) {
-
-                            $propertyPath = "properties.$($change.PropertyName)"
-
-                            Write-Host "    ~ $propertyPath`:" -ForegroundColor Magenta
-                            if ($null -ne $change.OldValue) {
-                                Write-Host "      - `"$($change.OldValue)`"" -ForegroundColor DarkRed
-                            }
-                            if ($null -ne $change.NewValue) {
-                                Write-Host "      + `"$($change.NewValue)`"" -ForegroundColor Green
-                            }
-                        }
-                    }
-                }
-
-                Write-Host ''
-
-                $createCount = ($changes | Where-Object Operation -EQ 'Create').Count
-                $modifyCount = ($changes | Where-Object Operation -EQ 'Modify').Count
-                $deleteCount = ($changes | Where-Object Operation -EQ 'Delete').Count
-
-                $summaryParts = @()
-                if ($createCount -gt 0) { $summaryParts += "$createCount to create" }
-                if ($modifyCount -gt 0) { $summaryParts += "$modifyCount to modify" }
-                if ($deleteCount -gt 0) { $summaryParts += "$deleteCount to delete" }
-
-                Write-Host "Resource changes: $($summaryParts -join ', ')."
-                Write-Host ''
-            } else {
-                Write-Host ''
-                Write-Host 'No changes detected. All resources match the desired state.'
-            }
-        }
 
         #endregion
 
@@ -544,7 +283,7 @@ process {
                 Write-Verbose "[NOTFOUND] Environment: '$Name' (ID: `$null)"
             }
 
-            # Return rollback result
+            # Return rollback result; rebuild object for consistency when not found
             return $env | Select-Object -ExcludeProperty collectionUri, projectName -Property *,
             @{ Name = 'projectName'; Expression = { $ProjectName } },
             @{ Name = 'collectionUri'; Expression = { $CollectionUri } },
@@ -555,12 +294,8 @@ process {
 
         #region OUTPUTS
 
-        # Return deployment result
+        # Return deployment result; rebuild object for consistency when created
         $env | Select-Object -ExcludeProperty collectionUri, projectName -Property *,
-        @{Name = 'resourceGroup'; Expression = {
-                $rg | Select-Object -ExcludeProperty collectionUri, projectName -Property *
-            }
-        },
         @{Name = 'projectName'; Expression = { $ProjectName } },
         @{Name = 'collectionUri'; Expression = { $CollectionUri } },
         @{Name = 'status'; Expression = { $status } }
