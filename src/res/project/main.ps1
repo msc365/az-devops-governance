@@ -55,8 +55,7 @@
 
 .PARAMETER Rollback
     Optional. Switch to indicate if the operation should rollback (soft delete) the project and related resources.
-    ⚠️ <b> WARNING! </b>
-    Use with caution! Removing a project may affect teams relying on it. See [Notes](#notes) for more information.
+    ⚠️ WARNING: Use with caution! Removing a project may affect teams relying on it. See [Notes](#notes) for more information.
 
 .OUTPUTS
     [PSCustomObject]@{
@@ -230,7 +229,7 @@ process {
 
         # Variables
 
-        $prj, $set, $get = $null
+        $prj = $null
 
         # Project
         $prj = Get-AdoProject -CollectionUri $CollectionUri -Project $Name -IncludeCapabilities -ErrorAction SilentlyContinue

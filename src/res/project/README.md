@@ -28,13 +28,13 @@ It provides options to configure project properties such as description, default
 
 | Parameter | Type | Required | Default | Description |
 | :-- | :-- | :-- | :-- | :-- |
-| `Name` | `String` | Yes | - | Required. The name of the Azure DevOps project to create, update or delete. |
+| `Name` | `String` | Yes | `$env:DefaultAdoProject` | Required. The name of the Azure DevOps project to create, update or delete. |
 | `CollectionUri` | `String` | No | `$env:DefaultAdoCollectionUri` | Optional. The collection URI of the Azure DevOps collection/organization, e.g.: `https://dev.azure.com/my-org`, `https://vssps.dev.azure.com/my-org`. |
 | `DefaultTeam` | `String` | No | - | Optional. The name of the default team for the project. Defaults to '\<Project Name> Team'. |
 | `Description` | `String` | No | - | Optional. A description for the Azure DevOps project. |
 | `Features` | `Hashtable` | No | - | Optional. A hashtable defining the feature states for the project. Valid features are 'boards', 'repos', 'pipelines', 'testPlans', and 'artifacts' with states 'enabled' or 'disabled'. |
 | `Process` | `String` | No | - | Optional. The process template to use for the project. Valid values are 'Agile', 'Scrum', 'CMMI', and 'Basic'. Defaults to the organization's default process. |
-| `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (soft delete) the project and related resources. <br> ⚠️ <b> WARNING! </b> <br> Use with caution! Removing a project may affect teams relying on it. See [Notes](#notes) for more information. |
+| `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (soft delete) the project and related resources. <br> ⚠️ WARNING: Use with caution! Removing a project may affect teams relying on it. See [Notes](#notes) for more information. |
 | `SourceControl` | `String` | No | - | Optional. The type of source control to use for the project. Valid values are 'Git' and 'Tfvc'. Defaults to 'Git'. |
 | `Visibility` | `String` | No | - | Optional. The visibility of the project. Valid values are 'Private' and 'Public'. Defaults to 'Private'. |
 
@@ -53,8 +53,7 @@ $deploySplat = @{
 .\deploy.ps1 @deploySplat -Verbose
 ```
 
-Deploys the project using the specified template and parameters.
-
+Deploys the project using the specified template and parameters.
 
 ### Example 2
 
@@ -69,24 +68,22 @@ $customSplat = @{
 .\deploy.ps1 @customSplat -Verbose
 ```
 
-Deploys the project using the specified template and custom parameters.
-
+Deploys the project using the specified template and custom parameters.
 
 ### Example 3
 
 #### PowerShell
 
 ```powershell
-$rollbackSplat = @{params/main.parameters.json
+$rollbackSplat = @{
     TemplateFile          = 'main.ps1'
-    TemplateParameterFile = 'params\main.parameters.json'
+    TemplateParameterFile = 'params/main.parameters.json'
 }
 
 .\deploy.ps1 @rollbackSplat -Rollback -Confirm:$false -Verbose
 ```
 
-Rolls back (removes) the project and related resources without confirmation.
-
+Rolls back (removes) the project and related resources without confirmation.
 
 ### Example 4
 
@@ -113,8 +110,7 @@ $paramSplat = @{
 .\src\res\project\main.ps1 @paramSplat
 ```
 
-Deploys or updates a project in the specified Azure DevOps organization using the provided parameters in code.
-
+Deploys or updates a project in the specified Azure DevOps organization using the provided parameters in code.
 
 ## OUTPUTS
 
