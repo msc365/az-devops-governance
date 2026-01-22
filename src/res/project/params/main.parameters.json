@@ -1,17 +1,21 @@
 {
     "$schema": "../../../../schemas/project.schema.json",
     "collectionUri": "{collectionUri}",
-    "name": "{prefix}-prj{uniqueId}",
-    "description": "Default project description",
-    "defaultTeam": "Default Team",
-    "sourceControl": "Git",
-    "process": "Agile",
-    "features": {
-        "boards": "enabled",
-        "repos": "enabled",
-        "pipelines": "enabled",
-        "artifacts": "enabled",
-        "testPlans": "disabled"
-    },
-    "visibility": "Private"
+    "projects": [
+        {
+            "name": "{prefix}-prj{uniqueId}",
+            "description": "Default project description",
+            "defaultTeam": "Default Team",
+            "sourceControl": "Git",
+            "process": "Agile",
+            "features": {
+                "boards": "enabled",
+                "repos": "enabled",
+                "pipelines": "enabled",
+                "artifacts": "enabled",
+                "testPlans": "disabled"
+            },
+            "visibility": "Private"
+        }
+    ]
 }

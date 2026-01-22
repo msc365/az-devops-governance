@@ -1,34 +1,37 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "$id": "https://raw.githubusercontent.com/msc365/az-devops-governance/main/schemas/project.schema.json",
-    "oneOf": [
-        {
-            "$ref": "#/definitions/project"
+    "type": "object",
+    "required": [
+        "collectionUri",
+        "projects"
+    ],
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "JSON Schema reference"
         },
-        {
+        "collectionUri": {
+            "type": "string",
+            "description": "The Azure DevOps collection URI"
+        },
+        "projects": {
             "type": "array",
+            "description": "Array of Azure DevOps projects to create or manage",
             "items": {
                 "$ref": "#/definitions/project"
             },
             "minItems": 1
         }
-    ],
+    },
+    "additionalProperties": false,
     "definitions": {
         "project": {
             "type": "object",
             "required": [
-                "collectionUri",
                 "name"
             ],
             "properties": {
-                "$schema": {
-                    "type": "string",
-                    "description": "JSON Schema reference"
-                },
-                "collectionUri": {
-                    "type": "string",
-                    "description": "The Azure DevOps collection URI"
-                },
                 "name": {
                     "type": "string",
                     "description": "The name of the project"

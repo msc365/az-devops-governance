@@ -143,28 +143,28 @@ param (
     [Parameter()]
     [string]$CollectionUri = $env:DefaultAdoCollectionUri,
 
-    [Parameter(Mandatory)]
+    [Parameter(Mandatory, ValueFromPipelineByPropertyName)]
     [string]$Name = $env:DefaultAdoProject,
 
-    [Parameter()]
+    [Parameter(ValueFromPipelineByPropertyName)]
     [string]$DefaultTeam,
 
-    [Parameter()]
+    [Parameter(ValueFromPipelineByPropertyName)]
     [string]$Description,
 
-    [Parameter()]
+    [Parameter(ValueFromPipelineByPropertyName)]
     [ValidateSet('Agile', 'Scrum', 'CMMI', 'Basic')]
     [string]$Process,
 
-    [Parameter()]
+    [Parameter(ValueFromPipelineByPropertyName)]
     [ValidateSet('Git', 'Tfvc')]
     [string]$SourceControl,
 
-    [Parameter()]
+    [Parameter(ValueFromPipelineByPropertyName)]
     [ValidateSet('Private', 'Public')]
     [string]$Visibility,
 
-    [Parameter()]
+    [Parameter(ValueFromPipelineByPropertyName)]
     [ValidateScript({
             $validKeys = @('boards', 'repos', 'pipelines', 'artifacts', 'testPlans')
             $validValues = @('enabled', 'disabled')
