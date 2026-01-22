@@ -18,7 +18,7 @@
 
     .ICONURI https://raw.githubusercontent.com/msc365/az-devops-governance/main/.assets/icon.png
 
-    .EXTERNALMODULEDEPENDENCIES Az.Accounts, Az.Resources, Azure.DevOps.PSModule
+    .EXTERNALMODULEDEPENDENCIES Az.Accounts, Azure.DevOps.PSModule
 #>
 <#
 .SYNOPSIS

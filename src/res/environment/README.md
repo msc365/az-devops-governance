@@ -135,7 +135,6 @@ This script supports the `-WhatIf` and `-Confirm` parameters for safe execution:
 This script requires the following PowerShell modules:
 
 - `Az.Accounts`
-- `Az.Resources`
 - `Azure.DevOps.PSModule`
 
 ## RESOURCES
