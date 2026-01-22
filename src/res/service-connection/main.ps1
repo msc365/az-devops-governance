@@ -22,17 +22,16 @@
 #>
 <#
 .SYNOPSIS
-    Deploys an Azure DevOps Service Connection with Managed Service Identity and Role Assignment.
+    Deploys an Azure DevOps service connection.
 
 .DESCRIPTION
-    This script deploys an Azure DevOps Service Connection using a Managed Service Identity (MSI) for authentication.
-    It also creates the necessary role assignments for the MSI to access Azure resources aka _Azure DevOps Workload Identity Federation_.
+    This script deploys an Azure DevOps service connection for a managed identity, including the creation of a federated identity credential.
 
 .PARAMETER CollectionUri
     Optional. The collection URI of the Azure DevOps collection/organization, e.g.: `https://dev.azure.com/my-org`, `https://vssps.dev.azure.com/my-org`.
 
 .PARAMETER ProjectName
-    Optional. The Azure DevOps project ID or Name where the environment will be created.
+    Optional. The Azure DevOps project ID or Name where the service connection will be created.
 
 .PARAMETER Name
     Required. The name of the service connection to be created.
@@ -40,16 +39,12 @@
 .PARAMETER Description
     Optional. A description for the service connection.
 
-.PARAMETER Scope
-    Required. The scope for the service connection (e.g.: /subscriptions/00000000-0000-0000-0000-000000000000).
-
-.PARAMETER ManagedServiceIdentity
-    Required. An object containing details of the Managed Service Identity to be used. The object should contain: `name`, `resourceGroupName`, `subscriptionId`, `location`, `tags`, and `roleAssignments` (an array of role assignment definitions). See [Example 4](#example-4) for more information.
+.PARAMETER ManagedIdentity
+    Required. An object containing details of the Managed Identity to be used. The object should contain: `name`, `resourceGroupName`, `subscriptionId`, and `federatedIdentityCredential` (an object with the `name` property). See [Example 4](#example-4) for more information.
 
 .PARAMETER Rollback
-    Optional. Switch to indicate if the operation should rollback (remove) the environment and related resources.
-    ⚠️ <b> WARNING! </b>
-    Use with caution! Removing an environment is irreversible and may affect teams relying on it. See [Notes](#notes) for more information.
+    Optional. Switch to indicate if the operation should rollback (remove) the service connection and related resources.
+    ⚠️ WARNING: Use with caution! Removing a service connection is irreversible and may affect teams relying on it.
 
 .EXAMPLE
     $deploySplat = @{
@@ -88,23 +83,13 @@
         ProjectName            = 'e2egov-prjHb72x9'
         Name                   = 'rg-e2egov-prjHb72x9-tst-weu'
         Description            = 'Service Connection for e2egov-prjHb72x9 testing in West Europe'
-        Scope                  = '/subscriptions/00000000-0000-0000-0000-000000000000'
-        ManagedServiceIdentity = @{
-            name               = 'id-e2egov-prjHb72x9-tst'
-            resourceGroupName  = 'rg-e2egov-prjHb72x9-tst-weu'
-            subscriptionId     = '00000000-0000-0000-0000-000000000000'
-            location           = 'westeurope'
-            tags               = @{ 'environment' = 'tst'; 'owner' = 'e2egov' }
-            roleAssignments     = @(
-                @{
-                    roleDefinitionName = 'Reader'
-                    scope              = '/subscriptions/00000000-0000-0000-0000-000000000000'
-                },
-                @{
-                    roleDefinitionName = 'Contributor'
-                    scope              = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-my-project'
-                }
-            )
+        ManagedIdentity = @{
+            Name                         = 'id-e2egov-prjHb72x9-tst'
+            ResourceGroupName            = 'rg-e2egov-prjHb72x9-tst-weu'
+            SubscriptionId               = '00000000-0000-0000-0000-000000000000'
+            FederatedIdentityCredential  = @{
+                Name = 'fic-e2egov-prjHb72x9-tst'
+            }
         }
     }
 
@@ -121,17 +106,14 @@ param (
     [Parameter()]
     [string]$ProjectName = $env:DefaultAdoProjectName,
 
-    [Parameter(Mandatory)]
+    [Parameter(Mandatory, ValueFromPipelineByPropertyName)]
     [string]$Name,
 
-    [Parameter()]
+    [Parameter(ValueFromPipelineByPropertyName)]
     [string]$Description,
 
-    [Parameter(Mandatory)]
-    [string]$Scope,
-
-    [Parameter(Mandatory)]
-    [object]$ManagedServiceIdentity,
+    [Parameter(Mandatory, ValueFromPipelineByPropertyName)]
+    [object]$ManagedIdentity,
 
     [Parameter()]
     [switch]$Rollback
@@ -167,90 +149,76 @@ process {
     try {
         $ErrorActionPreference = 'Stop'
 
-        $RESOURCE_TYPE = 'ServiceEndpoint'
-
         #region INITIALIZE
 
         # Status
         $status = 'Unknown'
 
         # Variables
-        $prj, $dep, $se, $fic, $sync, $ras = $null
+        $prj, $msi, $fic, $sep = $null
 
         # Project
         $prj = Get-AdoProject -Project $ProjectName -Verbose:$false -ErrorAction SilentlyContinue
 
-        # Dependencies
-        $depSplat = @{
-            IdentityName      = $ManagedServiceIdentity.name
-            ResourceGroupName = $ManagedServiceIdentity.resourceGroupName
-            SubscriptionId    = $ManagedServiceIdentity.subscriptionId
-            Location          = $ManagedServiceIdentity.location
-            Tags              = $ManagedServiceIdentity.tags
-            Rollback          = $Rollback.IsPresent
-            WhatIf            = $WhatIfPreference
-            Verbose           = $VerbosePreference
+        if ($null -eq $prj) {
+            throw "Project with ID $ProjectName does not exist, cannot proceed."
         }
 
-        $dep = & (Join-Path -Path $PSScriptRoot -ChildPath 'modules\dependencies.ps1') @depSplat
-
-        # Service Endpoint
-        $seSplat = @{
-            ProjectName = $ProjectName
-            Names       = $Name
+        # Managed service identity
+        $msiSplat = @{
+            Name              = $ManagedIdentity.name
+            ResourceGroupName = $ManagedIdentity.resourceGroupName
+            SubscriptionId    = $ManagedIdentity.subscriptionId
         }
 
-        $se = Get-AdoServiceEndpoint @seSplat -Verbose:$false -ErrorAction SilentlyContinue
+        $msi = Get-AzUserAssignedIdentity @msiSplat -Verbose:$false -ErrorAction SilentlyContinue
 
-        # Federated Credential
-        $ficName = "fic-$($Name.Substring(3))"
-
+        # Federated identity credential
         $ficSplat = @{
-            Name              = $ficName
-            IdentityName      = $ManagedServiceIdentity.name
-            ResourceGroupName = $ManagedServiceIdentity.resourceGroupName
-            SubscriptionId    = $ManagedServiceIdentity.subscriptionId
+            Name              = $ManagedIdentity.federatedIdentityCredential.name
+            IdentityName      = $ManagedIdentity.name
+            ResourceGroupName = $ManagedIdentity.resourceGroupName
+            SubscriptionId    = $ManagedIdentity.subscriptionId
         }
 
         $fic = Get-AzFederatedIdentityCredential @ficSplat -Verbose:$false -ErrorAction SilentlyContinue
 
-        # Role Assignments
-        if ($dep.principalId) {
-            $rasSplat = @{
-                ObjectId        = $dep.principalId
-                RoleAssignments = $ManagedServiceIdentity.roleAssignments
-                Rollback        = $Rollback.IsPresent
-                WhatIf          = $WhatIfPreference
-                Verbose         = $VerbosePreference
-            }
-
-            $ras = & (Join-Path -Path $PSScriptRoot -ChildPath '..\shared\role-assignment\main.ps1') @rasSplat
-        } else {
-            $ras = @()
+        # Service endpoint
+        $sepSplat = @{
+            ProjectName = $ProjectName
+            Names       = $Name
         }
+
+        $sep = Get-AdoServiceEndpoint @sepSplat -Verbose:$false -ErrorAction SilentlyContinue
 
         #endregion
 
         #region DEPLOYMENTS
 
         if (-not $Rollback.IsPresent) {
-            # Service Endpoint
-            if ($null -eq $se) {
+            # Service endpoint
+            if ($null -eq $sep) {
                 # Get Subscription details
-                $subSplat = @{
-                    SubscriptionId = ($Scope -split '/')[2]
-                    TenantId       = $dep.tenantId
+                if ($msi) {
+                    $subSplat = @{
+                        TenantId       = $msi.tenantId
+                        SubscriptionId = $ManagedIdentity.subscriptionId
+                    }
+                    $sub = Get-AzSubscription @subSplat -Verbose:$false -ErrorAction Stop
+                } else {
+                    $sub = [PSCustomObject]@{
+                        Name           = '<unknown>'
+                        SubscriptionId = $ManagedIdentity.subscriptionId
+                    }
                 }
-
-                $sub = Get-AzSubscription @subSplat -Verbose:$false -ErrorAction Stop
 
                 # Prepare Service Endpoint configuration
                 $data = [Ordered]@{
                     creationMode     = 'Manual'
                     environment      = 'AzureCloud'
                     scopeLevel       = 'Subscription'
-                    subscriptionId   = $sub.SubscriptionId
-                    subscriptionName = $sub.Name
+                    subscriptionId   = $sub.subscriptionId
+                    subscriptionName = $sub.name
                 }
 
                 $sepConfig = [Ordered]@{
@@ -261,9 +229,9 @@ process {
                     url                              = 'https://management.azure.com/'
                     authorization                    = [Ordered]@{
                         parameters = [Ordered]@{
-                            serviceprincipalid = $dep.clientId
-                            tenantid           = $dep.tenantId
-                            scope              = $Scope
+                            serviceprincipalid = if ($msi) { $msi.clientId } else { '<generated>' }
+                            tenantid           = if ($msi) { $msi.tenantId } else { '<generated>' }
+                            scope              = "/subscriptions/$($sub.subscriptionId)"
                         }
                         scheme     = 'WorkloadIdentityFederation'
                     }
@@ -273,48 +241,52 @@ process {
                         [Ordered]@{
                             name             = $Name
                             projectReference = [Ordered]@{
-                                id   = $prj.Id
-                                name = $prj.Name
+                                id   = $prj.id
+                                name = $prj.name
                             }
                         }
                     )
                 }
 
-                $seSplat = @{
+                $sepSplat = @{
                     Configuration = $sepConfig
                 }
 
                 if ($PSCmdlet.ShouldProcess($ProjectName, "Create service endpoint: $($Name)")) {
 
-                    $se = New-AdoServiceEndpoint @seSplat -Confirm:$false -Verbose:$false -ErrorAction Stop
+                    if ($null -eq $msi) {
+                        throw "Managed identity '$($ManagedIdentity.name)' not found in resource group '$($ManagedIdentity.resourceGroupName)'. Cannot create service endpoint."
+                    }
+
+                    $sep = New-AdoServiceEndpoint @sepSplat -Confirm:$false -Verbose:$false -ErrorAction Stop
 
                     $status = 'Created'
-                    Write-Verbose "[CREATE] Service endpoint: '$Name' (ID: $($se.Id))"
+                    Write-Verbose "[CREATED] Service endpoint: '$Name' (ID: $($sep.Id))"
                 } else {
-                    $status = 'Skipped'
-                    Write-Verbose "[WHATIF] Call New-AdoServiceEndpoint with parameters: $($seSplat | ConvertTo-Json -Depth 5)"
+                    $status = 'WouldCreate'
+                    Write-Verbose "[WHATIF] Call New-AdoServiceEndpoint with parameters: $($sepSplat | ConvertTo-Json -Depth 5)"
                 }
             } else {
                 $status = 'NoChange'
-                Write-Verbose "[NOCHANGE] Service endpoint: '$($se.Name)' (ID: $($se.Id))"
+                Write-Verbose "[NOCHANGE] Service endpoint: '$($sep.Name)' (ID: $($sep.Id))"
             }
 
             # Federated Credential
             if ($null -eq $fic) {
-                if ($PSCmdlet.ShouldProcess($Name, "Create federated identity credential: $($ficName)")) {
-                    if ($null -eq $se) {
+                if ($PSCmdlet.ShouldProcess($Name, "Create federated identity credential: $($ManagedIdentity.federatedIdentityCredential.name)")) {
+                    if ($null -eq $sep) {
                         throw "Service endpoint '$($Name)' not found! Cannot create 'Federated Identity Credential'."
                     }
 
                     $ficSplat += @{
-                        Issuer  = $se.Authorization.Parameters.WorkloadIdentityFederationIssuer
-                        Subject = $se.Authorization.Parameters.WorkloadIdentityFederationSubject
+                        Issuer  = $sep.Authorization.Parameters.WorkloadIdentityFederationIssuer
+                        Subject = $sep.Authorization.Parameters.WorkloadIdentityFederationSubject
                     }
 
                     $fic = New-AzFederatedIdentityCredential @ficSplat -Verbose:$false -ErrorAction Stop
 
                     # $status = 'Created'
-                    Write-Verbose "[CREATE] Federated identity credential: '$($fic.Name)' (ID: $($fic.Id))"
+                    Write-Verbose "[CREATED] Federated identity credential: '$($fic.Name)' (ID: $($fic.Id))"
                 } else {
                     # $status = 'Skipped'
                     Write-Verbose "[WHATIF] Call New-AzFederatedIdentityCredential with parameters: $($ficSplat | ConvertTo-Json -Depth 5)"
@@ -323,31 +295,6 @@ process {
             } else {
                 # $status = 'NoChange'
                 Write-Verbose "[NOCHANGE] Federated identity credential: '$($fic.Name)' (ID: $($fic.Id))"
-
-                # if ($null -ne $se) {
-                #     if ($fic.Issuer -ne $se.Authorization.Parameters.WorkloadIdentityFederationIssuer -or
-                #         $fic.Subject -ne $se.Authorization.Parameters.WorkloadIdentityFederationSubject) {
-
-                #         $ficSplat += @{
-                #             Issuer  = $se.Authorization.Parameters.WorkloadIdentityFederationIssuer
-                #             Subject = $se.Authorization.Parameters.WorkloadIdentityFederationSubject
-                #         }
-
-                #         if ($PSCmdlet.ShouldProcess($Name, "Update federated identity credential: $($ficName)")) {
-
-                #             $fic = Update-AzFederatedIdentityCredential @ficSplat -Verbose:$false -ErrorAction Stop
-
-                #             # $status = 'Updated'
-                #             Write-Verbose "[UPDATE] Federated identity credential: '$($fic.Name)' (ID: $($fic.Id))"
-                #         } else {
-                #             # $status = 'Skipped'
-                #             Write-Verbose "[WHATIF] Call Update-AzFederatedIdentityCredential with parameters: $($ficSplat | ConvertTo-Json -Depth 5)"
-                #         }
-                #     } else {
-                #         # $status = 'NoChange'
-                #         Write-Verbose "[NOCHANGE] Federated identity credential: '$($fic.Name)' (ID: $($fic.Id))"
-                #     }
-                # }
             }
         }
 
@@ -356,13 +303,37 @@ process {
         #region ROLLBACK
 
         if ($Rollback.IsPresent) {
-            # Service Endpoint
-            if ($null -ne $se) {
-                if ($PSCmdlet.ShouldProcess($ProjectName, "Remove service endpoint: $($Name)")) {
+            # Federated identity credential
+            if ($null -ne $fic) {
+                if ($PSCmdlet.ShouldProcess($Name, "Remove federated identity credential: $($ManagedIdentity.federatedIdentityCredential.name)")) {
+                    $ficSplat = @{
+                        Name              = $ManagedIdentity.federatedIdentityCredential.name
+                        IdentityName      = $ManagedIdentity.name
+                        ResourceGroupName = $ManagedIdentity.resourceGroupName
+                        SubscriptionId    = $ManagedIdentity.subscriptionId
+                    }
 
-                    $seSplat = @{
-                        Id         = $se.Id
-                        ProjectIds = $prj.Id
+                    Remove-AzFederatedIdentityCredential @ficSplat -Confirm:$false -Verbose:$false | Out-Null
+
+                    Write-Verbose "[REMOVED] Federated identity credential: '$($fic.Name)' (ID: $($fic.Id))"
+                    $fic = $null
+                } else {
+                    Write-Verbose "[WHATIF] Call Remove-AzFederatedIdentityCredential with parameters: $($ficSplat | ConvertTo-Json -Depth 5)"
+                }
+            } else {
+                Write-Warning "[NOTFOUND] Federated identity credential: '$($ManagedIdentity.federatedIdentityCredential.name)' (ID: <unknown>)"
+            }
+
+            # Service endpoint
+            if ($null -ne $sep) {
+                if ($PSCmdlet.ShouldProcess($ProjectName, "Remove service endpoint: $($Name)")) {
+                    if ($fic) {
+                        throw "Federated identity credential '$($ManagedIdentity.federatedIdentityCredential.name)' still exists! Cannot remove service endpoint '$($Name)'."
+                    }
+
+                    $sepSplat = @{
+                        Id         = $sep.id
+                        ProjectIds = $prj.id
                     }
 
                     $maxAttempts = 3; $waitSeconds = 15; $attempt = 0; $success = $false
@@ -371,13 +342,13 @@ process {
                         $attempt++
 
                         try {
-                            Write-Verbose "Removing service endpoint: '$($se.Name)', attempt '$($attempt)' of '$($maxAttempts)'..."
+                            Write-Verbose "Removing service endpoint: '$($sep.name)', attempt '$($attempt)' of '$($maxAttempts)'..."
 
-                            Remove-AdoServiceEndpoint @seSplat -Confirm:$false -Verbose:$false | Out-Null
+                            Remove-AdoServiceEndpoint @sepSplat -Confirm:$false -Verbose:$false | Out-Null
 
                             $success = $true
                             $status = 'Removed'
-                            Write-Verbose "[REMOVE] Service endpoint: '$($se.Name)' (ID: $($se.Id))"
+                            Write-Verbose "[REMOVED] Service endpoint: '$($sep.name)' (ID: $($sep.id))"
                         } catch {
                             Write-Warning "Attempt '$($attempt) of $($maxAttempts)' failed: $($_.Exception.Message)"
 
@@ -390,23 +361,23 @@ process {
                         }
                     }
                 } else {
-                    $status = 'Skipped'
-                    Write-Verbose "[WHATIF] Call Remove-AdoServiceEndpoint with parameters: $($seSplat | ConvertTo-Json -Depth 5)"
+                    $status = 'WouldRemove'
+                    Write-Verbose "[WHATIF] Call Remove-AdoServiceEndpoint with parameters: $($sepSplat | ConvertTo-Json -Depth 5)"
                 }
             } else {
                 $status = 'NotFound'
-                Write-Warning "[NOTFOUND] Service endpoint: '$($Name)' (ID: UNKNOWN)"
+                $sep = [PSCustomObject]@{
+                    name          = $Name
+                    projectName   = $ProjectName
+                    collectionUri = $CollectionUri
+                }
+
+                Write-Warning "[NOTFOUND] Service endpoint: '$($Name)' (ID: <unknown>)"
             }
 
             # Return rollback result
-            return [PSCustomObject]@{
-                id            = if ($se) { $se.id } else { $null }
-                name          = $Name
-                resourceType  = $RESOURCE_TYPE
-                projectName   = $ProjectName
-                collectionUri = $CollectionUri
-                action        = 'Rollback'
-                status        = $status
+            return $sep | Select-Object -Property *, @{
+                Name = 'status'; Expression = { $status }
             }
         }
 
@@ -414,63 +385,10 @@ process {
 
         #region OUTPUTS
 
-        $obj = [ordered]@{
-            serviceEndpoint = if ($se) {
-                [PSCustomObject]@{
-                    id                               = $se.id
-                    name                             = $se.name
-                    type                             = $se.type
-                    description                      = $se.description
-                    authorization                    = $se.authorization
-                    isShared                         = $se.isShared
-                    url                              = $se.url
-                    isReady                          = $se.isReady
-                    owner                            = $se.owner
-                    data                             = $se.data
-                    serviceEndpointProjectReferences = $se.serviceEndpointProjectReferences
-                    projectName                      = $projectName
-                    collectionUri                    = $CollectionUri
-                }
-            } else { $null }
-            identity        = if ($dep) {
-                [PSCustomObject]@{
-                    id                = $dep.id
-                    name              = $dep.name
-                    clientId          = $dep.clientId
-                    principalId       = $dep.principalId
-                    tenantId          = $dep.tenantId
-                    resourceGroupName = $dep.resourceGroupName
-                    type              = $dep.type
-                }
-            } else { $null }
-            credential      = if ($fic) {
-                [PSCustomObject]@{
-                    id        = $fic.id
-                    name      = $fic.name
-                    issuer    = $fic.issuer
-                    subject   = $fic.subject
-                    audiences = $fic.audiences
-                }
-            } else { $null }
-            roleAssignments = if ($ras -and $ras.Count -gt 0) {
-                $ras | ForEach-Object {
-                    [PSCustomObject]@{
-                        objectId           = $_.objectId
-                        displayName        = $_.displayName
-                        roleDefinitionName = $_.roleDefinitionName
-                        principalId        = $_.principalId
-                        principalType      = $_.principalType
-                        scope              = $_.scope
-                        status             = $_.status
-                    }
-                }
-            } else { $null }
-            resourceType    = $RESOURCE_TYPE
-            projectName     = $ProjectName
-            collectionUri   = $CollectionUri
-            status          = $status
-        }
-        [PSCustomObject]$obj
+        $sep | Select-Object -ExcludeProperty collectionUri, projectName -Property *,
+        @{ Name = 'projectName'; Expression = { $ProjectName } },
+        @{ Name = 'collectionUri'; Expression = { $CollectionUri } },
+        @{ Name = 'status'; Expression = { $status } }
 
         #endregion
 

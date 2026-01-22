@@ -5,9 +5,7 @@
     "required": [
         "collectionUri",
         "projectName",
-        "name",
-        "scope",
-        "managedServiceIdentity"
+        "endpoints"
     ],
     "properties": {
         "$schema": {
@@ -22,79 +20,66 @@
             "type": "string",
             "description": "The Azure DevOps project name"
         },
-        "name": {
-            "type": "string",
-            "description": "The name of the service endpoint/connection"
-        },
-        "description": {
-            "type": "string",
-            "description": "The description of the service connection"
-        },
-        "scope": {
-            "type": "string",
-            "description": "The Azure resource scope for the service connection",
-            "pattern": "^/subscriptions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(/resourceGroups/[^/]+)?$"
-        },
-        "managedServiceIdentity": {
-            "type": "object",
-            "required": [
-                "name",
-                "subscriptionId",
-                "resourceGroupName",
-                "location",
-                "roleAssignments"
-            ],
-            "properties": {
-                "name": {
-                    "type": "string",
-                    "description": "The name of the managed service identity"
-                },
-                "subscriptionId": {
-                    "type": "string",
-                    "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
-                    "description": "The subscription ID (must be a valid GUID)"
-                },
-                "resourceGroupName": {
-                    "type": "string",
-                    "description": "The name of the resource group containing the managed identity"
-                },
-                "location": {
-                    "type": "string",
-                    "description": "The Azure region/location for the managed identity"
-                },
-                "tags": {
-                    "type": "object",
-                    "description": "Tags to apply to the managed identity",
-                    "additionalProperties": {
-                        "type": "string"
-                    }
-                },
-                "roleAssignments": {
-                    "type": "array",
-                    "description": "Array of role assignments for the managed identity",
-                    "minItems": 1,
-                    "items": {
+        "endpoints": {
+            "type": "array",
+            "description": "Array of service endpoint/connection configurations",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "managedIdentity"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "The name of the service endpoint/connection"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "The description of the service connection"
+                    },
+                    "managedIdentity": {
                         "type": "object",
                         "required": [
-                            "roleDefinitionName",
-                            "scope"
+                            "name",
+                            "subscriptionId",
+                            "resourceGroupName",
+                            "federatedIdentityCredential"
                         ],
                         "properties": {
-                            "roleDefinitionName": {
+                            "name": {
                                 "type": "string",
-                                "description": "The name of the role definition to assign"
+                                "description": "The name of the managed identity"
                             },
-                            "scope": {
+                            "subscriptionId": {
                                 "type": "string",
-                                "description": "The scope at which to assign the role",
-                                "pattern": "^/subscriptions/[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}(/resourceGroups/[^/]+)?$"
+                                "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+                                "description": "The subscription ID (must be a valid GUID)"
+                            },
+                            "resourceGroupName": {
+                                "type": "string",
+                                "description": "The name of the resource group containing the managed identity"
+                            },
+                            "federatedIdentityCredential": {
+                                "type": "object",
+                                "required": [
+                                    "name"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "description": "The name of the federated identity credential"
+                                    }
+                                },
+                                "additionalProperties": false
                             }
                         },
                         "additionalProperties": false
                     }
-                }
-            },
-            "additionalProperties": false
+                },
+                "additionalProperties": false
+            }
         }
     },
     "additionalProperties": false

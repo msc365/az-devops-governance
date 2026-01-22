@@ -31,25 +31,34 @@ process {
         # Replace placeholders in parameters using utility function
         $paramsAsJson = Set-PlaceholderValue -ParamsJson $paramsAsJson -ConfigJson $configAsJson
 
-        # Convert JSON string to Hashtable
-        $params = $paramsAsJson | ConvertFrom-Json -AsHashtable
-
-        # Remove $schema key if it exists
-        if ($params.ContainsKey('$schema')) {
-            $params.Remove('$schema') | Out-Null
-        }
+        # Convert JSON string to PSCustomObject to preserve pipeline property binding
+        $params = $paramsAsJson | ConvertFrom-Json
 
         Write-Verbose "Using params: $($params | ConvertTo-Json -Depth 5)"
 
-        # Execute the deployment template with parameters
-        $params += @{
-            Rollback = $Rollback.IsPresent
-            WhatIf   = $WhatIfPreference
-            Confirm  = $ConfirmPreference
-            Verbose  = $VerbosePreference
+        # Extract common parameters
+        $collectionUri = $params.collectionUri
+        $projectName = $params.projectName
+        $endpoints = $params.endpoints
+
+        if ($null -eq $endpoints -or $endpoints.Count -eq 0) {
+            throw 'No endpoints found in parameter file. At least one endpoint is required.'
         }
 
-        & (Join-Path $PSScriptRoot -ChildPath $TemplateFile) @params
+        Write-Verbose "Processing $($endpoints.Count) endpoint(s) via pipeline..."
+
+        # Prepare script parameters for common values
+        $scriptParams = @{
+            CollectionUri = $collectionUri
+            ProjectName   = $projectName
+            Rollback      = $Rollback.IsPresent
+            WhatIf        = $WhatIfPreference
+            Confirm       = $ConfirmPreference
+            Verbose       = $VerbosePreference
+        }
+
+        # Pipe endpoints to main.ps1
+        $endpoints | & (Join-Path $PSScriptRoot -ChildPath $TemplateFile) @scriptParams
 
     } catch {
         throw $_

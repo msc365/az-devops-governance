@@ -2,40 +2,38 @@
 <!-- omit from toc -->
 # Service Connection `[res\service-connection\main.ps1]`
 
-![Version](https://img.shields.io/badge/script--version-0.1.0-blue) [![License](https://img.shields.io/badge/license-MIT-purple)](https://github.com/msc365/az-devops-governance/blob/main/LICENSE)
+![Version](https://img.shields.io/badge/script%20version-0.1.0-blue) [![License](https://img.shields.io/badge/license-MIT-purple)](https://github.com/msc365/az-devops-governance/blob/main/LICENSE)
 
-Deploys an Azure DevOps Service Connection with Managed Service Identity and Role Assignment.
+Deploys an Azure DevOps service connection.
 
 <!-- omit from toc -->
-## Navigation
+## NAVIGATION
 
-- [Description](#description)
-- [Parameters](#parameters)
-- [Examples](#examples)
-- [Outputs](#outputs)
-- [Support](#support)
-- [Dependencies](#dependencies)
-- [Resources](#resources)
-- [Notes](#notes)
+- [DESCRIPTION](#description)
+- [PARAMETERS](#parameters)
+- [EXAMPLES](#examples)
+- [OUTPUTS](#outputs)
+- [SUPPORT](#support)
+- [DEPENDENCIES](#dependencies)
+- [RESOURCES](#resources)
+- [NOTES](#notes)
 
-## Description
+## DESCRIPTION
 
-This script deploys an Azure DevOps Service Connection using a Managed Service Identity (MSI) for authentication.
-It also creates the necessary role assignments for the MSI to access Azure resources aka _Azure DevOps Workload Identity Federation_.
+This script deploys an Azure DevOps service connection for a managed identity, including the creation of a federated identity credential.
 
-## Parameters
+## PARAMETERS
 
 | Parameter | Type | Required | Default | Description |
 | :-- | :-- | :-- | :-- | :-- |
-| `ManagedServiceIdentity` | `Object` | Yes | - | Required. An object containing details of the Managed Service Identity to be used. The object should contain: `name`, `resourceGroupName`, `subscriptionId`, `location`, `tags`, and `roleAssignments` (an array of role assignment definitions). See [Example 4](#example-4) for more information. |
-| `Organization` | `String` | Yes | - | Required. The Azure DevOps organization name. |
-| `Project` | `String` | Yes | - | Required. The Azure DevOps project ID or Name where the service connection will be created. |
-| `Scope` | `String` | Yes | - | Required. The scope for the service connection (e.g.: /subscriptions/00000000-0000-0000-0000-000000000000). |
-| `ServiceEndpointName` | `String` | Yes | - | Required. The name of the service connection to be created. |
-| `Force` | `Switch` | No | - | Optional. Switch to force deletion without confirmation during rollback. |
-| `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (delete) the service connection and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing a service connection is irreversible and may affect teams relying on it. See [Notes](#notes) for more information. |
+| `ManagedIdentity` | `Object` | Yes | - | Required. An object containing details of the Managed Identity to be used. The object should contain: `name`, `resourceGroupName`, `subscriptionId`, and `federatedIdentityCredential` (an object with the `name` property). See [Example 4](#example-4) for more information. |
+| `Name` | `String` | Yes | - | Required. The name of the service connection to be created. |
+| `CollectionUri` | `String` | No | `$env:DefaultAdoCollectionUri` | Optional. The collection URI of the Azure DevOps collection/organization, e.g.: `https://dev.azure.com/my-org`, `https://vssps.dev.azure.com/my-org`. |
+| `Description` | `String` | No | - | Optional. A description for the service connection. |
+| `ProjectName` | `String` | No | `$env:DefaultAdoProjectName` | Optional. The Azure DevOps project ID or Name where the service connection will be created. |
+| `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (remove) the service connection and related resources. <br> ⚠️ WARNING: Use with caution! Removing a service connection is irreversible and may affect teams relying on it. |
 
-## Examples
+## EXAMPLES
 
 ### Example 1
 
@@ -50,8 +48,7 @@ $deploySplat = @{
 .\deploy.ps1 @deploySplat -Verbose
 ```
 
-Deploys the service connection using the specified template and parameters.
-
+Deploys the service connection using the specified template and parameters.
 
 ### Example 2
 
@@ -66,8 +63,7 @@ $customSplat = @{
 .\deploy.ps1 @customSplat -Verbose
 ```
 
-Deploys the service connection using the specified template and custom parameters.
-
+Deploys the service connection using the specified template and custom parameters.
 
 ### Example 3
 
@@ -82,8 +78,7 @@ $rollbackSplat = @{
 .\deploy.ps1 @rollbackSplat -Rollback -Force -Verbose
 ```
 
-Rolls back (deletes) the service connection and related resources without confirmation.
-
+Rolls back (deletes) the service connection and related resources without confirmation.
 
 ### Example 4
 
@@ -91,26 +86,17 @@ Rolls back (deletes) the service connection and related resources without confir
 
 ```powershell
 $paramSplat = @{
-    Organization           = 'e2egov-org'
-    Project              = 'e2egov-prjHb72x9'
-    ServiceEndpointName    = 'rg-e2egov-prjHb72x9-tst-weu'
-    Scope                  = '/subscriptions/00000000-0000-0000-0000-000000000000'
-    ManagedServiceIdentity = @{
-        name               = 'id-e2egov-prjHb72x9-tst'
-        resourceGroupName  = 'rg-e2egov-prjHb72x9-tst-weu'
-        subscriptionId     = '00000000-0000-0000-0000-000000000000'
-        location           = 'westeurope'
-        tags               = @{ 'environment' = 'tst'; 'owner' = 'e2egov' }
-        roleAssignments     = @(
-            @{
-                roleDefinitionName = 'Reader'
-                scope              = '/subscriptions/00000000-0000-0000-0000-000000000000'
-            },
-            @{
-                roleDefinitionName = 'Contributor'
-                scope              = '/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/rg-my-project'
-            }
-        )
+    CollectionUri          = 'https://dev.azure.com/e2egov-org'
+    ProjectName            = 'e2egov-prjHb72x9'
+    Name                   = 'rg-e2egov-prjHb72x9-tst-weu'
+    Description            = 'Service Connection for e2egov-prjHb72x9 testing in West Europe'
+    ManagedIdentity = @{
+        Name                         = 'id-e2egov-prjHb72x9-tst'
+        ResourceGroupName            = 'rg-e2egov-prjHb72x9-tst-weu'
+        SubscriptionId               = '00000000-0000-0000-0000-000000000000'
+        FederatedIdentityCredential  = @{
+            Name = 'fic-e2egov-prjHb72x9-tst'
+        }
     }
 }
 
@@ -119,11 +105,11 @@ $paramSplat = @{
 
 Deploys a service connection using the specified parameters in code.
 
-## Outputs
+## OUTPUTS
 
 ### `PSCustomObject`
 
-## Support
+## SUPPORT
 
 ### CommonParameters
 
@@ -139,7 +125,7 @@ This script supports the `-WhatIf` and `-Confirm` parameters for safe execution:
 - **`-WhatIf`**: Shows what would happen if the script runs without actually making any changes.
 - **`-Confirm`**: Prompts for confirmation before performing each action.
 
-## Dependencies
+## DEPENDENCIES
 
 This script requires the following PowerShell modules:
 
@@ -148,18 +134,9 @@ This script requires the following PowerShell modules:
 - `Az.Resources`
 - `Azure.DevOps.PSModule`
 
-## Resources
+## RESOURCES
 
 - [deploy](deploy.ps1)
-
-### Modules
-
-- [dependencies](modules/dependencies.ps1)
-
-### Shared
-
-- [resource-group](../shared/resource-group)
-- [role-assignment](../shared/role-assignment)
 
 ### Tests
 
@@ -167,14 +144,8 @@ This script requires the following PowerShell modules:
 - [rollback](tests/e2e/rollback)
 
 
-## Notes
+## NOTES
 
 - Operations are idempotent (safe to run multiple times).
 - Ensure you are logged in to Azure using Connect-AzAccount before running this script.
 - User confirmation is required for deletion unless `-Force` is specified.
-
-> [!IMPORTANT]
-> Removing a service connection is irreversible and may affect teams relying on it, use with caution!
-
-> [!NOTE]
-> When using `-WhatIf`, you may see role assignment operations displaying `..."roleAssignment/Reader/[Unknown]"`. This is expected behavior. Role assignments that depend on resources being created in the same execution will show `[Unknown]` during `-WhatIf` previews.
