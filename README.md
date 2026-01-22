@@ -42,7 +42,7 @@ End‑to‑end governance is platform‑agnostic. This repository illustrates on
 Any governance model must be tied to the organization's business rules, which are reflected in any technical implementation of access controls. This example model uses a fictitious international _Building Materials_ company with the following common scenario (with business requirements):
 
 - **Align with OpCo's and permissions models**  
-  The international organization has multiple Operational Companies (OpCos) across Europe, including countries such as "_Portugal_" and the "Netherlands_", which operate largely independently. In each OpCo, there are three levels or privileges, which are mapped to distinct `*-admin(istrator)s`, `*-dev(eloper)s` or `*-stake(holder)s` Microsoft Entra groups. This allows developers and stakeholders to be targeted when configuring permissions in the cloud.
+  The international organization has multiple Operational Companies (OpCos) across Europe, including countries such as "_Portugal_" and the "_Netherlands_", which operate largely independently. In each OpCo, there are three levels or privileges, which are mapped to distinct `*-admin(istrator)s`, `*-dev(eloper)s` or `*-stake(holder)s` Microsoft Entra groups. This allows developers and stakeholders to be targeted when configuring permissions in the cloud.
 
 - **Staged deployment environments**  
   Every business domain has two environments:
@@ -111,7 +111,7 @@ The numbering reflects the order in which administrators and enterprise architec
 
    > \* In real life scenarios you should create a _Custom Role_ that prevents a managed identity from removing any [management locks](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/lock-resources) that you've placed on your resources. This helps protect resources from accidental damage, such as database deletion. See [Create a custom role for the service principal](#create-a-custom-role-for-the-service-principal) later in this document.
 
-   This implementation follows structured _naming patterns_ defined in [src/cfg/main.abbreviations.json](src/cfg/main.abbreviations.json).
+   This implementation follows structured _naming patterns_ defined in [config/main.abbreviations.json](config/main.abbreviations.json).
 
    Examples:
    - `id-*`: User-assigned managed identities
