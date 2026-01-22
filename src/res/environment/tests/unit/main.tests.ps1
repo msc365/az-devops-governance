@@ -9,8 +9,6 @@ BeforeAll {
     function New-AdoEnvironment { }
     function Set-AdoEnvironment { }
     function Remove-AdoEnvironment { }
-    function Set-AzContextInfo { }
-    function Restore-AzContextInfo { }
 
     # Mock all external dependencies
     Mock -CommandName Get-AzContext -MockWith {
@@ -23,17 +21,6 @@ BeforeAll {
         }
     }
 
-    Mock -CommandName Set-AzContext -MockWith {
-        param($TenantId, $SubscriptionId)
-        [PSCustomObject]@{
-            Tenant       = @{ Id = $TenantId }
-            Subscription = @{
-                Id   = $SubscriptionId
-                Name = 'Switched Subscription'
-            }
-        }
-    }
-
     Mock -CommandName Import-Module
     Mock -CommandName Get-Module -MockWith { $true }
     Mock -CommandName Start-Sleep
@@ -41,55 +28,6 @@ BeforeAll {
     Mock -CommandName New-AdoEnvironment
     Mock -CommandName Set-AdoEnvironment
     Mock -CommandName Remove-AdoEnvironment
-    Mock -CommandName Set-AzContextInfo -MockWith {
-        [PSCustomObject]@{
-            originalContext = $CurrentContext
-            targetContext   = $CurrentContext
-            switched        = $false
-        }
-    }
-    Mock -CommandName Restore-AzContextInfo
-
-    # Create mock scripts in TestDrive
-    # 1. Mock the Set-AzContextInfo helper script
-    $mockHelperScriptPath = Join-Path -Path $TestDrive -ChildPath 'Set-AzContextInfo.ps1'
-    @'
-function Set-AzContextInfo {
-    param($SubscriptionId, $CurrentContext, $Verbose)
-    [PSCustomObject]@{
-        originalContext = $CurrentContext
-        targetContext   = $CurrentContext
-        switched        = $false
-    }
-}
-function Restore-AzContextInfo {
-    param($ContextInfo)
-}
-'@ | Out-File -FilePath $mockHelperScriptPath -Force
-
-    # 2. Mock the resource-group main script
-    $mockRgScriptPath = Join-Path -Path $TestDrive -ChildPath 'resource-group-main.ps1'
-    @"
-param(`$Name, `$Location, `$SubscriptionId, `$Tags, `$Rollback, `$WhatIf, `$Verbose, `$Confirm)
-[PSCustomObject]@{
-    ResourceGroupName = `$Name
-    Location          = `$Location
-    ResourceId        = "/subscriptions/`$SubscriptionId/resourceGroups/`$Name"
-}
-"@ | Out-File -FilePath $mockRgScriptPath -Force
-
-    # Mock Join-Path to return our mock scripts
-    Mock -CommandName Join-Path -ParameterFilter {
-        $ChildPath -like '*Set-AzContextInfo.ps1*'
-    } -MockWith {
-        $mockHelperScriptPath
-    }
-
-    Mock -CommandName Join-Path -ParameterFilter {
-        $ChildPath -like '*resource-group\main.ps1*'
-    } -MockWith {
-        $mockRgScriptPath
-    }
 }
 
 Describe 'Environment DSC Script - Core Functionality' {
@@ -126,6 +64,8 @@ Describe 'Environment DSC Script - Core Functionality' {
             $result.id | Should -Be 123
             $result.name | Should -Be 'env-test'
             $result.status | Should -Be 'Created'
+            $result.collectionUri | Should -Be 'https://dev.azure.com/test-org'
+            $result.projectName | Should -Be 'test-project'
             Should -Invoke -CommandName New-AdoEnvironment -Times 1
         }
 
@@ -183,6 +123,7 @@ Describe 'Environment DSC Script - Core Functionality' {
 
             # Assert
             $result.status | Should -Be 'Updated'
+            $result.description | Should -Be 'New description'
             Should -Invoke -CommandName Set-AdoEnvironment -Times 1
         }
 
@@ -200,6 +141,32 @@ Describe 'Environment DSC Script - Core Functionality' {
 
             # Assert
             $result.status | Should -Be 'NoChange'
+            $result.id | Should -Be 456
+            Should -Invoke -CommandName Set-AdoEnvironment -Times 0
+        }
+
+        It 'Should not update when description is not explicitly provided' {
+            # Arrange
+            Mock -CommandName Get-AdoEnvironment -MockWith {
+                [PSCustomObject]@{
+                    id          = 456
+                    name        = 'env-existing'
+                    description = 'Existing description'
+                }
+            }
+            $params = @{
+                CollectionUri = 'https://dev.azure.com/test-org'
+                ProjectName   = 'test-project'
+                Name          = 'env-existing'
+                Confirm       = $false
+            }
+
+            # Act
+            $result = & $script:scriptPath @params
+
+            # Assert
+            $result.status | Should -Be 'NoChange'
+            $result.description | Should -Be 'Existing description'
             Should -Invoke -CommandName Set-AdoEnvironment -Times 0
         }
     }
@@ -230,7 +197,7 @@ Describe 'Environment DSC Script - Core Functionality' {
 
             # Assert
             $result.status | Should -Be 'Removed'
-            $result.action | Should -Be 'Rollback'
+            $result.id | Should -Be 789
             Should -Invoke -CommandName Remove-AdoEnvironment -Times 1
         }
 
@@ -323,76 +290,4 @@ Describe 'Environment DSC Script - Azure Context Validation' {
     }
 }
 
-Describe 'Environment DSC Script - ResourceGroup Integration' {
 
-    Context 'When ResourceGroup parameter is provided' {
-        BeforeEach {
-            Mock -CommandName Get-AdoEnvironment -MockWith { $null }
-            Mock -CommandName New-AdoEnvironment -MockWith {
-                [PSCustomObject]@{
-                    id   = 999
-                    name = 'env-with-rg'
-                }
-            }
-        }
-
-        It 'Should throw when ResourceGroup is missing required properties' {
-            # Arrange
-            $params = @{
-                CollectionUri  = 'https://dev.azure.com/test-org'
-                ProjectName    = 'test-project'
-                Name           = 'env-test'
-                SubscriptionId = '33333333-3333-3333-3333-333333333333'
-                ResourceGroup  = @{
-                    name = 'rg-test'
-                    # Missing 'location'
-                }
-                Confirm        = $false
-            }
-
-            # Act & Assert
-            { & $script:scriptPath @params } | Should -Throw -ExpectedMessage '*missing required property*'
-        }
-
-        It 'Should throw when SubscriptionId is not provided with ResourceGroup' {
-            # Arrange
-            $params = @{
-                CollectionUri = 'https://dev.azure.com/test-org'
-                ProjectName   = 'test-project'
-                Name          = 'env-test'
-                ResourceGroup = @{
-                    name     = 'rg-test'
-                    location = 'westeurope'
-                }
-                Confirm       = $false
-            }
-
-            # Act & Assert
-            { & $script:scriptPath @params } | Should -Throw -ExpectedMessage '*SubscriptionId parameter is required when ResourceGroup is specified*'
-        }
-
-        It 'Should create environment with resource group using separate SubscriptionId parameter' {
-            # Arrange
-            $params = @{
-                CollectionUri  = 'https://dev.azure.com/test-org'
-                ProjectName    = 'test-project'
-                Name           = 'env-with-rg'
-                SubscriptionId = '33333333-3333-3333-3333-333333333333'
-                ResourceGroup  = @{
-                    name     = 'rg-test'
-                    location = 'westeurope'
-                    tags     = @{ environment = 'test' }
-                }
-                Confirm        = $false
-            }
-
-            # Act
-            $result = & $script:scriptPath @params
-
-            # Assert
-            $result.resourceGroup.name | Should -Be 'rg-test'
-            $result.resourceGroup.location | Should -Be 'westeurope'
-            $result.resourceGroup.resourceId | Should -Match '/subscriptions/33333333-3333-3333-3333-333333333333/resourceGroups/rg-test'
-        }
-    }
-}
