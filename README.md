@@ -25,7 +25,7 @@ End‑to‑end governance is platform‑agnostic. This repository illustrates on
 
 ### Table of Contents
 
-- [Use cases](#use-cases)
+- [Potential use cases](#potential-use-cases)
 - [Architecture](#architecture)
 - [Considerations](#considerations)
 - [Components](#components)
@@ -34,7 +34,7 @@ End‑to‑end governance is platform‑agnostic. This repository illustrates on
 - [Support](#support)
 - [License](#license)
 
-## Use cases
+## Potential use cases
 
 > [!IMPORTANT]
 > Please read this scenario carefully to understand the decisions behind the model used in this sample repository.
@@ -170,7 +170,7 @@ To successfully secure your workloads, you must use a combination of security pe
 | ![bullet 4](.assets/e2egov-no4.png) | Service Connections | Shared | Configure Azure DevOps to restrict access to these credentials. |
 | ![bullet 5](.assets/e2egov-no5.png) | Azure Resources | Shared | Configure RBAC in Resource Manager. |
 
-The following concepts and questions are important to consider when designing a governance model. Bear in mind the [potential use cases](#use-cases) of the demo organization.
+The following concepts and questions are important to consider when designing a governance model. Bear in mind the [potential use cases](#potential-use-cases) of the demo organization.
 
 ### Safeguard your environments with branch policies
 
@@ -240,9 +240,9 @@ See [iac/ptn/authorization/role-definition/main.bicep](iac/ptn/authorization/rol
     "Microsoft.Authorization/*/Delete"
   ],
   "AssignableScopes": [
-    "/subscriptions/{subscriptionId1}",
-    "/subscriptions/{subscriptionId2}",
-    "/providers/Microsoft.Management/managementGroups/{groupId1}"
+    "/subscriptions/{subscriptionId}",
+    "/subscriptions/{subscriptionId}",
+    "/providers/Microsoft.Management/managementGroups/{managementGroupId}"
   ]
 }
 ```
@@ -271,7 +271,7 @@ If that removes too many permissions for your purposes, refer to the full list i
 
 ## Deploy this scenario
 
-This scenario extends beyond Azure Resource Manager. This is way we use **Bicep templates** for Azure infrastructure provisioning and Microsoft Entra ID group management, and **PowerShell scripts** for Azure DevOps bootstrapping. This combination provides declarative infrastructure-as-code for Azure resources and identity while leveraging PowerShell's flexibility for DevOps operations in a declarative DSC like approach.
+This scenario extends beyond Azure Resource Manager. This is why we use **PowerShell scripts** for Azure DevOps bootstrapping and **Bicep templates** for Azure infrastructure provisioning and Microsoft Entra ID group management. This combination provides declarative infrastructure-as-code for Azure resources and identity while leveraging PowerShell's flexibility for DevOps operations in a declarative DSC like approach.
 
 ### Quick Start
 
