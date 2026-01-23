@@ -138,11 +138,13 @@ begin {
     }
 
     # Import required module if not already loaded
-    $requiredModule = 'Azure.DevOps.PSModule'
+    $requiredModules = @('Azure.DevOps.PSModule', 'Microsoft.Graph.Groups')
 
-    if (-not (Get-Module -Name $requiredModule)) {
-        Import-Module $requiredModule -Force -Verbose:$false -ErrorAction Stop
-        Write-Verbose "Module '$requiredModule' imported successfully."
+    foreach ($requiredModule in $requiredModules) {
+        if (-not (Get-Module -Name $requiredModule)) {
+            Import-Module $requiredModule -Force -Verbose:$false -ErrorAction Stop
+            Write-Verbose "Module '$requiredModule' imported successfully."
+        }
     }
 
     # Project
