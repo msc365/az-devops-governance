@@ -1,0 +1,48 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://raw.githubusercontent.com/msc365/az-devops-governance/main/schemas/membership.schema.json",
+    "type": "object",
+    "required": [
+        "collectionUri",
+        "projectName",
+        "securityGroups"
+    ],
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "JSON Schema reference"
+        },
+        "collectionUri": {
+            "type": "string",
+            "description": "The Azure DevOps collection URI"
+        },
+        "projectName": {
+            "type": "string",
+            "description": "The Azure DevOps project name"
+        },
+        "securityGroups": {
+            "type": "array",
+            "description": "Array of security groups and their project memberships",
+            "items": {
+                "type": "object",
+                "required": [
+                    "uniqueName",
+                    "groupMembership"
+                ],
+                "properties": {
+                    "uniqueName": {
+                        "type": "string",
+                        "description": "The unique name (mailNickname of the Microsoft Entra ID security group"
+                    },
+                    "groupMembership": {
+                        "type": "string",
+                        "description": "The Azure DevOps project group that the security group should be added to"
+                    }
+                },
+                "additionalProperties": false
+            },
+            "minItems": 1
+        }
+    },
+    "additionalProperties": false
+}

@@ -116,7 +116,7 @@ param (
 )
 
 begin {
-    Write-Verbose "[Enter]: ./src/res/group-membership/$($MyInvocation.MyCommand.Name)"
+    Write-Verbose "[Enter]: ./src/res/membership/$($MyInvocation.MyCommand.Name)"
 
     # Validate required parameters
     if ([string]::IsNullOrWhiteSpace($CollectionUri)) {
@@ -298,5 +298,5 @@ process {
 }
 
 end {
-    Write-Verbose ("[Exit]: ./src/res/group-membership/$($MyInvocation.MyCommand.Name)")
+    Write-Verbose ("[Exit]: ./src/res/membership/$($MyInvocation.MyCommand.Name)")
 }
