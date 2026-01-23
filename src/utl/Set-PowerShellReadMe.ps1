@@ -1182,7 +1182,7 @@ function Merge-FileWithNewContent {
 
 .EXAMPLE
     . src\utl\Set-PowerShellReadMe.ps1
-    Set-PowerShellReadMe -ScriptFilePath 'c:\_git\az-devops-governance\src\res\service-connection\main.ps1'
+    Set-PowerShellReadMe -ScriptFilePath 'c:\_git\az-devops-governance\src\res\connection\main.ps1'
 
     Generates or updates the README.md file for the specified PowerShell script.
 

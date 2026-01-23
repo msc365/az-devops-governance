@@ -27,7 +27,7 @@ Generates or updates README.md files for individual PowerShell scripts.
 ```powershell
 # Generate README for a single script
 . .\src\utl\Set-PowerShellReadMe.ps1
-Set-PowerShellReadMe -ScriptFilePath '.\src\res\service-connection\main.ps1'
+Set-PowerShellReadMe -ScriptFilePath '.\src\res\connection\main.ps1'
 
 # Update specific sections only
 Set-PowerShellReadMe -ScriptFilePath '.\main.ps1' -SectionsToRefresh @('Parameters', 'Examples')
@@ -175,7 +175,7 @@ To get the best results from these README generators, follow these practices:
 
 ```powershell
 . .\src\utl\Set-PowerShellReadMe.ps1
-Set-PowerShellReadMe -ScriptFilePath '.\src\res\service-connection\main.ps1' -Verbose
+Set-PowerShellReadMe -ScriptFilePath '.\src\res\connection\main.ps1' -Verbose
 ```
 
 ### Example 2: Update All READMEs in a Folder
