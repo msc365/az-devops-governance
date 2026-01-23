@@ -1,9 +1,9 @@
 ﻿<#
 .SYNOPSIS
-    Rollback end-to-end tests for Azure DevOps environment.
+    Rollback end-to-end tests for Azure DevOps group membership.
 
 .DESCRIPTION
-    This script executes end-to-end tests with rollback properties for an Azure DevOps environment configuration.
+    This script executes end-to-end tests with rollback properties for an Azure DevOps group membership configuration.
 
 .NOTES
     File Name      : main.tests.ps1

@@ -1,9 +1,9 @@
 ﻿<#
 .SYNOPSIS
-    Create end-to-end tests for Azure DevOps environment.
+    Create end-to-end tests for Azure DevOps group membership.
 
 .DESCRIPTION
-    This script executes end-to-end tests with default properties for an Azure DevOps environment configuration.
+    This script executes end-to-end tests with default properties for an Azure DevOps group membership configuration.
 
 .NOTES
     File Name      : main.tests.ps1
