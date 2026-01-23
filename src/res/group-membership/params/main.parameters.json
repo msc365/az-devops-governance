@@ -4,15 +4,15 @@
     "projectName": "{prefix}-prj{uniqueId}",
     "securityGroups": [
         {
-            "mailNickname": "{prefix}-prj{uniqueId}-admins",
+            "uniqueName": "{prefix}-prj{uniqueId}-admins",
             "groupMembership": "Project Administrators"
         },
         {
-            "mailNickname": "{prefix}-prj{uniqueId}-devs",
+            "uniqueName": "{prefix}-prj{uniqueId}-devs",
             "groupMembership": "Contributors"
         },
         {
-            "mailNickname": "{prefix}-prj{uniqueId}-stakes",
+            "uniqueName": "{prefix}-prj{uniqueId}-stakes",
             "groupMembership": "Readers"
         }
     ]

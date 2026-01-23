@@ -33,8 +33,8 @@
 .PARAMETER ProjectName
     Optional. The Azure DevOps project ID or Name where the environment will be created.
 
-.PARAMETER MailNickname
-    Mandatory. The MailNickname of the Entra ID security group to be added to Azure DevOps groups.
+.PARAMETER UniqueName
+    Mandatory. The UniqueName (MailNickname) of the Entra ID security group to be added to Azure DevOps groups.
 
 .PARAMETER GroupMembership
     Mandatory. The name of the Azure DevOps built-in group to which the Entra ID security group will be added, e.g., `Readers`, `Contributors`, `Project Administrators`.
@@ -47,7 +47,8 @@
     [PSCustomObject]@{
         memberDescriptor    = The descriptor of the member (Entra ID security group)
         containerDescriptor = The descriptor of the container (Azure DevOps built-in group)
-        mailNickname        = Entra ID Group MailNickname
+        uniqueName          = Entra ID Group UniqueName (MailNickname)
+        originId            = Entra ID Group Object ID
         groupMembership     = Azure DevOps Built-in Group Name
         projectName         = Azure DevOps Project Name
         collectionUri       = Azure DevOps Collection URI
@@ -88,7 +89,7 @@
     $params = @{
         CollectionUri   = 'https://dev.azure.com/e2egov-org'
         ProjectName     = 'e2egov-prjHb72x9'
-        MailNickname    = 'e2egov-prjHb72x9-devs'
+        UniqueName      = 'e2egov-prjHb72x9-devs'
         GroupMembership = 'Contributors'
     }
     .\main.ps1 @params -Verbose
@@ -105,7 +106,7 @@ param (
     [string]$ProjectName = $env:DefaultAdoProjectName,
 
     [Parameter(Mandatory, ValueFromPipelineByPropertyName)]
-    [string]$MailNickname,
+    [string]$UniqueName,
 
     [Parameter(Mandatory, ValueFromPipelineByPropertyName)]
     [string]$GroupMembership,
@@ -184,14 +185,14 @@ process {
 
         # Graph group lookup
         $mgGrpSplat = @{
-            Filter   = "mailNickname eq '$($MailNickname)'"
+            Filter   = "mailNickname eq '$($UniqueName)'"
             Property = 'Id, MailNickname, DisplayName'
         }
 
         $mgGrp = Get-MgGroup @mgGrpSplat -ErrorAction Stop
 
         if ($null -eq $mgGrp) {
-            throw "Security group with MailNickname '$($MailNickname)' does not exist, cannot proceed."
+            throw "Security group with UniqueName '$($UniqueName)' does not exist, cannot proceed."
         }
 
         # Build-in group lookup
@@ -275,7 +276,8 @@ process {
 
             # Return rollback result; rebuild object
             return $grpMshp | Select-Object -ExcludeProperty collectionUri -Property *,
-            @{ Name = 'mailNickname'; Expression = { $mgGrp.mailNickname } },
+            @{ Name = 'uniqueName'; Expression = { $mgGrp.mailNickname } },
+            @{ Name = 'originId'; Expression = { $mgGrp.id } },
             @{ Name = 'groupMembership'; Expression = { $GroupMembership } },
             @{ Name = 'projectName'; Expression = { $ProjectName } },
             @{ Name = 'collectionUri'; Expression = { $CollectionUri } },
@@ -288,7 +290,8 @@ process {
 
         # Return deployment result; rebuild object
         $grpMshp | Select-Object -ExcludeProperty collectionUri -Property *,
-        @{ Name = 'mailNickname'; Expression = { $mgGrp.mailNickname } },
+        @{ Name = 'uniqueName'; Expression = { $mgGrp.mailNickname } },
+        @{ Name = 'originId'; Expression = { $mgGrp.id } },
         @{ Name = 'groupMembership'; Expression = { $GroupMembership } },
         @{ Name = 'projectName'; Expression = { $ProjectName } },
         @{ Name = 'collectionUri'; Expression = { $CollectionUri } },

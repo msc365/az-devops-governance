@@ -26,13 +26,13 @@
             "items": {
                 "type": "object",
                 "required": [
-                    "mailNickname",
+                    "uniqueName",
                     "groupMembership"
                 ],
                 "properties": {
-                    "mailNickname": {
+                    "uniqueName": {
                         "type": "string",
-                        "description": "The mail nickname of the Microsoft Entra ID security group"
+                        "description": "The unique name (mailNickname of the Microsoft Entra ID security group"
                     },
                     "groupMembership": {
                         "type": "string",

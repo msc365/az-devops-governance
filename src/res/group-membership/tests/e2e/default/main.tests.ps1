@@ -15,7 +15,7 @@
 $params = @{
     CollectionUri   = 'https://dev.azure.com/e2egov-org'
     ProjectName     = 'e2egov-prjHb72x9'
-    MailNickname    = 'e2egov-prjHb72x9-devs'
+    UniqueName      = 'e2egov-prjHb72x9-devs'
     GroupMembership = 'Contributors'
 }
 

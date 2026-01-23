@@ -1,4 +1,4 @@
-﻿#Requires -Version 7.0
+#Requires -Version 7.0
 
 BeforeAll {
     # Import the script under test
@@ -100,7 +100,7 @@ Describe 'Group Membership Script - Core Functionality' {
             $params = @{
                 CollectionUri   = 'https://dev.azure.com/test-org'
                 ProjectName     = 'test-project'
-                MailNickname    = 'test-group'
+                UniqueName      = 'test-group'
                 GroupMembership = 'Contributors'
                 Confirm         = $false
             }
@@ -112,7 +112,7 @@ Describe 'Group Membership Script - Core Functionality' {
             $result.status | Should -Be 'Created'
             $result.memberDescriptor | Should -Be 'descriptor-new-member'
             $result.containerDescriptor | Should -Be 'descriptor-contributors'
-            $result.mailNickname | Should -Be 'test-group'
+            $result.uniqueName | Should -Be 'test-group'
             $result.groupMembership | Should -Be 'Contributors'
             $result.projectName | Should -Be 'test-project'
             $result.collectionUri | Should -Be 'https://dev.azure.com/test-org'
@@ -124,7 +124,7 @@ Describe 'Group Membership Script - Core Functionality' {
             $params = @{
                 CollectionUri   = 'https://dev.azure.com/test-org'
                 ProjectName     = 'test-project'
-                MailNickname    = 'test-group'
+                UniqueName      = 'test-group'
                 GroupMembership = 'Readers'
                 Confirm         = $false
             }
@@ -154,7 +154,7 @@ Describe 'Group Membership Script - Core Functionality' {
             $params = @{
                 CollectionUri   = 'https://dev.azure.com/test-org'
                 ProjectName     = 'test-project'
-                MailNickname    = 'test-group'
+                UniqueName      = 'test-group'
                 GroupMembership = 'Contributors'
                 Confirm         = $false
             }
@@ -184,7 +184,7 @@ Describe 'Group Membership Script - Core Functionality' {
             $params = @{
                 CollectionUri   = 'https://dev.azure.com/test-org'
                 ProjectName     = 'test-project'
-                MailNickname    = 'test-group'
+                UniqueName      = 'test-group'
                 GroupMembership = 'Contributors'
                 Rollback        = $true
                 Confirm         = $false
@@ -205,7 +205,7 @@ Describe 'Group Membership Script - Core Functionality' {
             $params = @{
                 CollectionUri   = 'https://dev.azure.com/test-org'
                 ProjectName     = 'test-project'
-                MailNickname    = 'test-group'
+                UniqueName      = 'test-group'
                 GroupMembership = 'Contributors'
                 Rollback        = $true
                 Confirm         = $false
@@ -240,7 +240,7 @@ Describe 'Group Membership Script - Parameter Validation' {
             # Arrange
             $params = @{
                 ProjectName     = 'test-project'
-                MailNickname    = 'test-group'
+                UniqueName      = 'test-group'
                 GroupMembership = 'Contributors'
                 Confirm         = $false
             }
@@ -253,7 +253,7 @@ Describe 'Group Membership Script - Parameter Validation' {
             # Arrange
             $params = @{
                 CollectionUri   = 'https://dev.azure.com/test-org'
-                MailNickname    = 'test-group'
+                UniqueName      = 'test-group'
                 GroupMembership = 'Contributors'
                 Confirm         = $false
             }
@@ -262,9 +262,9 @@ Describe 'Group Membership Script - Parameter Validation' {
             { & $script:scriptPath @params } | Should -Throw -ExpectedMessage '*ProjectName is required*'
         }
 
-        It 'Should validate MailNickname parameter is mandatory via metadata' {
+        It 'Should validate UniqueName parameter is mandatory via metadata' {
             # Arrange
-            $metadata = (Get-Command $script:scriptPath).Parameters['MailNickname']
+            $metadata = (Get-Command $script:scriptPath).Parameters['UniqueName']
 
             # Assert
             $metadata.Attributes.Mandatory | Should -Contain $true
@@ -289,7 +289,7 @@ Describe 'Group Membership Script - Context Validation' {
             $params = @{
                 CollectionUri   = 'https://dev.azure.com/test-org'
                 ProjectName     = 'test-project'
-                MailNickname    = 'test-group'
+                UniqueName      = 'test-group'
                 GroupMembership = 'Contributors'
                 Confirm         = $false
             }
@@ -306,7 +306,7 @@ Describe 'Group Membership Script - Context Validation' {
             $params = @{
                 CollectionUri   = 'https://dev.azure.com/test-org'
                 ProjectName     = 'test-project'
-                MailNickname    = 'test-group'
+                UniqueName      = 'test-group'
                 GroupMembership = 'Contributors'
                 Confirm         = $false
             }
@@ -320,19 +320,19 @@ Describe 'Group Membership Script - Context Validation' {
 Describe 'Group Membership Script - Error Handling' {
 
     Context 'When Entra ID group does not exist' {
-        It 'Should throw when MailNickname does not match any group' {
+        It 'Should throw when UniqueName does not match any group' {
             # Arrange
             Mock -CommandName Get-MgGroup -MockWith { $null }
             $params = @{
                 CollectionUri   = 'https://dev.azure.com/test-org'
                 ProjectName     = 'test-project'
-                MailNickname    = 'nonexistent-group'
+                UniqueName      = 'nonexistent-group'
                 GroupMembership = 'Contributors'
                 Confirm         = $false
             }
 
             # Act & Assert
-            { & $script:scriptPath @params } | Should -Throw -ExpectedMessage "*Security group with MailNickname 'nonexistent-group' does not exist*"
+            { & $script:scriptPath @params } | Should -Throw -ExpectedMessage "*Security group with UniqueName 'nonexistent-group' does not exist*"
         }
     }
 
@@ -343,7 +343,7 @@ Describe 'Group Membership Script - Error Handling' {
             $params = @{
                 CollectionUri   = 'https://dev.azure.com/test-org'
                 ProjectName     = 'nonexistent-project'
-                MailNickname    = 'test-group'
+                UniqueName      = 'test-group'
                 GroupMembership = 'Contributors'
                 Confirm         = $false
             }
@@ -353,296 +353,3 @@ Describe 'Group Membership Script - Error Handling' {
         }
     }
 }
-#Requires -Version 7.0
-
-BeforeAll {
-    # Import the script under test
-    $script:scriptPath = Join-Path -Path $PSScriptRoot -ChildPath '..\..\main.ps1'
-
-    # Create mock functions for Azure DevOps cmdlets before importing the script
-    function Get-AdoEnvironment { }
-    function New-AdoEnvironment { }
-    function Set-AdoEnvironment { }
-    function Remove-AdoEnvironment { }
-
-    # Mock all external dependencies
-    Mock -CommandName Get-AzContext -MockWith {
-        [PSCustomObject]@{
-            Tenant       = @{ Id = '11111111-1111-1111-1111-111111111111' }
-            Subscription = @{
-                Id   = '22222222-2222-2222-2222-222222222222'
-                Name = 'Test Subscription'
-            }
-        }
-    }
-
-    Mock -CommandName Import-Module
-    Mock -CommandName Get-Module -MockWith { $true }
-    Mock -CommandName Start-Sleep
-    Mock -CommandName Get-AdoEnvironment
-    Mock -CommandName New-AdoEnvironment
-    Mock -CommandName Set-AdoEnvironment
-    Mock -CommandName Remove-AdoEnvironment
-}
-
-Describe 'Environment DSC Script - Core Functionality' {
-
-    Context 'DSC Scenario: Create - Environment Does Not Exist' {
-        BeforeEach {
-            Mock -CommandName Get-AdoEnvironment -MockWith { $null }
-            Mock -CommandName New-AdoEnvironment -MockWith {
-                [PSCustomObject]@{
-                    id             = 123
-                    name           = 'env-test'
-                    description    = 'Test environment'
-                    createdBy      = 'test@example.com'
-                    createdOn      = '2026-01-11T10:00:00Z'
-                    lastModifiedBy = 'test@example.com'
-                    lastModifiedOn = '2026-01-11T10:00:00Z'
-                }
-            }
-        }
-
-        It 'Should create environment with required parameters' {
-            # Arrange
-            $params = @{
-                CollectionUri = 'https://dev.azure.com/test-org'
-                ProjectName   = 'test-project'
-                Name          = 'env-test'
-                Confirm       = $false
-            }
-
-            # Act
-            $result = & $script:scriptPath @params
-
-            # Assert
-            $result.id | Should -Be 123
-            $result.name | Should -Be 'env-test'
-            $result.status | Should -Be 'Created'
-            $result.collectionUri | Should -Be 'https://dev.azure.com/test-org'
-            $result.projectName | Should -Be 'test-project'
-            Should -Invoke -CommandName New-AdoEnvironment -Times 1
-        }
-
-        It 'Should create environment with description' {
-            # Arrange
-            $params = @{
-                CollectionUri = 'https://dev.azure.com/test-org'
-                ProjectName   = 'test-project'
-                Name          = 'env-test'
-                Description   = 'Test description'
-                Confirm       = $false
-            }
-
-            # Act
-            $result = & $script:scriptPath @params
-
-            # Assert
-            $result.description | Should -Be 'Test environment'
-            Should -Invoke -CommandName New-AdoEnvironment -Times 1
-        }
-    }
-
-    Context 'DSC Scenario: Update - Environment Exists with Different Properties' {
-        BeforeEach {
-            Mock -CommandName Get-AdoEnvironment -MockWith {
-                [PSCustomObject]@{
-                    id          = 456
-                    name        = 'env-existing'
-                    description = 'Old description'
-                }
-            }
-            Mock -CommandName Set-AdoEnvironment -MockWith {
-                [PSCustomObject]@{
-                    id             = 456
-                    name           = 'env-existing'
-                    description    = 'New description'
-                    lastModifiedBy = 'test@example.com'
-                    lastModifiedOn = '2026-01-11T11:00:00Z'
-                }
-            }
-        }
-
-        It 'Should update environment when description changes' {
-            # Arrange
-            $params = @{
-                CollectionUri = 'https://dev.azure.com/test-org'
-                ProjectName   = 'test-project'
-                Name          = 'env-existing'
-                Description   = 'New description'
-                Confirm       = $false
-            }
-
-            # Act
-            $result = & $script:scriptPath @params
-
-            # Assert
-            $result.status | Should -Be 'Updated'
-            $result.description | Should -Be 'New description'
-            Should -Invoke -CommandName Set-AdoEnvironment -Times 1
-        }
-
-        It 'Should not update when no changes detected' {
-            # Arrange
-            $params = @{
-                CollectionUri = 'https://dev.azure.com/test-org'
-                ProjectName   = 'test-project'
-                Name          = 'env-existing'
-                Confirm       = $false
-            }
-
-            # Act
-            $result = & $script:scriptPath @params
-
-            # Assert
-            $result.status | Should -Be 'NoChange'
-            $result.id | Should -Be 456
-            Should -Invoke -CommandName Set-AdoEnvironment -Times 0
-        }
-
-        It 'Should not update when description is not explicitly provided' {
-            # Arrange
-            Mock -CommandName Get-AdoEnvironment -MockWith {
-                [PSCustomObject]@{
-                    id          = 456
-                    name        = 'env-existing'
-                    description = 'Existing description'
-                }
-            }
-            $params = @{
-                CollectionUri = 'https://dev.azure.com/test-org'
-                ProjectName   = 'test-project'
-                Name          = 'env-existing'
-                Confirm       = $false
-            }
-
-            # Act
-            $result = & $script:scriptPath @params
-
-            # Assert
-            $result.status | Should -Be 'NoChange'
-            $result.description | Should -Be 'Existing description'
-            Should -Invoke -CommandName Set-AdoEnvironment -Times 0
-        }
-    }
-
-    Context 'DSC Scenario: Rollback - Remove Environment' {
-        BeforeEach {
-            Mock -CommandName Get-AdoEnvironment -MockWith {
-                [PSCustomObject]@{
-                    id   = 789
-                    name = 'env-to-remove'
-                }
-            }
-            Mock -CommandName Remove-AdoEnvironment
-        }
-
-        It 'Should remove existing environment' {
-            # Arrange
-            $params = @{
-                CollectionUri = 'https://dev.azure.com/test-org'
-                ProjectName   = 'test-project'
-                Name          = 'env-to-remove'
-                Rollback      = $true
-                Confirm       = $false
-            }
-
-            # Act
-            $result = & $script:scriptPath @params
-
-            # Assert
-            $result.status | Should -Be 'Removed'
-            $result.id | Should -Be 789
-            Should -Invoke -CommandName Remove-AdoEnvironment -Times 1
-        }
-
-        It 'Should handle rollback when environment does not exist' {
-            # Arrange
-            Mock -CommandName Get-AdoEnvironment -MockWith { $null }
-            $params = @{
-                CollectionUri = 'https://dev.azure.com/test-org'
-                ProjectName   = 'test-project'
-                Name          = 'env-nonexistent'
-                Rollback      = $true
-                Confirm       = $false
-            }
-
-            # Act
-            $result = & $script:scriptPath @params
-
-            # Assert
-            $result.status | Should -Be 'NotFound'
-            Should -Invoke -CommandName Remove-AdoEnvironment -Times 0
-        }
-    }
-}
-
-Describe 'Environment DSC Script - Parameter Validation' {
-
-    Context 'When required parameters are missing' {
-        BeforeEach {
-            # Clear environment variables to test parameter validation
-            $env:DefaultAdoCollectionUri = $null
-            $env:DefaultAdoProjectName = $null
-        }
-
-        AfterEach {
-            # Restore environment variables
-            $env:DefaultAdoCollectionUri = 'https://dev.azure.com/test-org'
-            $env:DefaultAdoProjectName = 'test-project'
-        }
-
-        It 'Should throw when CollectionUri is not provided' {
-            # Arrange
-            $params = @{
-                ProjectName = 'test-project'
-                Name        = 'env-test'
-                Confirm     = $false
-            }
-
-            # Act & Assert
-            { & $script:scriptPath @params } | Should -Throw -ExpectedMessage '*CollectionUri is required*'
-        }
-
-        It 'Should throw when ProjectName is not provided' {
-            # Arrange
-            $params = @{
-                CollectionUri = 'https://dev.azure.com/test-org'
-                Name          = 'env-test'
-                Confirm       = $false
-            }
-
-            # Act & Assert
-            { & $script:scriptPath @params } | Should -Throw -ExpectedMessage '*ProjectName is required*'
-        }
-
-        It 'Should validate Name parameter is mandatory via metadata' {
-            # Arrange
-            $metadata = (Get-Command $script:scriptPath).Parameters['Name']
-
-            # Assert
-            $metadata.Attributes.Mandatory | Should -Contain $true
-        }
-    }
-}
-
-Describe 'Environment DSC Script - Azure Context Validation' {
-
-    Context 'When Azure context is invalid' {
-        It 'Should throw when no Azure context exists' {
-            # Arrange
-            Mock -CommandName Get-AzContext -MockWith { $null }
-            $params = @{
-                CollectionUri = 'https://dev.azure.com/test-org'
-                ProjectName   = 'test-project'
-                Name          = 'env-test'
-                Confirm       = $false
-            }
-
-            # Act & Assert
-            { & $script:scriptPath @params } | Should -Throw -ExpectedMessage '*No Azure context found*'
-        }
-    }
-}
-
-

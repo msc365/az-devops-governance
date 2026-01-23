@@ -26,7 +26,7 @@ This script manages Azure DevOps group memberships by adding specified Entra ID 
 | Parameter | Type | Required | Default | Description |
 | :-- | :-- | :-- | :-- | :-- |
 | `GroupMembership` | `String` | Yes | - | Mandatory. The name of the Azure DevOps built-in group to which the Entra ID security group will be added, e.g., `Readers`, `Contributors`, `Project Administrators`. |
-| `MailNickname` | `String` | Yes | - | Mandatory. The MailNickname of the Entra ID security group to be added to Azure DevOps groups. |
+| `UniqueName` | `String` | Yes | - | Mandatory. The UniqueName (MailNickname) of the Entra ID security group to be added to Azure DevOps groups. |
 | `CollectionUri` | `String` | No | `$env:DefaultAdoCollectionUri` | Optional. The collection URI of the Azure DevOps collection/organization, e.g., `https://dev.azure.com/my-org`. |
 | `ProjectName` | `String` | No | `$env:DefaultAdoProjectName` | Optional. The Azure DevOps project ID or Name where the environment will be created. |
 | `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should be rolled back (i.e., remove the specified group memberships). <br> ⚠️ Note: Rollback functionality is not yet implemented. |
@@ -86,7 +86,7 @@ Rolls back (removes) the group membership and related resources without confirma
 $params = @{
     CollectionUri   = 'https://dev.azure.com/e2egov-org'
     ProjectName     = 'e2egov-prjHb72x9'
-    MailNickname    = 'e2egov-prjHb72x9-devs'
+    UniqueName      = 'e2egov-prjHb72x9-devs'
     GroupMembership = 'Contributors'
 }
 .\main.ps1 @params -Verbose
@@ -100,7 +100,8 @@ Deploys a new group membership with the specified parameters.
 [PSCustomObject]@{
     memberDescriptor    = The descriptor of the member (Entra ID security group)
     containerDescriptor = The descriptor of the container (Azure DevOps built-in group)
-    mailNickname        = Entra ID Group MailNickname
+    uniqueName          = Entra ID Group UniqueName (MailNickname)
+    originId            = Entra ID Group Object ID
     groupMembership     = Azure DevOps Built-in Group Name
     projectName         = Azure DevOps Project Name
     collectionUri       = Azure DevOps Collection URI
@@ -140,4 +141,5 @@ This script requires the following PowerShell modules:
 
 - [default](tests/e2e/default)
 - [rollback](tests/e2e/rollback)
+- [unit](tests/unit)
 
