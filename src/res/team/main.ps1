@@ -22,7 +22,7 @@
 #>
 <#
 .SYNOPSIS
-    Create, update or rollback an Azure DevOps Team within a specified project.
+    [🚧 UNDER CONSTRUCTION] Create, update or rollback an Azure DevOps Team within a specified project.
 
 .DESCRIPTION
     This script creates, updates or rolls back an Azure DevOps Team within a specified project. It allows you to set team properties such as name, description and team settings.

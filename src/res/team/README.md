@@ -2,29 +2,29 @@
 <!-- omit from toc -->
 # Team `[res\team\main.ps1]`
 
-![Version](https://img.shields.io/badge/script--version-0.1.0-blue) [![License](https://img.shields.io/badge/license-MIT-purple)](https://github.com/msc365/az-devops-governance/blob/main/LICENSE)
+![Version](https://img.shields.io/badge/script%20version-0.1.0-blue) [![License](https://img.shields.io/badge/license-MIT-purple)](https://github.com/msc365/az-devops-governance/blob/main/LICENSE)
 
-Create, update or rollback an Azure DevOps Team within a specified project.
+[🚧 UNDER CONSTRUCTION] Create, update or rollback an Azure DevOps Team within a specified project.
 
 <!-- omit from toc -->
-## Navigation
+## NAVIGATION
 
-- [Description](#description)
-- [Parameters](#parameters)
-- [Examples](#examples)
-- [Outputs](#outputs)
-- [Support](#support)
-- [Dependencies](#dependencies)
-- [Resources](#resources)
-- [Notes](#notes)
+- [DESCRIPTION](#description)
+- [PARAMETERS](#parameters)
+- [EXAMPLES](#examples)
+- [OUTPUTS](#outputs)
+- [SUPPORT](#support)
+- [DEPENDENCIES](#dependencies)
+- [RESOURCES](#resources)
+- [NOTES](#notes)
 
-## Description
+## DESCRIPTION
 
 This script creates, updates or rolls back an Azure DevOps Team within a specified project. It allows you to set team properties such as name, description and team settings.
 
 If the team already exists, it updates the properties and settings as needed.
 
-## Parameters
+## PARAMETERS
 
 | Parameter | Type | Required | Default | Description |
 | :-- | :-- | :-- | :-- | :-- |
@@ -36,7 +36,7 @@ If the team already exists, it updates the properties and settings as needed.
 | `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (delete) the team and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing a team is irreversible and may affect teams relying on it. See [Notes](#notes) for more information. |
 | `TeamSettings` | `Object` | No | - | Optional. A hashtable containing team settings to override the default settings. |
 
-## Examples
+## EXAMPLES
 
 ### Example 1
 
@@ -51,8 +51,7 @@ $deploySplat = @{
 .\deploy.ps1 @deploySplat -Verbose
 ```
 
-Deploys the team using the specified template and parameters.
-
+Deploys the team using the specified template and parameters.
 
 ### Example 2
 
@@ -67,8 +66,7 @@ $customSplat = @{
 .\deploy.ps1 @customSplat -Verbose
 ```
 
-Deploys the team using the specified template and custom parameters.
-
+Deploys the team using the specified template and custom parameters.
 
 ### Example 3
 
@@ -83,8 +81,7 @@ $rollbackSplat = @{
 .\deploy.ps1 @rollbackSplat -Rollback -Force -Verbose
 ```
 
-Rolls back (deletes) the team and related resources without confirmation.
-
+Rolls back (deletes) the team and related resources without confirmation.
 
 ### Example 4
 
@@ -108,14 +105,13 @@ $paramSplat = @{
 .\src\res\team\main.ps1 @paramSplat -Verbose
 ```
 
-Deploys or updates a team in the specified Azure DevOps project using the provided parameters in code.
+Deploys or updates a team in the specified Azure DevOps project using the provided parameters in code.
 
-
-## Outputs
+## OUTPUTS
 
 ### `PSCustomObject`
 
-## Support
+## SUPPORT
 
 ### CommonParameters
 
@@ -131,14 +127,14 @@ This script supports the `-WhatIf` and `-Confirm` parameters for safe execution:
 - **`-WhatIf`**: Shows what would happen if the script runs without actually making any changes.
 - **`-Confirm`**: Prompts for confirmation before performing each action.
 
-## Dependencies
+## DEPENDENCIES
 
 This script requires the following PowerShell modules:
 
 - `Az.Accounts`
 - `Azure.DevOps.PSModule`
 
-## Resources
+## RESOURCES
 
 - [deploy](deploy.ps1)
 
@@ -156,7 +152,7 @@ This script requires the following PowerShell modules:
 - [update](tests/e2e/update)
 
 
-## Notes
+## NOTES
 
 - Operations are idempotent (safe to run multiple times).
 - Ensure you are logged in to Azure using Connect-AzAccount before running this script.
