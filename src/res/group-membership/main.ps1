@@ -275,15 +275,6 @@ process {
                 }
                 Write-Verbose "[NOTFOUND] Group membership: '$GroupMembership' (GroupId: $($mgGrp.Id))"
             }
-
-            # Return rollback result; rebuild object
-            return $grpMshp | Select-Object -ExcludeProperty collectionUri -Property *,
-            @{ Name = 'uniqueName'; Expression = { $mgGrp.mailNickname } },
-            @{ Name = 'originId'; Expression = { $mgGrp.id } },
-            @{ Name = 'groupMembership'; Expression = { $GroupMembership } },
-            @{ Name = 'projectName'; Expression = { $ProjectName } },
-            @{ Name = 'collectionUri'; Expression = { $CollectionUri } },
-            @{ Name = 'status'; Expression = { $status } }
         }
 
         #endregion
