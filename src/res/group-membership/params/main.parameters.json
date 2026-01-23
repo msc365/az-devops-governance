@@ -1,0 +1,19 @@
+{
+    "$schema": "../../../../schemas/group-membership.schema.json",
+    "collectionUri": "{collectionUri}",
+    "projectName": "{prefix}-prj{uniqueId}",
+    "securityGroups": [
+        {
+            "mailNickname": "{prefix}-prj{uniqueId}-admins",
+            "groupMembership": "Project Administrators"
+        },
+        {
+            "mailNickname": "{prefix}-prj{uniqueId}-devs",
+            "groupMembership": "Contributors"
+        },
+        {
+            "mailNickname": "{prefix}-prj{uniqueId}-stakes",
+            "groupMembership": "Readers"
+        }
+    ]
+}

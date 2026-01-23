@@ -173,7 +173,6 @@ process {
         $env = $null
 
         # Environment - Lookup by Name (DSC-like declarative approach)
-
         $envSplat = @{
             CollectionUri = $CollectionUri
             ProjectName   = $ProjectName
@@ -282,7 +281,7 @@ process {
                 Write-Verbose "[NOTFOUND] Environment: '$Name' (ID: `$null)"
             }
 
-            # Return rollback result; rebuild object for consistency when not found
+            # Return rollback result; rebuild object
             return $env | Select-Object -ExcludeProperty collectionUri, projectName -Property *,
             @{ Name = 'projectName'; Expression = { $ProjectName } },
             @{ Name = 'collectionUri'; Expression = { $CollectionUri } },
@@ -293,7 +292,7 @@ process {
 
         #region OUTPUTS
 
-        # Return deployment result; rebuild object for consistency when created
+        # Return deployment result; rebuild object
         $env | Select-Object -ExcludeProperty collectionUri, projectName -Property *,
         @{Name = 'projectName'; Expression = { $ProjectName } },
         @{Name = 'collectionUri'; Expression = { $CollectionUri } },
