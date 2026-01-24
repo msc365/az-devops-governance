@@ -129,7 +129,7 @@ The numbering reflects the order in which administrators and enterprise architec
 
    | Group name | Scope | Azure role | Azure DevOps role |
    | :-- | :-- | :-- | :-- |
-   | `sg-portugal-collab-on-repo-a` ¹ | - | - | Repo-scoped permissions only |
+   | `sg-portugal-collab-on-repo-a` ¹ | Repo-scoped permissions only | - | - |
    | `sg-portugal-stakes` | `rg-portugal-prd` | Reader | Reader |
    | `sg-portugal-devs` | `rg-portugal-dev` | Contributor | Contributor |
    | `sg-portugal-admins` | `rg-portugal-prd` | Owner | Project Administrators |
@@ -226,8 +226,7 @@ But a CI/CD Build Agent will delete your entire production environment if told t
 - Removes Key Vault access policies
 - Removes [management locks](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/lock-resources) that by design should prevent resources from being deleted (a common requirement in regulated industries)
 
-To do this, we create a custom role that removes destructive permissions.  
-See [iac/ptn/authorization/role-definition/main.bicep](iac/ptn/authorization/role-definition/main.bicep) for a working example that removes `Microsoft.Authorization/*/Delete` actions.
+To do this, we create a custom role that removes destructive permissions. See this [role-definition](iac/ptn/authorization/role-definition/main.bicep) for a working example.
 
 ```json
 {
@@ -240,9 +239,9 @@ See [iac/ptn/authorization/role-definition/main.bicep](iac/ptn/authorization/rol
     "Microsoft.Authorization/*/Delete"
   ],
   "AssignableScopes": [
-    "/subscriptions/{subscriptionId}",
-    "/subscriptions/{subscriptionId}",
-    "/providers/Microsoft.Management/managementGroups/{managementGroupId}"
+    "/subscriptions/<your-subscription-id-dev>",
+    "/subscriptions/<your-subscription-id-prd>",
+    "/providers/Microsoft.Management/managementGroups/<your-management-group-id>}"
   ]
 }
 ```
