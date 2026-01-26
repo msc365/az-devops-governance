@@ -1,28 +1,9 @@
-﻿
-<#
-.SYNOPSIS
-    Configures iteration paths for a given Azure DevOps team.
-
-.DESCRIPTION
-    This script retrieves the current iteration paths for the specified team and adds any missing iteration paths from the project.
-    It only applies changes if there are iteration paths in the project that are not already assigned to the team.
-.PARAMETER Project
-    Required. The Azure DevOps project object.
-
-.PARAMETER Team
-    Required. The Azure DevOps team object.
-
-.EXAMPLE
-    $project = Get-AdoProject -Project 'e2egov-prjHb72x9'
-    $team = Get-AdoTeam -Project $project.Id -TeamId 'Default Team'
-
-    .\modules\nested_iterationPaths.ps1 -Project $project -Team $team
-
-    This example retrieves a project and team, and applies iteration paths to the team using the script.
-#>
-[CmdletBinding(SupportsShouldProcess)]
+[CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Medium')]
 [OutputType([PSCustomObject])]
 param (
+    [Parameter()]
+    [string]$CollectionUri = $env:DefaultAdoCollectionUri,
+
     [Parameter(Mandatory)]
     [object]$Project,
 
@@ -41,50 +22,62 @@ process {
         #region INITIALIZE
 
         # Variables
-        $status = 'NoChange'
+        $status = 'Unknown'
 
-        # Team Iterations
-        $teamIterationSplat = @{
-            Project = $Project.Id
-            TeamId  = $Team.Name
+        $tmPaths = $null
+
+        # Team Iteration Paths
+        $tmPathsSplat = @{
+            CollectionUri = $CollectionUri
+            ProjectName   = $Project.Name
+            TeamName      = $Team.Name
         }
-
-        Write-Verbose 'Processing: team\iterationPaths'
-
-        $teamIterations = Get-AdoTeamIterationList @teamIterationSplat -ErrorAction Stop
+        $tmPaths = Get-AdoTeamIteration @tmPathsSplat -Verbose:$false
 
         #endregion
 
         #region DEPLOYMENTS
 
-        if ($null -eq $teamIterations -or $teamIterations.Count -eq 0) {
-            # Get project iterations as default to add to team
-            $projectIteration = Get-AdoTeamIterationList -Project $Project.Id -ErrorAction Stop
+        if ($null -eq $tmPaths -or $tmPaths.Length -eq 0) {
+            # Project iteration paths as default to add to team
+            $prjPathsSplat = @{
+                CollectionUri  = $CollectionUri
+                ProjectName    = $Project.Name
+                StructureGroup = 'Iterations'
+                Depth          = 2
+            }
+            $prjPaths = Get-AdoClassificationNode @prjPathsSplat -Verbose:$false
 
-            if ($null -ne $projectIteration.Value) {
+            if ($null -ne $prjPaths -and $prjPaths.hasChildren) {
 
-                $projectIteration.Value | ForEach-Object -Process {
-                    if ($PSCmdlet.ShouldProcess("team\iterationPath\$($_.Path)", 'Set')) {
+                $tmPaths = @()
+                foreach ($path in $prjPaths.children) {
 
-                        Write-Debug "Setting: team\iterationPath\$($_.Path)"
+                    # Add each project iteration path to team
+                    $tmPathsSplat['IterationId'] = $path.identifier
 
-                        $setIterationSplat = @{
-                            Project     = $Project.Id
-                            TeamId      = $Team.Name
-                            IterationId = $_.Id
-                            Verbose     = $VerbosePreference
+                    if ($PSCmdlet.ShouldProcess($Team.Name, "Add iteration path: $($path.path) (ID: $($path.id))")) {
+
+                        $tmPaths += (Add-AdoTeamIteration @tmPathsSplat -Confirm:$false -Verbose:$false)
+
+                        $status = 'Succeeded'
+                        Write-Verbose "[ADDED] Iteration path: '$($path.path)' (ID: $($path.id))"
+                    } else {
+                        $tmPaths += [PSCustomObject]@{
+                            id         = '<generated>'
+                            name       = $path.name
+                            attributes = $path.attributes
                         }
 
-                        Set-AdoTeamIteration @setIterationSplat | Out-Null
-                        $script:status = 'Succeeded'
-
-                        Write-Verbose "- Set: $($_.Path)"
+                        $status = 'WouldAdd'
+                        Write-Verbose "[WHATIF] Call Add-AdoTeamIteration with parameters: $($tmPathsSplat | ConvertTo-Json -Depth 5)"
                     }
                 }
             }
         } else {
-            $teamIterations.Value | ForEach-Object -Process {
-                Write-Verbose "- NoChange: $($_.Path)"
+            $status = 'NoChange'
+            foreach ($path in $tmPaths) {
+                Write-Verbose "- NoChange: $($path.name) (ID: $($path.id))"
             }
         }
 
@@ -92,23 +85,11 @@ process {
 
         #region OUTPUTS
 
-        if (-not $WhatIfPreference) {
-            if ($status -eq 'Succeeded') {
-                # Refresh team iterations
-                $teamIterations = Get-AdoTeamIterationList @teamIterationSplat -ErrorAction Stop
-            }
-
-            $output = [PSCustomObject]@{
-                Project        = $Project.Id
-                TeamId         = $Team.Id
-                TeamIterations = $teamIterations
-                Status         = $status
-            }
-
-            return $output
-        }
-
-        return $null
+        $tmPaths | Select-Object -ExcludeProperty collectionUri, projectName, teamName -Property *,
+        @{Name = 'teamName'; Expression = { $Team.Name } },
+        @{Name = 'projectName'; Expression = { $Project.Name } },
+        @{Name = 'collectionUri'; Expression = { $CollectionUri } },
+        @{Name = 'status'; Expression = { $status } }
 
         #endregion
 
@@ -120,4 +101,11 @@ process {
 end {
     Write-Verbose ("[Exit]: ./modules/$($MyInvocation.MyCommand.Name)")
 }
+
+
+
+
+
+
+
 

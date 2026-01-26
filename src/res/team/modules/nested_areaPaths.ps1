@@ -1,43 +1,30 @@
-﻿<#
-.SYNOPSIS
-    Configures area paths for a given Azure DevOps team.
-
-.DESCRIPTION
-    This script retrieves the current area paths for the specified team and creates a new area path for the team if it does not exist.
-    It also updates the team's default area path if it is not set to the newly created area path.
-
-.PARAMETER Project
-    Required. The Azure DevOps project object.
-
-.PARAMETER Team
-    Required. The Azure DevOps team object.
-
-.EXAMPLE
-    $project = Get-AdoProject -Project 'e2egov-prjHb72x9'
-    $team = Get-AdoTeam -Project $project.Id -TeamId 'Default Team'
-
-    .\modules\nested_areaPaths.ps1 -Project $project -Team $team
-
-    This example retrieves a project and team, and applies area paths to the team using the script.
-#>
 [CmdletBinding(SupportsShouldProcess)]
 [OutputType([PSCustomObject])]
 param (
+    [Parameter()]
+    [string]$CollectionUri = $env:DefaultAdoCollectionUri,
+
     [Parameter(Mandatory)]
     [object]$Project,
 
     [Parameter(Mandatory)]
-    [object]$Team,
-
-    [Parameter()]
-    [switch]$Rollback,
-
-    [Parameter()]
-    [switch]$Force
+    [object]$Team
 )
 
 begin {
     Write-Verbose ("[Enter]: ./modules/$($MyInvocation.MyCommand.Name)")
+
+    # Root area path
+    $rapSplat = @{
+        ProjectName    = $Project.Name
+        StructureGroup = 'Areas'
+        Depth          = 2
+    }
+    $rap = Get-AdoClassificationNode @rapSplat -ErrorAction SilentlyContinue
+
+    if ($null -eq $rap) {
+        throw "Root area path for project $($Project.Name) does not exist, cannot proceed."
+    }
 }
 
 process {
@@ -47,60 +34,104 @@ process {
         #region INITIALIZE
 
         # Variables
-        $status = 'NoChange'
+        $status = 'Unknown'
+
+        $tmfv, $ap = $null
+
+        # Team area path, project-level
+        if ($rap.HasChildren) {
+            $ap = $rap.Children | Where-Object {
+                $_.Name -eq $Team.Name
+            }
+        }
+
+        # Team area path, team-level
+        $tmfvSplat = [ordered]@{
+            CollectionUri = $CollectionUri
+            ProjectName   = $Project.Name
+            TeamName      = $Team.Name
+        }
+        $tmfv = Get-AdoTeamFieldValue @tmfvSplat -Verbose:$false
 
         #endregion
 
         #region DEPLOYMENTS
 
-        if (-not $Rollback.IsPresent) {
-            # Team area path
-            $fieldValue = Get-AdoTeamFieldValue -Project $Project.Id -Team $Team.Id -ErrorAction Stop
+        # Project area path
+        if ($null -eq $ap) {
+            $apSplat = @{
+                ProjectName    = $Project.Name
+                Name           = $Team.Name
+                StructureGroup = 'Areas'
+            }
 
-            if ($null -eq $fieldValue.DefaultValue) {
-                if ($PSCmdlet.ShouldProcess("team\areaPath\$($Project.Name)\$($Team.Name)", 'Set')) {
+            if ($PSCmdlet.ShouldProcess($Project.Name, "Create project area path: $($Project.Name)\$($Team.Name)")) {
 
-                    Write-Debug "Setting: team\areaPath\$($Project.Name)\$($Team.Name)"
+                $ap = New-AdoClassificationNode @apSplat -Verbose:$false
 
-                    $defaultValue = "$($Project.Name)\$($Team.Name)"
-                    $values = @(
-                        @{
-                            value           = $defaultValue
+                $status = 'Succeeded'
+                Write-Verbose "[CREATED]: Project area path '$($ap.path)'"
+            } else {
+                $status = 'WouldCreate'
+                Write-Verbose "[WHATIF]: Call New-AdoClassificationNode with parameters: $($apSplat | ConvertTo-Json -Depth 5)"
+            }
+        } else {
+            $status = 'NoChange'
+            Write-Verbose "[NOCHANGE]: Project area path '$($ap.path)'"
+        }
+
+        # Team area path
+        if ($null -eq $tmfv -or $tmfv.DefaultValue -ne "$($Project.Name)\$($Team.Name)") {
+
+            $defaultValue = "$($Project.Name)\$($Team.Name)"
+            $values = @(
+                @{
+                    value           = $defaultValue
+                    includeChildren = $false
+                }
+            )
+            $tmfvSplat['DefaultValue'] = $defaultValue
+            $tmfvSplat['Values'] = $values
+
+            if ($PSCmdlet.ShouldProcess($Team.Name, "Add team area path: $($Project.Name)\$($Team.Name)")) {
+
+                if ($null -eq $ap) {
+                    throw "Root area path '$($Project.Name)\$($Team.Name)' does not exist, cannot proceed."
+                }
+
+                $tmfv = Set-AdoTeamFieldValue @tmfvSplat -Confirm:$false -Verbose:$false
+
+                $status = 'Succeeded'
+                Write-Verbose "[ADDED] Team area path: '$($tmfv.defaultValue)'"
+            } else {
+                $tmfv = [PSCustomObject]@{
+                    field        = '<generated>'
+                    defaultValue = "$($Project.Name)\$($Team.Name)"
+                    values       = @(
+                        [ordered]@{
+                            value           = "$($Project.Name)\$($Team.Name)"
                             includeChildren = $false
                         }
                     )
-
-                    $teamFieldSplat = @{
-                        Project      = $Project.Id
-                        Team         = $Team.Id
-                        DefaultValue = $defaultValue
-                        Values       = $values
-                        Verbose      = $VerbosePreference
-                    }
-
-                    $fieldValue = Set-AdoTeamFieldValue @teamFieldSplat -ErrorAction Stop
-                    $status = 'Succeeded'
-
-                    Write-Verbose "Set: team\areaPath\$($Project.Name)\$($Team.Name)"
                 }
-            } else {
-                Write-Verbose "NoChange: team\areaPath\$($Project.Name)\$($Team.Name)"
+
+                $status = 'WouldAdd'
+                Write-Verbose "[WHATIF] Call Set-AdoTeamFieldValue with parameters: $($tmfvSplat | ConvertTo-Json -Depth 5)"
             }
+        } else {
+            $status = 'NoChange'
+            Write-Verbose "[NOCHANGE]: Team area path '$($tmfv.defaultValue)'."
         }
 
         #endregion
 
         #region OUTPUTS
 
-        $output = [PSCustomObject]@{
-            Project      = $Project.Id
-            TeamId       = $Team.Id
-            DefaultValue = $fieldValue.DefaultValue
-            Values       = $fieldValue.Values | ForEach-Object { $_ | Select-Object -Property * }
-            Status       = $status
-        }
-
-        return $output
+        $tmfv | Select-Object -ExcludeProperty collectionUri, projectName, teamName -Property *,
+        @{Name = 'teamName'; Expression = { $Team.Name } },
+        @{Name = 'projectName'; Expression = { $Project.Name } },
+        @{Name = 'collectionUri'; Expression = { $CollectionUri } },
+        @{Name = 'status'; Expression = { $status } }
 
         #endregion
 
@@ -112,3 +143,10 @@ process {
 end {
     Write-Verbose ("[Exit]: ./modules/$($MyInvocation.MyCommand.Name)")
 }
+
+
+
+
+
+
+

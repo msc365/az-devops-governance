@@ -115,7 +115,7 @@
 
     Deploys a service connection using the specified parameters in code.
 #>
-[CmdletBinding(SupportsShouldProcess)]
+[CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'High')]
 [OutputType([PSCustomObject])]
 param (
     [Parameter()]
@@ -301,7 +301,7 @@ process {
                         Subject = $sep.Authorization.Parameters.WorkloadIdentityFederationSubject
                     }
 
-                    $fic = New-AzFederatedIdentityCredential @ficSplat -Verbose:$false -ErrorAction Stop
+                    $fic = New-AzFederatedIdentityCredential @ficSplat -Confirm:$false -Verbose:$false -ErrorAction Stop
 
                     # $status = 'Created'
                     Write-Verbose "[CREATED] Federated identity credential: '$($fic.Name)' (ID: $($fic.Id))"

@@ -1,37 +1,45 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
     "$id": "https://raw.githubusercontent.com/msc365/az-devops-governance/main/schemas/team.schema.json",
-    "oneOf": [
-        {
-            "$ref": "#/definitions/team"
+    "type": "object",
+    "required": [
+        "collectionUri",
+        "projectName",
+        "teams"
+    ],
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "JSON Schema reference"
         },
-        {
+        "collectionUri": {
+            "type": "string",
+            "description": "The Azure DevOps collection URI"
+        },
+        "projectName": {
+            "type": "string",
+            "description": "The Azure DevOps project name"
+        },
+        "teams": {
             "type": "array",
+            "description": "Array of teams to create or configure",
             "items": {
                 "$ref": "#/definitions/team"
             },
             "minItems": 1
         }
-    ],
+    },
+    "additionalProperties": false,
     "definitions": {
         "team": {
             "type": "object",
             "required": [
-                "Project",
-                "teamId"
+                "teamName"
             ],
             "properties": {
-                "$schema": {
+                "teamName": {
                     "type": "string",
-                    "description": "JSON Schema reference"
-                },
-                "Project": {
-                    "type": "string",
-                    "description": "The ID or Name of the project containing the team"
-                },
-                "teamId": {
-                    "type": "string",
-                    "description": "The ID or Name of the team"
+                    "description": "The name of the team"
                 },
                 "description": {
                     "type": "string",

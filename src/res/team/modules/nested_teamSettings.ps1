@@ -1,56 +1,16 @@
-﻿<#
-.SYNOPSIS
-    Configures nested team settings for a given Azure DevOps team.
-
-.DESCRIPTION
-    This script retrieves the default team settings for the specified project and merges them with the provided team settings.
-    It only applies changes if there are differences between the current settings and the provided settings.
-
-.PARAMETER Project
-    Required. The Azure DevOps project object.
-
-.PARAMETER Team
-    Required. The Azure DevOps team object.
-
-.PARAMETER TeamSettings
-    Required. A hashtable of team settings to apply.
-
-.EXAMPLE
-    $project = Get-AdoProject -Project 'e2egov-prjHb72x9'
-
-    $team = Get-AdoTeam -Project $project.Id -TeamId 'Default Team'
-
-    $teamSettings = @{
-        backlogVisibilities = @{
-            "Microsoft.EpicCategory" = $false
-            "Microsoft.FeatureCategory" = $true
-            "Microsoft.RequirementCategory" = $true
-        }
-        bugsBehavior = "asRequirements"
-        defaultIterationMacro = "@currentIteration"
-        workingDays = @(
-            "monday",
-            "tuesday",
-            "wednesday",
-            "thursday",
-            "friday"
-        )
-    }
-
-    .\modules\nested_teamSettings.ps1 -Project $project -Team $team -TeamSettings $teamSettings
-
-    This example retrieves a project and team, defines new team settings, and applies them using the script.
-#>
-[CmdletBinding(SupportsShouldProcess)]
+[CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'Medium')]
 [OutputType([PSCustomObject])]
 param (
+    [Parameter()]
+    [string]$CollectionUri = $env:DefaultAdoCollectionUri,
+
     [Parameter(Mandatory)]
     [object]$Project,
 
     [Parameter(Mandatory)]
     [object]$Team,
 
-    [Parameter(Mandatory)]
+    [Parameter()]
     [object]$TeamSettings
 )
 
@@ -67,113 +27,143 @@ process {
         # Variables
         $status = 'NoChange'
 
+        $ts = $null
+
         # Team settings
-        Write-Verbose 'Processing: team\teamSettings'
-        $settings = Get-AdoTeamSettings -Project $Project.Id -TeamId $Team.Id -ErrorAction Stop
+        $tsSplat = [ordered]@{
+            CollectionUri = $CollectionUri
+            ProjectName   = $Project.Name
+            TeamId        = $Team.Id
+        }
+        $ts = Get-AdoTeamSettings @tsSplat -Verbose:$false
 
-        if ($settings.backlogIteration.id -eq '00000000-0000-0000-0000-000000000000') {
-            Write-Debug 'Getting: Default team settings for backlogIteration restoration.'
+        if ($ts.backlogIteration.id -eq '00000000-0000-0000-0000-000000000000') {
+            Write-Verbose 'Get default team settings for backlogIteration restoration.'
 
-            $defaultSettings = Get-AdoTeamSettings -Project $Project.Id -TeamId $Project.DefaultTeam.Id -ErrorAction Stop
+            $dtsSplat = [ordered]@{
+                CollectionUri = $CollectionUri
+                ProjectName   = $Project.Name
+                TeamId        = $Project.DefaultTeam.Id
+            }
+            $defaultTeamSettings = Get-AdoTeamSettings @dtsSplat -Verbose:$false
         }
 
         # Prepare current settings as hashtable
-        $currentSettings = [hashtable]@{
-            backlogIteration    = $settings.backlogIteration.id
-            backlogVisibilities = ($settings.backlogVisibilities | ConvertTo-Json -Depth 5 | ConvertFrom-Json -AsHashtable)
-            bugsBehavior        = $settings.bugsBehavior
-            workingDays         = $settings.workingDays
+        $currentTeamSettings = [hashtable]@{
+            backlogIteration    = $ts.backlogIteration.id
+            backlogVisibilities = ($ts.backlogVisibilities | ConvertTo-Json -Depth 5 | ConvertFrom-Json -AsHashtable)
+            bugsBehavior        = $ts.bugsBehavior
+            workingDays         = $ts.workingDays
         }
-        if ($null -ne $settings.defaultIterationMacro) {
-            $currentSettings['defaultIterationMacro'] = $settings.defaultIterationMacro
+        if ($null -ne $ts.defaultIterationMacro) {
+            $currentTeamSettings['defaultIterationMacro'] = $ts.defaultIterationMacro
         } else {
-            $currentSettings['defaultIteration'] = $settings.defaultIteration.id
+            $currentTeamSettings['defaultIteration'] = $ts.defaultIteration.id
         }
 
         # Process provided team settings
-        $mergedSettings = @{}
-        foreach ($key in $currentSettings.Keys) {
+        $mergedTeamSettings = @{}
+        $backlogIterationHasChanges, $backlogVisibilitiesHasChanges,
+        $bugsBehaviorHasChanges, $defaultIterationHasChanges,
+        $defaultIterationMacroHasChanges, $workingDaysHasChanges = $false
+
+        foreach ($key in $currentTeamSettings.Keys) {
             switch ($key) {
-                'backlogVisibilities' {
-                    # Merge backlogVisibilities as hashtable
-                    $mergedVisibilities = $currentSettings[$key].Clone()
-                    foreach ($visibilityKey in $TeamSettings[$key].Keys) {
-                        $mergedVisibilities[$visibilityKey] = $TeamSettings[$key][$visibilityKey]
-
-                        if ($mergedVisibilities[$visibilityKey] -ne $TeamSettings[$key][$visibilityKey]) {
-                            $setBacklogVisibilities = $true
-
-                            Write-Verbose "- Updated : $key -> $visibilityKey\$($TeamSettings[$key][$visibilityKey])"
-                        }
+                'backlogIteration' {
+                    # Special case: always restore if backlog iteration is the zero GUID
+                    if ($currentTeamSettings[$key] -eq '00000000-0000-0000-0000-000000000000') {
+                        # Restore to default backlog iteration
+                        $mergedTeamSettings[$key] = $defaultTeamSettings.backlogIteration.id
+                        $backlogIterationHasChanges = $true
+                        Write-Verbose "- Restored: $key -> $($mergedTeamSettings[$key])"
                     }
+                    # Only update if TeamSettings is provided and value is different
+                    elseif ($null -ne $TeamSettings -and
+                        $null -ne $TeamSettings[$key] -and
+                        $currentTeamSettings[$key] -ne $TeamSettings[$key]) {
+                        # Update to provided backlog iteration
+                        $mergedTeamSettings[$key] = $TeamSettings[$key]
+                        $backlogIterationHasChanges = $true
+                        Write-Verbose "- Updated : $key -> $($mergedTeamSettings[$key])"
+                    } else {
+                        Write-Verbose "- NoChange: $key"
+                    }
+                }
+                'backlogVisibilities' {
+                    # Only process if TeamSettings is provided and has this key
+                    if ($null -ne $TeamSettings -and $null -ne $TeamSettings[$key]) {
+                        $backlogVisibilitiesHasChanges = $false
 
-                    # Only update if different
-                    if ($setBacklogVisibilities) {
-                        $mergedSettings[$key] = $mergedVisibilities
+                        # Merge backlogVisibilities as hashtable
+                        $mergedBacklogVisibilities = $currentTeamSettings[$key].Clone()
+                        foreach ($bvKey in $TeamSettings[$key].Keys) {
+                            if ($mergedBacklogVisibilities[$bvKey] -ne $TeamSettings[$key][$bvKey]) {
+                                $mergedBacklogVisibilities[$bvKey] = $TeamSettings[$key][$bvKey]
+                                $backlogVisibilitiesHasChanges = $true
+                                Write-Verbose "- Updated : $key -> $bvKey\$($TeamSettings[$key][$bvKey])"
+                            }
+                        }
+
+                        # Only update if different
+                        if ($backlogVisibilitiesHasChanges) {
+                            $mergedTeamSettings[$key] = $mergedBacklogVisibilities
+                        } else {
+                            Write-Verbose "- NoChange: $key"
+                        }
                     } else {
                         Write-Verbose "- NoChange: $key"
                     }
                 }
                 'workingDays' {
-                    # Merge workingDays array
-                    $mergedDays = $currentSettings[$key] | Select-Object -Unique
+                    # Only process if TeamSettings is provided and has this key
+                    if ($null -ne $TeamSettings -and $null -ne $TeamSettings[$key]) {
+                        $workingDaysHasChanges = $false
 
-                    # Add missing working days from $TeamSettings
-                    foreach ($day in $TeamSettings[$key]) {
-                        if (-not ($mergedDays -contains $day)) {
-                            $mergedDays += $day
-                            $setWorkingDays = $true
-                        }
-                    }
+                        # Merge workingDays array
+                        $mergedWorkingDays = $currentTeamSettings[$key] | Select-Object -Unique
 
-                    # Remove extra working days not in $TeamSettings
-                    if ($null -ne $TeamSettings[$key]) {
-                        foreach ($day in $mergedDays.Clone()) {
-                            if (-not ($TeamSettings[$key] -contains $day)) {
-                                $mergedDays = $mergedDays | Where-Object { $_ -ne $day }
-                                $setWorkingDays = $true
+                        # Add missing working days from $TeamSettings
+                        foreach ($day in $TeamSettings[$key]) {
+                            if (-not ($mergedWorkingDays -contains $day)) {
+                                $mergedWorkingDays += $day
+                                $workingDaysHasChanges = $true
                             }
-
                         }
-                    }
 
-                    if ($setWorkingDays) {
-                        $mergedSettings[$key] = $mergedDays
-                        Write-Verbose "- Updated : $key -> $($mergedDays -join ', ')"
+                        # Remove extra working days not in $TeamSettings
+                        foreach ($day in $mergedWorkingDays.Clone()) {
+                            if (-not ($TeamSettings[$key] -contains $day)) {
+                                $mergedWorkingDays = $mergedWorkingDays | Where-Object { $_ -ne $day }
+                                $workingDaysHasChanges = $true
+                            }
+                        }
+
+                        if ($workingDaysHasChanges) {
+                            $mergedTeamSettings[$key] = $mergedWorkingDays
+                            Write-Verbose "- Updated : $key -> $($mergedWorkingDays -join ', ')"
+                        } else {
+                            Write-Verbose "- NoChange: $key"
+                        }
                     } else {
                         Write-Verbose "- NoChange: $key"
                     }
                 }
-                'backlogIteration' {
-                    # Only update if different
-                    if ($null -eq $TeamSettings -or $null -eq $TeamSettings[$key] -or ($currentSettings[$key] -ne $TeamSettings[$key])) {
 
-                        if ($null -eq $TeamSettings[$key] -and ($currentSettings[$key] -eq '00000000-0000-0000-0000-000000000000')) {
-                            # Restore to default backlog iteration
-                            $mergedSettings[$key] = $defaultSettings.backlogIteration.id
-                            $setBacklogIteration = $true
-
-                            Write-Verbose "- Restored: $key -> $($mergedSettings[$key])"
-
-                        } elseif ($null -ne $TeamSettings[$key]) {
-                            # Update to provided backlog iteration
-                            $mergedSettings[$key] = $TeamSettings[$key]
-                            $setBacklogIteration = $true
-
-                            Write-Verbose "- Updated : $key -> $($mergedSettings[$key])"
-                        } else {
-                            Write-Verbose "- NoChange: $key"
-                        }
-                    }
-
-                }
                 default {
-                    # Only update if different
-                    if ($null -ne $TeamSettings[$key] -and ($currentSettings[$key] -ne $TeamSettings[$key])) {
-                        $mergedSettings[$key] = $TeamSettings[$key]
-                        $setDefault = $true
+                    # Only update if TeamSettings is provided and value is different
+                    if ($null -ne $TeamSettings -and
+                        $null -ne $TeamSettings[$key] -and
+                        $currentTeamSettings[$key] -ne $TeamSettings[$key]) {
 
-                        Write-Verbose "- Updated : $key -> $($mergedSettings[$key])"
+                        $mergedTeamSettings[$key] = $TeamSettings[$key]
+
+                        switch ($key) {
+                            'bugsBehavior' { $bugsBehaviorHasChanges = $true }
+                            'defaultIteration' { $defaultIterationHasChanges = $true }
+                            'defaultIterationMacro' { $defaultIterationMacroHasChanges = $true }
+                        }
+
+                        Write-Verbose "- Updated : $key -> $($mergedTeamSettings[$key])"
                     } else {
                         Write-Verbose "- NoChange: $key"
                     }
@@ -185,43 +175,54 @@ process {
 
         #region DEPLOYMENTS
 
-        if ($setDefault -or $setBacklogIteration -or $setWorkingDays -or $setBacklogVisibilities) {
-            if ($PSCmdlet.ShouldProcess("teamSettings\$($Team.Name)", 'Update')) {
+        if ($backlogIterationHasChanges -or $backlogVisibilitiesHasChanges -or
+            $bugsBehaviorHasChanges -or $defaultIterationHasChanges -or
+            $defaultIterationMacroHasChanges -or $workingDaysHasChanges) {
 
-                Write-Debug "Updating: teamSettings\$($Team.Name)"
-
-                $settingsSplat = @{
-                    Project      = $Project.Id
-                    TeamId       = $Team.Id
-                    TeamSettings = ($mergedSettings | ConvertTo-Json -Depth 5 -Compress)
-                    Verbose      = $VerbosePreference
-                }
-
-                $settings = Set-AdoTeamSettings @settingsSplat -ErrorAction Stop
-                $status = 'Succeeded'
-
-                Write-Verbose "Updated: teamSettings\$($Team.Name) -> $($settings | Select-Object backlogIteration,
-                    bugsBehavior, workingDays, backlogVisibilities,
-                    defaultIteration, defaultIterationMacro | ConvertTo-Json -Depth 5)"
+            # Only update changed team settings
+            if ($backlogIterationHasChanges) {
+                $tsSplat['BacklogIteration'] = $mergedTeamSettings['backlogIteration']
             }
+            if ($backlogVisibilitiesHasChanges) {
+                $tsSplat['BacklogVisibilities'] = $mergedTeamSettings['backlogVisibilities']
+            }
+            if ($bugsBehaviorHasChanges) {
+                $tsSplat['BugsBehavior'] = $mergedTeamSettings['bugsBehavior']
+            }
+            if ($defaultIterationHasChanges) {
+                $tsSplat['DefaultIteration'] = $mergedTeamSettings['defaultIteration']
+            }
+            if ($defaultIterationMacroHasChanges) {
+                $tsSplat['DefaultIterationMacro'] = $mergedTeamSettings['defaultIterationMacro']
+            }
+            if ($workingDaysHasChanges) {
+                $tsSplat['WorkingDays'] = $mergedTeamSettings['workingDays']
+            }
+
+            if ($PSCmdlet.ShouldProcess($($Team.Name), 'Update team settings')) {
+
+                $ts = Set-AdoTeamSettings @tsSplat -Confirm:$false
+
+                $status = 'Succeeded'
+                Write-Verbose "[UPDATED] Team settings: '$($Team.Name)' (ID: $($Team.Id))"
+            } else {
+                $status = 'WouldUpdate'
+                Write-Verbose "[WHATIF] Call Set-AdoTeamSettings with parameters: $($tsSplat | ConvertTo-Json -Depth 5)"
+            }
+        } else {
+            $status = 'NoChange'
+            Write-Verbose "[NOCHANGE] Team settings: '$($Team.Name)' (ID: $($Team.Id))"
         }
 
         #endregion
 
         #region OUTPUTS
 
-        if (-not $WhatIfPreference) {
-            $output = [PSCustomObject]@{
-                Project      = $Project.Id
-                TeamId       = $Team.Id
-                TeamSettings = $settings
-                Status       = $status
-            }
-
-            return $output
-        }
-
-        return $null
+        $ts | Select-Object -ExcludeProperty collectionUri, projectName -Property *,
+        @{Name = 'teamName'; Expression = { $Team.Name } },
+        @{Name = 'projectName'; Expression = { $Project.Name } },
+        @{Name = 'collectionUri'; Expression = { $CollectionUri } },
+        @{Name = 'status'; Expression = { $status } }
 
         #endregion
 
@@ -233,3 +234,10 @@ process {
 end {
     Write-Verbose ("[Exit]: ./modules/$($MyInvocation.MyCommand.Name)")
 }
+
+
+
+
+
+
+

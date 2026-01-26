@@ -1,23 +1,20 @@
 ﻿[CmdletBinding(SupportsShouldProcess)]
 param (
     [Parameter()]
-    [string]$templateFile = 'main.ps1',
+    [string]$TemplateFile = 'main.ps1',
 
     [Parameter()]
-    [string]$templateParameterFile = 'params/main.parameters.json',
+    [string]$TemplateParameterFile = 'params/main.parameters.json',
 
     [Parameter()]
     [string]$ConfigFile = '../../../config/main.config.json',
 
     [Parameter()]
-    [switch]$Rollback,
-
-    [Parameter()]
-    [switch]$Force
+    [switch]$Rollback
 )
 
 begin {
-    Write-Verbose "[Enter]: ./src/res/team/$($MyInvocation.MyCommand.Name)"
+    Write-Verbose "[Enter]: ./$($MyInvocation.MyCommand.Name)"
 
     # Import utility functions
     . (Join-Path $PSScriptRoot -ChildPath '../../utl/Set-PlaceholderValue.ps1' -ErrorAction Stop)
@@ -34,32 +31,39 @@ process {
         # Replace placeholders in parameters using utility function
         $paramsAsJson = Set-PlaceholderValue -ParamsJson $paramsAsJson -ConfigJson $configAsJson
 
-        # Convert JSON string to Hashtable
-        $params = $paramsAsJson | ConvertFrom-Json -AsHashtable
+        # Convert JSON string to PSCustomObject to preserve pipeline property binding
+        $params = $paramsAsJson | ConvertFrom-Json
 
-        # Remove $schema key if it exists
-        if ($params.ContainsKey('$schema')) {
-            $params.Remove('$schema') | Out-Null
+        Write-Verbose "Using params: $($params | ConvertTo-Json -Depth 5)"
+
+        # Extract common parameters
+        $collectionUri = $params.collectionUri
+        $projectName = $params.projectName
+        $teams = $params.teams
+
+        if ($null -eq $teams -or $teams.Count -eq 0) {
+            throw 'No teams found in parameter file. At least one team is required.'
         }
 
-        Write-Verbose 'Using params:'
-        Write-Verbose ($params | ConvertTo-Json -Depth 5)
+        Write-Verbose "Processing $($teams.Count) team(s) via pipeline..."
 
-        # Execute the deployment template with parameters
-        $params += @{
-            Rollback = $Rollback.IsPresent
-            Force    = $Force.IsPresent
-            WhatIf   = $WhatIfPreference
-            Verbose  = $VerbosePreference
+        # Prepare script parameters for common values
+        $scriptParams = @{
+            CollectionUri = $collectionUri
+            ProjectName   = $projectName
+            Rollback      = $Rollback.IsPresent
+            WhatIf        = $WhatIfPreference
+            Confirm       = $ConfirmPreference
+            Verbose       = $VerbosePreference
         }
 
-        & (Join-Path $PSScriptRoot -ChildPath $TemplateFile) @params
-
+        # Pipe teams to main.ps1
+        $teams | & (Join-Path $PSScriptRoot -ChildPath $TemplateFile) @scriptParams
     } catch {
         throw $_
     }
 }
 
 end {
-    Write-Verbose "[Exit]: ./src/res/team/$($MyInvocation.MyCommand.Name)"
+    Write-Verbose "[Exit]: ./$($MyInvocation.MyCommand.Name)"
 }

@@ -1,9 +1,9 @@
 ﻿<#
 .SYNOPSIS
-    Create end-to-end tests for Azure DevOps team.
+    All properties end-to-end tests for Azure DevOps team.
 
 .DESCRIPTION
-    This script executes end-to-end tests with default properties for the Azure DevOps team configuration.
+    This script executes end-to-end tests with all properties for an Azure DevOps team configuration.
 
 .NOTES
     File Name      : main.tests.ps1
@@ -13,8 +13,10 @@
 #region PARAMETERS
 
 $params = @{
-    Project = 'e2egov-prjHb72x9'
-    TeamId  = 'Test Team'
+    CollectionUri = 'https://dev.azure.com/e2egov-org'
+    ProjectName   = 'e2egov-prjHb72x9'
+    TeamName      = 'Test Team A'
+    Description   = 'Default team description'
 }
 
 # endregion
@@ -27,6 +29,6 @@ $rootPath = (Get-Item $PSScriptRoot).Parent.Parent.Parent.FullName
 
 #region TEST EXECUTION
 
-& (Join-Path $rootPath -ChildPath 'main.ps1') @params -Verbose | Format-List *
+& (Join-Path $rootPath -ChildPath 'main.ps1') @params -Confirm:$false -Verbose | Format-List *
 
 #endregion

@@ -4,7 +4,7 @@
 
 ![Version](https://img.shields.io/badge/script%20version-0.1.0-blue) [![License](https://img.shields.io/badge/license-MIT-purple)](https://github.com/msc365/az-devops-governance/blob/main/LICENSE)
 
-[🚧 UNDER CONSTRUCTION] Create, update or rollback an Azure DevOps Team within a specified project.
+Manage an Azure DevOps team within a project.
 
 <!-- omit from toc -->
 ## NAVIGATION
@@ -20,21 +20,19 @@
 
 ## DESCRIPTION
 
-This script creates, updates or rolls back an Azure DevOps Team within a specified project. It allows you to set team properties such as name, description and team settings.
-
-If the team already exists, it updates the properties and settings as needed.
+This script creates, updates, or removes an Azure DevOps team within a specified project,
+including configuration of team settings, iteration paths, and area paths.
 
 ## PARAMETERS
 
 | Parameter | Type | Required | Default | Description |
 | :-- | :-- | :-- | :-- | :-- |
-| `Project` | `String` | Yes | - | Required. The Azure DevOps project ID or Name where the environment will be created. |
-| `TeamId` | `String` | Yes | - | Optional. The ID or Name of the Azure DevOps team to create, update or rollback. |
-| `Description` | `String` | No | - | Optional. A description for the Azure DevOps team. |
-| `Force` | `Switch` | No | - | Optional. Switch to force deletion without confirmation during rollback. |
-| `GroupMembership` | `Object[]` | No | - | {{ Fill in the Description }} |
-| `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (delete) the team and related resources. <br /> ⚠️ <b> WARNING! </b> <br /> Use with caution! Removing a team is irreversible and may affect teams relying on it. See [Notes](#notes) for more information. |
-| `TeamSettings` | `Object` | No | - | Optional. A hashtable containing team settings to override the default settings. |
+| `TeamName` | `String` | Yes | - | Mandatory. The name of the Azure DevOps team to manage. |
+| `CollectionUri` | `String` | No | `$env:DefaultAdoCollectionUri` | Optional. The collection URI of the Azure DevOps collection/organization, e.g., `https://dev.azure.com/my-org`. |
+| `Description` | `String` | No | - | Optional. The description of the Azure DevOps team. |
+| `ProjectName` | `String` | No | `$env:DefaultAdoProjectName` | Optional. The Azure DevOps project ID or Name where the team will be managed. |
+| `Rollback` | `Switch` | No | - | Optional. Switch to indicate if the operation should rollback (remove) the specified team. |
+| `TeamSettings` | `Object` | No | - | Optional. A hashtable or PSCustomObject containing team settings to configure. |
 
 ## EXAMPLES
 
@@ -78,38 +76,56 @@ $rollbackSplat = @{
     TemplateParameterFile = 'params/main.parameters.json'
 }
 
-.\deploy.ps1 @rollbackSplat -Rollback -Force -Verbose
+.\deploy.ps1 @rollbackSplat -Rollback -Confirm:$false -Verbose
 ```
 
-Rolls back (deletes) the team and related resources without confirmation.
+Rolls back (removes) the team and related resources without confirmation.
 
 ### Example 4
 
 #### PowerShell
 
 ```powershell
-$paramSplat = @{
-    Project = 'e2egov-prjHb72x9'
-    TeamId = 'Other Team'
-    TeamSettings = @{
-        BugsBehavior = "asRequirements"
-        WorkingDays = @(
-            "monday",
-            "tuesday",
-            "wednesday"
+$params = @{
+    CollectionUri = 'https://dev.azure.com/my-org'
+    ProjectName   = 'e2egov-prjHb72x9'
+    TeamName      = 'Another Team'
+    Description   = 'Another team description'
+    TeamSettings  = @{
+        backlogVisibilities   = @{
+            'Microsoft.EpicCategory'        = false
+            'Microsoft.FeatureCategory'     = true
+            'Microsoft.RequirementCategory' = true
+        }
+        bugsBehavior          = 'asRequirements'
+        defaultIterationMacro = '@currentIteration'
+        workingDays           = @(
+            'monday'
+            'tuesday'
+            'wednesday'
+            'thursday'
+            'friday'
         )
     }
-    Description = 'Other Team Description'
 }
-
-.\src\res\team\main.ps1 @paramSplat -Verbose
+.\main.ps1 @params
 ```
 
-Deploys or updates a team in the specified Azure DevOps project using the provided parameters in code.
+Creates or updates the specified team within the given project.
 
 ## OUTPUTS
 
-### `PSCustomObject`
+```text
+[PSCustomObject]@{
+    id            = Team ID
+    name          = Team Name
+    description   = Team Description
+    teamSettings  = Configured Team Settings
+    projectName   = Azure DevOps Project Name
+    collectionUri = Azure DevOps Collection URI
+    status        = Operation Status (Created, Updated, Added, NoChange, Removed, NotFound)
+}
+```
 
 ## SUPPORT
 
