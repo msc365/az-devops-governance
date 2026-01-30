@@ -1637,6 +1637,8 @@ function ConvertTo-FormattedJSONParameterObject {
 
             # Special case: Multi-line function
             $isLineWithMultilineFunction = $lineValue -match '[a-zA-Z]+\s*\([^\)]*\){0}\s*$' # e.g., roleDefinitionIdOrName: subscriptionResourceId( \n 'Microsoft.Authorization/roleDefinitions', \n 'acdd72a7-3385-48ef-bd42-f606fba81ae7' \n )
+            $lineProcessed = $false
+
             if ($isLineWithMultilineFunction) {
                 # Search leading indent so that we can use it to identify at which line the function ends
                 $indent = ([regex]::Match($paramInJSONFormatArray[$index], '^(\s+)')).Captures.Groups[1].Value.Length
@@ -1664,20 +1666,32 @@ function ConvertTo-FormattedJSONParameterObject {
 
                 # Increase index to skip the function lines
                 $index += $indexToIncrease
+                $lineProcessed = $true
             } else {
+                $hasInlineObject = $line -match '{' -and $line -match '}'
+                $colonCount = ([regex]::Matches($line, ':')).Count
+                $isSingleLineNestedObject = $hasInlineObject -and $colonCount -gt 1
+                if ($isSingleLineNestedObject) {
+                    $parameterNameMatch = [regex]::Match(($line -split ':')[0], '"(.+)"')
+                    $parameterName = $parameterNameMatch.Success ? $parameterNameMatch.Groups[1].Value : ($line -split ':')[0].Trim().Trim('"')
+                    $line = '{0}: "<{1}>"' -f ($line -split ':')[0], $parameterName
+                    $lineProcessed = $true
+                }
                 # Combined checks
                 # In case of an output reference like '"virtualWanId": resourceGroupResources.outputs.virtualWWANResourceId' we'll only show "<virtualWanId>" (but NOT e.g. 'reference': {})
-                $isLineWithObjectPropertyReference = -not $isLineWithEmptyObjectValue -and -not $isLineWithStringValue -and $isLineWithObjectPropertyReferenceValue
-                # In case of a parameter/variable reference like 'adminPassword: password' we'll only show "<adminPassword>" (but NOT e.g. enableMe: true)
-                $isLineWithParameterOrVariableReferenceValue = $isLineWithPlainValue -and -not $isLineWithPrimitiveValue
-                # In case of any contained line like ''${resourceGroupResources.outputs.managedIdentityResourceId}': {}' we'll only show "managedIdentityResourceId: {}"
-                $isLineWithObjectReferenceKeyAndEmptyObjectValue = $isLineWithEmptyObjectValue -and $isLineWithReferenceInLineKey
-                # In case of any contained function like '"backupVaultResourceGroup": (split(resourceGroupResources.outputs.recoveryServicesVaultResourceId, "/"))[4]' we'll only show "<backupVaultResourceGroup>"
+                if (-not $lineProcessed) {
+                    $isLineWithObjectPropertyReference = -not $isLineWithEmptyObjectValue -and -not $isLineWithStringValue -and $isLineWithObjectPropertyReferenceValue
+                    # In case of a parameter/variable reference like 'adminPassword: password' we'll only show "<adminPassword>" (but NOT e.g. enableMe: true)
+                    $isLineWithParameterOrVariableReferenceValue = $isLineWithPlainValue -and -not $isLineWithPrimitiveValue
+                    # In case of any contained line like ''${resourceGroupResources.outputs.managedIdentityResourceId}': {}' we'll only show "managedIdentityResourceId: {}"
+                    $isLineWithObjectReferenceKeyAndEmptyObjectValue = $isLineWithEmptyObjectValue -and $isLineWithReferenceInLineKey
+                    # In case of any contained function like '"backupVaultResourceGroup": (split(resourceGroupResources.outputs.recoveryServicesVaultResourceId, "/"))[4]' we'll only show "<backupVaultResourceGroup>"
 
-                if ($isLineWithObjectPropertyReference -or $isLineWithStringNestedReference -or $isLineWithFunction -or $isLineWithParameterOrVariableReferenceValue -or $isLineContainingCondition) {
-                    $line = '{0}: "<{1}>"' -f ($line -split ':')[0], ([regex]::Match(($line -split ':')[0], '"(.+)"')).Captures.Groups[1].Value
-                } elseif ($isLineWithObjectReferenceKeyAndEmptyObjectValue) {
-                    $line = '"<{0}>": {1}' -f (($line -split ':')[0] -split '\.')[-1].TrimEnd('}"'), $lineValue
+                    if ($isLineWithObjectPropertyReference -or $isLineWithStringNestedReference -or $isLineWithFunction -or $isLineWithParameterOrVariableReferenceValue -or $isLineContainingCondition) {
+                        $line = '{0}: "<{1}>"' -f ($line -split ':')[0], ([regex]::Match(($line -split ':')[0], '"(.+)"')).Captures.Groups[1].Value
+                    } elseif ($isLineWithObjectReferenceKeyAndEmptyObjectValue) {
+                        $line = '"<{0}>": {1}' -f (($line -split ':')[0] -split '\.')[ -1].TrimEnd('}"'), $lineValue
+                    }
                 }
             }
         } else {
