@@ -14,8 +14,8 @@
 
 $params = @{
     CollectionUri   = 'https://dev.azure.com/e2egov-org'
-    ProjectName     = 'e2egov-prjHb72x9'
-    UniqueName      = 'e2egov-prjHb72x9-devs'
+    ProjectName     = 'e2egov-prjE2eT3st'
+    UniqueName      = 'e2egov-prjE2eT3st-devs'
     GroupMembership = 'Contributors'
     Rollback        = $true
 }

@@ -122,6 +122,7 @@ begin {
     if ([string]::IsNullOrWhiteSpace($CollectionUri)) {
         throw "CollectionUri is required. Provide via parameter or use Set-AdoDefault to set '`$env:DefaultAdoCollectionUri'."
     }
+
     if ([string]::IsNullOrWhiteSpace($ProjectName)) {
         throw "ProjectName is required. Provide via parameter or use Set-AdoDefault to set '`$env:DefaultAdoProjectName'."
     }
@@ -148,28 +149,36 @@ begin {
     }
 
     # Project
-    $prj = Get-AdoProject -Project $ProjectName -Verbose:$false -ErrorAction SilentlyContinue
+    $prjSplat = @{
+        CollectionUri = $CollectionUri
+        Project       = $ProjectName
+    }
+    $prj = Get-AdoProject @prjSplat -Verbose:$false -ErrorAction SilentlyContinue
 
     if ($null -eq $prj) {
         throw "Project with ID $ProjectName does not exist, cannot proceed."
     }
 
     # Project scope descriptor
-    $projectScopeDescriptor = (Get-AdoDescriptor -StorageKey $prj.id -Verbose:$false).value
+    $prjScopeDescSplat = @{
+        CollectionUri = $CollectionUri
+        StorageKey    = $prj.id
+    }
+    $projectScopeDescriptor = (Get-AdoDescriptor @prjScopeDescSplat -Verbose:$false).value
 
     # Get built-in group
     $buildInGroupsSplat = @{
+        CollectionUri   = $CollectionUri
         ScopeDescriptor = $projectScopeDescriptor
         SubjectTypes    = 'vssgp'
     }
-
     $buildInGroups = (Get-AdoGroup @buildInGroupsSplat -Verbose:$false)
 
     # Get Entra ID group
     $entraGroupsSplat = @{
-        SubjectTypes = 'aadgp'
+        CollectionUri = $CollectionUri
+        SubjectTypes  = 'aadgp'
     }
-
     $entraGroups = Get-AdoGroup @entraGroupsSplat -Verbose:$false
 }
 
@@ -190,8 +199,7 @@ process {
             Filter   = "mailNickname eq '$($UniqueName)'"
             Property = 'Id, MailNickname, DisplayName'
         }
-
-        $mgGrp = Get-MgGroup @mgGrpSplat -ErrorAction Stop
+        $mgGrp = Get-MgGroup @mgGrpSplat
 
         if ($null -eq $mgGrp) {
             throw "Security group with UniqueName '$($UniqueName)' does not exist, cannot proceed."
@@ -209,6 +217,7 @@ process {
         } else {
             # Check if membership already exists
             $groupMembershipSplat = @{
+                CollectionUri       = $CollectionUri
                 subjectDescriptor   = $entraGroup.descriptor
                 containerDescriptor = $buildInGroup.descriptor
             }
@@ -219,35 +228,33 @@ process {
         #endregion
 
         #region DEPLOYMENTS
+
         if (-not $Rollback.IsPresent) {
             if ($null -eq $grpMshp) {
                 $addMembershipSplat = @{
+                    CollectionUri   = $CollectionUri
                     GroupDescriptor = $buildInGroup.descriptor
                     GroupId         = $mgGrp.Id
                 }
 
-                if ($PSCmdlet.ShouldProcess($ProjectName, "Add group membership : $($GroupMembership)")) {
+                if ($PSCmdlet.ShouldProcess($ProjectName, "Add group membership: $($GroupMembership)")) {
 
-                    $addGrpMshp = Add-AdoGroupMember @addMembershipSplat -Verbose:$false -ErrorAction Stop
+                    $addGrpMshp = Add-AdoGroupMember @addMembershipSplat -Confirm:$false -Verbose:$false
 
                     $grpMshp = [PSCustomObject]@{
                         memberDescriptor    = $addGrpMshp.descriptor
                         containerDescriptor = $buildInGroup.descriptor
                     }
 
-                    $status = 'Created'
-                    Write-Verbose "[CREATED] Group membership: '$GroupMembership' (GroupId: $($mgGrp.Id))"
+                    $status = 'Added'
+                    Write-Verbose "[ADDED]: Group membership '$GroupMembership' (GroupId: $($mgGrp.Id))"
                 } else {
-                    $grpMshp = [PSCustomObject]@{
-                        memberDescriptor    = '<generated>'
-                        containerDescriptor = $buildInGroup.descriptor
-                    }
                     $status = 'WouldCreate'
-                    Write-Verbose "[WHATIF] Call Add-AdoGroupMember with parameters: $($addMembershipSplat | ConvertTo-Json -Depth 5)"
+                    Write-Verbose "[WHATIF]: Call Add-AdoGroupMember with parameters: $($addMembershipSplat | ConvertTo-Json -Depth 5)"
                 }
             } else {
                 $status = 'NoChange'
-                Write-Verbose "[NOCHANGE] Group membership: '$GroupMembership' (GroupId: $($mgGrp.Id))"
+                Write-Verbose "[NOCHANGE]: Group membership '$GroupMembership' (GroupId: $($mgGrp.Id))"
             }
         }
 
@@ -265,7 +272,7 @@ process {
                 }
                 # TODO: Implement removal of membership when available
                 # Waiting for Azure.DevOps.PSModule to implement Remove-AdoMembership
-                Write-Warning "[NOTIMPLEMENTED] Group membership: '$GroupMembership' (GroupId: $($mgGrp.Id))"
+                Write-Warning "[NOTIMPLEMENTED]: Group membership '$GroupMembership' (GroupId: $($mgGrp.Id))"
 
             } else {
                 $status = 'NotFound'
@@ -273,7 +280,7 @@ process {
                     memberDescriptor    = '<unknown>'
                     containerDescriptor = $buildInGroup.descriptor
                 }
-                Write-Verbose "[NOTFOUND] Group membership: '$GroupMembership' (GroupId: $($mgGrp.Id))"
+                Write-Verbose "[NOTFOUND]: Group membership '$GroupMembership' (GroupId: $($mgGrp.Id))"
             }
         }
 
