@@ -8,7 +8,7 @@ targetScope = 'subscription'
 // ========== //
 
 @description('Optional. A short identifier for the kind of deployment. Should be kept short to not run into resource-name length-constraints.')
-param serviceShort string = 'rrgmin'
+param serviceShort string = 'E2eT3st'
 
 @description('Optional. A token to inject into the name of each resource. This value can be automatically injected by the CI.')
 param namePrefix string = 'e2egov-'
@@ -23,16 +23,25 @@ param resourceLocation string = deployment().location
 @batchSize(1)
 module testDeployment '../../../main.bicep' = [
   for iteration in ['init', 'idem']: {
-    name: '${uniqueString(deployment().name, resourceLocation)}-test-${serviceShort}-${iteration}'
+    name: '${uniqueString(deployment().name, resourceLocation)}-tests-${serviceShort}-${iteration}'
     params: {
       resourceGroups: [
         {
-          name: 'rg-${namePrefix}${serviceShort}-test-${iteration}'
+          name: 'rg-${namePrefix}prj${serviceShort}-dev-weu'
           location: resourceLocation
           tags: {
             public: 'false'
             service: serviceShort
-            reason: 'e2e-test'
+            reason: 'e2e-tests'
+          }
+        }
+        {
+          name: 'rg-${namePrefix}prj${serviceShort}-prd-weu'
+          location: resourceLocation
+          tags: {
+            public: 'false'
+            service: serviceShort
+            reason: 'e2e-tests'
           }
         }
       ]

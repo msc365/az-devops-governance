@@ -32,7 +32,7 @@ The following section provides usage examples for the module, which were used to
 > To reference the module, please use the following syntax `iac/ptn/resources/resource-group/main.bicep`.
 
 - [Using all](#example-1-using-all)
-- [Using defaults only](#example-2-using-defaults-only)
+- [Defaults only](#example-2-defaults-only)
 
 ### Example 1: _Using all_
 
@@ -50,10 +50,19 @@ module resourceGroup 'iac/ptn/resources/resource-group/main.bicep' = {
     resourceGroups: [
       {
         location: '<location>'
-        name: '<name>'
+        name: 'rg-prjE2eT3st-dev-weu'
         tags: {
           public: 'false'
-          reason: 'e2e-test'
+          reason: 'e2e-tests'
+          service: '<service>'
+        }
+      }
+      {
+        location: '<location>'
+        name: 'rg-prjE2eT3st-prd-weu'
+        tags: {
+          public: 'false'
+          reason: 'e2e-tests'
           service: '<service>'
         }
       }
@@ -78,10 +87,19 @@ module resourceGroup 'iac/ptn/resources/resource-group/main.bicep' = {
       "value": [
         {
           "location": "<location>",
-          "name": "<name>",
+          "name": "rg-prjE2eT3st-dev-weu",
           "tags": {
             "public": "false",
-            "reason": "e2e-test",
+            "reason": "e2e-tests",
+            "service": "<service>"
+          }
+        },
+        {
+          "location": "<location>",
+          "name": "rg-prjE2eT3st-prd-weu",
+          "tags": {
+            "public": "false",
+            "reason": "e2e-tests",
             "service": "<service>"
           }
         }
@@ -104,10 +122,19 @@ using 'iac/ptn/resources/resource-group/main.bicep'
 param resourceGroups = [
   {
     location: '<location>'
-    name: '<name>'
+    name: 'rg-prjE2eT3st-dev-weu'
     tags: {
       public: 'false'
-      reason: 'e2e-test'
+      reason: 'e2e-tests'
+      service: '<service>'
+    }
+  }
+  {
+    location: '<location>'
+    name: 'rg-prjE2eT3st-prd-weu'
+    tags: {
+      public: 'false'
+      reason: 'e2e-tests'
       service: '<service>'
     }
   }
@@ -117,7 +144,7 @@ param resourceGroups = [
 </details>
 <p>
 
-### Example 2: _Using defaults only_
+### Example 2: _Defaults only_
 
 This instance deploys the module with the minimum set of required parameters.
 
@@ -133,7 +160,11 @@ module resourceGroup 'iac/ptn/resources/resource-group/main.bicep' = {
     resourceGroups: [
       {
         location: '<location>'
-        name: '<name>'
+        name: 'rg-prjE2eT3st-dev-weu'
+      }
+      {
+        location: '<location>'
+        name: 'rg-prjE2eT3st-prd-weu'
       }
     ]
   }
@@ -156,7 +187,11 @@ module resourceGroup 'iac/ptn/resources/resource-group/main.bicep' = {
       "value": [
         {
           "location": "<location>",
-          "name": "<name>"
+          "name": "rg-prjE2eT3st-dev-weu"
+        },
+        {
+          "location": "<location>",
+          "name": "rg-prjE2eT3st-prd-weu"
         }
       ]
     }
@@ -177,7 +212,11 @@ using 'iac/ptn/resources/resource-group/main.bicep'
 param resourceGroups = [
   {
     location: '<location>'
-    name: '<name>'
+    name: 'rg-prjE2eT3st-dev-weu'
+  }
+  {
+    location: '<location>'
+    name: 'rg-prjE2eT3st-prd-weu'
   }
 ]
 ```
