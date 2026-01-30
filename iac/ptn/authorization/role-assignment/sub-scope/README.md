@@ -8,6 +8,7 @@ This module deploys role assignments at the subscription scope used for end-to-e
 
 <!-- no toc -->
 - [Resource Types](#resource-types)
+- [Usage examples](#usage-examples)
 - [Parameters](#parameters)
 - [Outputs](#outputs)
 - [Cross-referenced modules](#cross-referenced-modules)
@@ -17,6 +18,133 @@ This module deploys role assignments at the subscription scope used for end-to-e
 | Resource Type | API Version |
 | :-- | :-- |
 | `Microsoft.Authorization/roleAssignments` | [2022-04-01](https://learn.microsoft.com/en-us/azure/templates/Microsoft.Authorization/2022-04-01/roleAssignments) |
+
+## Usage examples
+
+The following section provides usage examples for the module, which were used to validate and deploy the module successfully. For a full reference, please review the module's test folder in its repository.
+
+> **Note** <br>
+> Each example lists all the required parameters first, followed by the rest - each in alphabetical order.
+
+> **Note** <br>
+> To reference the module, please use the following syntax `iac/ptn/authorization/role-assignment/sub-scope/main.bicep`.
+
+- [Defaults only](#example-1-defaults-only)
+
+### Example 1: _Defaults only_
+
+This instance deploys the module with default parameters.
+
+
+<details>
+
+<summary>via Bicep module</summary>
+
+```bicep
+module roleAssignment 'iac/ptn/authorization/role-assignment/sub-scope/main.bicep' = {
+  name: 'roleAssignmentDeployment'
+  params: {
+    // Required parameters
+    customRoleDefinitionId: '8e3af657-a8ff-443c-a75c-2fe8c4bcb635'
+    managedIdentities: {
+      development: '<development>'
+      production: '<production>'
+    }
+    resourceGroups: {
+      development: '<development>'
+      production: '<production>'
+    }
+    securityGroups: {
+      administrators: '<administrators>'
+      developers: '<developers>'
+      stakeholders: '<stakeholders>'
+    }
+    subscriptions: {
+      development: '<development>'
+      production: '<production>'
+    }
+  }
+}
+```
+
+</details>
+<p>
+
+<details>
+
+<summary>via JSON parameters file</summary>
+
+```json
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    // Required parameters
+    "customRoleDefinitionId": {
+      "value": "8e3af657-a8ff-443c-a75c-2fe8c4bcb635"
+    },
+    "managedIdentities": {
+      "value": {
+        "development": "<development>",
+        "production": "<production>"
+      }
+    },
+    "resourceGroups": {
+      "value": {
+        "development": "<development>",
+        "production": "<production>"
+      }
+    },
+    "securityGroups": {
+      "value": {
+        "administrators": "<administrators>",
+        "developers": "<developers>",
+        "stakeholders": "<stakeholders>"
+      }
+    },
+    "subscriptions": {
+      "value": {
+        "development": "<development>",
+        "production": "<production>"
+      }
+    }
+  }
+}
+```
+
+</details>
+<p>
+
+<details>
+
+<summary>via Bicep parameters file</summary>
+
+```bicep-params
+using 'iac/ptn/authorization/role-assignment/sub-scope/main.bicep'
+
+// Required parameters
+param customRoleDefinitionId = '8e3af657-a8ff-443c-a75c-2fe8c4bcb635'
+param managedIdentities = {
+  development: '<development>'
+  production: '<production>'
+}
+param resourceGroups = {
+  development: '<development>'
+  production: '<production>'
+}
+param securityGroups = {
+  administrators: '<administrators>'
+  developers: '<developers>'
+  stakeholders: '<stakeholders>'
+}
+param subscriptions = {
+  development: '<development>'
+  production: '<production>'
+}
+```
+
+</details>
+<p>
 
 ## Parameters
 
