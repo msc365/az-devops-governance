@@ -144,6 +144,7 @@ begin {
     if ([string]::IsNullOrWhiteSpace($CollectionUri)) {
         throw "CollectionUri is required. Provide via parameter or use Set-AdoDefault to set '`$env:DefaultAdoCollectionUri'."
     }
+
     if ([string]::IsNullOrWhiteSpace($ProjectName)) {
         throw "ProjectName is required. Provide via parameter or use Set-AdoDefault to set '`$env:DefaultAdoProjectName'."
     }
@@ -176,37 +177,39 @@ process {
         $prj, $msi, $fic, $sep = $null
 
         # Project
-        $prj = Get-AdoProject -Project $ProjectName -Verbose:$false -ErrorAction SilentlyContinue
+        $prjSplat = [ordered]@{
+            CollectionUri = $CollectionUri
+            Project       = $ProjectName
+        }
+        $prj = Get-AdoProject @prjSplat -Verbose:$false -ErrorAction SilentlyContinue
 
         if ($null -eq $prj) {
             throw "Project with ID $ProjectName does not exist, cannot proceed."
         }
 
         # Managed service identity
-        $msiSplat = @{
+        $msiSplat = [ordered]@{
             Name              = $ManagedIdentity.name
             ResourceGroupName = $ManagedIdentity.resourceGroupName
             SubscriptionId    = $ManagedIdentity.subscriptionId
         }
-
         $msi = Get-AzUserAssignedIdentity @msiSplat -Verbose:$false -ErrorAction SilentlyContinue
 
         # Federated identity credential
-        $ficSplat = @{
+        $ficSplat = [ordered]@{
             Name              = $ManagedIdentity.federatedIdentityCredential.name
             IdentityName      = $ManagedIdentity.name
             ResourceGroupName = $ManagedIdentity.resourceGroupName
             SubscriptionId    = $ManagedIdentity.subscriptionId
         }
-
         $fic = Get-AzFederatedIdentityCredential @ficSplat -Verbose:$false -ErrorAction SilentlyContinue
 
         # Service endpoint
-        $sepSplat = @{
-            ProjectName = $ProjectName
-            Names       = $Name
+        $sepSplat = [ordered]@{
+            CollectionUri = $CollectionUri
+            ProjectName   = $ProjectName
+            Names         = $Name
         }
-
         $sep = Get-AdoServiceEndpoint @sepSplat -Verbose:$false -ErrorAction SilentlyContinue
 
         #endregion
@@ -266,7 +269,9 @@ process {
                     )
                 }
 
-                $sepSplat = @{
+                $sepSplat = [ordered]@{
+                    CollectionUri = $CollectionUri
+                    ProjectName   = $ProjectName
                     Configuration = $sepConfig
                 }
 
@@ -276,17 +281,17 @@ process {
                         throw "Managed identity '$($ManagedIdentity.name)' not found in resource group '$($ManagedIdentity.resourceGroupName)'. Cannot create service endpoint."
                     }
 
-                    $sep = New-AdoServiceEndpoint @sepSplat -Confirm:$false -Verbose:$false -ErrorAction Stop
+                    $sep = New-AdoServiceEndpoint @sepSplat -Confirm:$false -Verbose:$false
 
                     $status = 'Created'
-                    Write-Verbose "[CREATED] Service endpoint: '$Name' (ID: $($sep.Id))"
+                    Write-Verbose "[CREATED]: Service endpoint '$Name' (ID: $($sep.Id))"
                 } else {
                     $status = 'WouldCreate'
-                    Write-Verbose "[WHATIF] Call New-AdoServiceEndpoint with parameters: $($sepSplat | ConvertTo-Json -Depth 5)"
+                    Write-Verbose "[WHATIF]: Call New-AdoServiceEndpoint with parameters: $($sepSplat | ConvertTo-Json -Depth 5)"
                 }
             } else {
                 $status = 'NoChange'
-                Write-Verbose "[NOCHANGE] Service endpoint: '$($sep.Name)' (ID: $($sep.Id))"
+                Write-Verbose "[NOCHANGE]: Service endpoint '$($sep.Name)' (ID: $($sep.Id))"
             }
 
             # Federated Credential
@@ -296,23 +301,21 @@ process {
                         throw "Service endpoint '$($Name)' not found! Cannot create 'Federated Identity Credential'."
                     }
 
-                    $ficSplat += @{
-                        Issuer  = $sep.Authorization.Parameters.WorkloadIdentityFederationIssuer
-                        Subject = $sep.Authorization.Parameters.WorkloadIdentityFederationSubject
-                    }
+                    $ficSplat['Issuer'] = $sep.Authorization.Parameters.WorkloadIdentityFederationIssuer
+                    $ficSplat['Subject'] = $sep.Authorization.Parameters.WorkloadIdentityFederationSubject
 
-                    $fic = New-AzFederatedIdentityCredential @ficSplat -Confirm:$false -Verbose:$false -ErrorAction Stop
+                    $fic = New-AzFederatedIdentityCredential @ficSplat -Confirm:$false -Verbose:$false
 
                     # $status = 'Created'
-                    Write-Verbose "[CREATED] Federated identity credential: '$($fic.Name)' (ID: $($fic.Id))"
+                    Write-Verbose "[CREATED]: Federated identity credential '$($fic.Name)' (ID: $($fic.Id))"
                 } else {
                     # $status = 'Skipped'
-                    Write-Verbose "[WHATIF] Call New-AzFederatedIdentityCredential with parameters: $($ficSplat | ConvertTo-Json -Depth 5)"
+                    Write-Verbose "[WHATIF]: Call New-AzFederatedIdentityCredential with parameters: $($ficSplat | ConvertTo-Json -Depth 5)"
                 }
 
             } else {
                 # $status = 'NoChange'
-                Write-Verbose "[NOCHANGE] Federated identity credential: '$($fic.Name)' (ID: $($fic.Id))"
+                Write-Verbose "[NOCHANGE]: Federated identity credential '$($fic.Name)' (ID: $($fic.Id))"
             }
         }
 
@@ -324,7 +327,9 @@ process {
             # Federated identity credential
             if ($null -ne $fic) {
                 if ($PSCmdlet.ShouldProcess($Name, "Remove federated identity credential: $($ManagedIdentity.federatedIdentityCredential.name)")) {
-                    $ficSplat = @{
+                    $ficSplat = [ordered]@{
+                        CollectionUri     = $CollectionUri
+                        ProjectName       = $ProjectName
                         Name              = $ManagedIdentity.federatedIdentityCredential.name
                         IdentityName      = $ManagedIdentity.name
                         ResourceGroupName = $ManagedIdentity.resourceGroupName
@@ -333,13 +338,13 @@ process {
 
                     Remove-AzFederatedIdentityCredential @ficSplat -Confirm:$false -Verbose:$false | Out-Null
 
-                    Write-Verbose "[REMOVED] Federated identity credential: '$($fic.Name)' (ID: $($fic.Id))"
+                    Write-Verbose "[REMOVED]: Federated identity credential '$($fic.Name)' (ID: $($fic.Id))"
                     $fic = $null
                 } else {
-                    Write-Verbose "[WHATIF] Call Remove-AzFederatedIdentityCredential with parameters: $($ficSplat | ConvertTo-Json -Depth 5)"
+                    Write-Verbose "[WHATIF]: Call Remove-AzFederatedIdentityCredential with parameters: $($ficSplat | ConvertTo-Json -Depth 5)"
                 }
             } else {
-                Write-Warning "[NOTFOUND] Federated identity credential: '$($ManagedIdentity.federatedIdentityCredential.name)' (ID: <unknown>)"
+                Write-Warning "[NOTFOUND]: Federated identity credential '$($ManagedIdentity.federatedIdentityCredential.name)' (ID: <unknown>)"
             }
 
             # Service endpoint
@@ -349,9 +354,11 @@ process {
                         throw "Federated identity credential '$($ManagedIdentity.federatedIdentityCredential.name)' still exists! Cannot remove service endpoint '$($Name)'."
                     }
 
-                    $sepSplat = @{
-                        Id         = $sep.id
-                        ProjectIds = $prj.id
+                    $sepSplat = [ordered]@{
+                        CollectionUri = $CollectionUri
+                        ProjectName   = $ProjectName
+                        Id            = $sep.id
+                        ProjectIds    = $prj.id
                     }
 
                     $maxAttempts = 3; $waitSeconds = 15; $attempt = 0; $success = $false
@@ -366,7 +373,7 @@ process {
 
                             $success = $true
                             $status = 'Removed'
-                            Write-Verbose "[REMOVED] Service endpoint: '$($sep.name)' (ID: $($sep.id))"
+                            Write-Verbose "[REMOVED]: Service endpoint '$($sep.name)' (ID: $($sep.id))"
                         } catch {
                             Write-Warning "Attempt '$($attempt) of $($maxAttempts)' failed: $($_.Exception.Message)"
 
@@ -380,7 +387,7 @@ process {
                     }
                 } else {
                     $status = 'WouldRemove'
-                    Write-Verbose "[WHATIF] Call Remove-AdoServiceEndpoint with parameters: $($sepSplat | ConvertTo-Json -Depth 5)"
+                    Write-Verbose "[WHATIF]: Call Remove-AdoServiceEndpoint with parameters: $($sepSplat | ConvertTo-Json -Depth 5)"
                 }
             } else {
                 $status = 'NotFound'
@@ -390,7 +397,7 @@ process {
                     collectionUri = $CollectionUri
                 }
 
-                Write-Warning "[NOTFOUND] Service endpoint: '$($Name)' (ID: <unknown>)"
+                Write-Warning "[NOTFOUND]: Service endpoint '$($Name)' (ID: <unknown>)"
             }
 
             # Return rollback result

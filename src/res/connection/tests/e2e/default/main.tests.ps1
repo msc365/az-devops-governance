@@ -2,14 +2,14 @@
 
 $params = @{
     CollectionUri   = 'https://dev.azure.com/e2egov-org'
-    ProjectName     = 'e2egov-prjHb72x9'
-    Name            = 'rg-e2egov-prjHb72x9-tst-weu'
+    ProjectName     = 'e2egov-prjE2eT3st'
+    Name            = 'rg-e2egov-prjE2eT3st-tst-weu'
     ManagedIdentity = @{
-        Name                        = 'id-e2egov-prjHb72x9-tst'
+        Name                        = 'id-e2egov-prjE2eT3st-tst'
         SubscriptionId              = '00000000-0000-0000-0000-000000000000'
-        ResourceGroupName           = 'rg-e2egov-prjHb72x9-tst-weu'
+        ResourceGroupName           = 'rg-e2egov-prjE2eT3st-tst-weu'
         FederatedIdentityCredential = @{
-            Name = 'fic-e2egov-prjHb72x9-tst'
+            Name = 'fic-e2egov-prjE2eT3st-tst'
         }
     }
 }
