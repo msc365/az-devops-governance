@@ -47,7 +47,7 @@ BeforeAll {
         $script:originalScripts['teamSettings'] = Get-Content -Path $teamSettingsPath -Raw
         @'
 [CmdletBinding(SupportsShouldProcess)]
-param($Project, $Team, $TeamSettings)
+param($CollectionUri, $Project, $Team, $TeamSettings)
 [PSCustomObject]@{ status = 'NoChange' }
 '@ | Set-Content -Path $teamSettingsPath -Force
     }
@@ -58,7 +58,7 @@ param($Project, $Team, $TeamSettings)
         $script:originalScripts['iterationPaths'] = Get-Content -Path $iterationPathsPath -Raw
         @'
 [CmdletBinding(SupportsShouldProcess)]
-param($Project, $Team)
+param($CollectionUri, $Project, $Team)
 [PSCustomObject]@{ status = 'NoChange' }
 '@ | Set-Content -Path $iterationPathsPath -Force
     }
@@ -69,7 +69,7 @@ param($Project, $Team)
         $script:originalScripts['areaPaths'] = Get-Content -Path $areaPathsPath -Raw
         @'
 [CmdletBinding(SupportsShouldProcess)]
-param($Project, $Team)
+param($CollectionUri, $Project, $Team)
 [PSCustomObject]@{ status = 'NoChange' }
 '@ | Set-Content -Path $areaPathsPath -Force
     }

@@ -143,6 +143,7 @@ begin {
     if ([string]::IsNullOrWhiteSpace($CollectionUri)) {
         throw "CollectionUri is required. Provide via parameter or use Set-AdoDefault to set '`$env:DefaultAdoCollectionUri'."
     }
+
     if ([string]::IsNullOrWhiteSpace($ProjectName)) {
         throw "ProjectName is required. Provide via parameter or use Set-AdoDefault to set '`$env:DefaultAdoProjectName'."
     }
@@ -161,11 +162,13 @@ begin {
         Write-Verbose "Module '$requiredModule' imported successfully."
     }
 
-    # Variables
-    $prj, $ra = $null
-
     # Project
-    $prj = Get-AdoProject -Project $ProjectName -Verbose:$false -ErrorAction SilentlyContinue
+    $prjSplat = [ordered]@{
+        CollectionUri = $CollectionUri
+        ProjectName   = $ProjectName
+    }
+
+    $prj = Get-AdoProject @prjSplat -Verbose:$false -ErrorAction SilentlyContinue
 
     if ($null -eq $prj) {
         throw "Project with ID $ProjectName does not exist, cannot proceed."
@@ -182,12 +185,13 @@ process {
         $status = 'Unknown'
 
         # Variables
-        $tm, $tms, $ap = $null
+        $tm = $null
 
         # Team
         $tmSplat = [ordered]@{
-            ProjectName = $ProjectName
-            TeamName    = $TeamName
+            CollectionUri = $CollectionUri
+            ProjectName   = $ProjectName
+            TeamName      = $TeamName
         }
         $tm = Get-AdoTeam @tmSplat -Verbose:$false
 
@@ -198,10 +202,9 @@ process {
         if (-not $Rollback.IsPresent) {
             if ($null -eq $tm) {
                 # Team does not exist, create it
-                $tmSplat = [ordered]@{
-                    ProjectName = $ProjectName
-                    TeamName    = $TeamName
-                    Description = $Description
+
+                if ($PSBoundParameters.ContainsKey('Description')) {
+                    $tmSplat['Description'] = $Description
                 }
 
                 if ($PSCmdlet.ShouldProcess($ProjectName, "Create team: $($TeamName)")) {
@@ -209,33 +212,26 @@ process {
                     $tm = New-AdoTeam @tmSplat -Confirm:$false -Verbose:$false
 
                     $status = 'Created'
-                    Write-Verbose "[CREATED] Team: '$TeamName' (ID: $($tm.Id))"
+                    Write-Verbose "[CREATED]: Team '$TeamName' (ID: $($tm.Id))"
                 } else {
-
-                    $tm = [PSCustomObject]@{
-                        id          = '<generated>'
-                        name        = $TeamName
-                        description = $Description
-                    }
-
                     $status = 'WouldCreate'
-                    $tmSplat += @{
-                        teamSettings = $TeamSettings
-                    }
-                    Write-Verbose "[WHATIF] Call New-AdoTeam with parameters: $($tmSplat | ConvertTo-Json -Depth 5)"
+                    $tmSplat['teamSettings'] = $TeamSettings
+                    Write-Verbose "[WHATIF]: Call New-AdoTeam with parameters: $($tmSplat | ConvertTo-Json -Depth 5)"
                 }
-            } else {
+            }
+
+            if ($null -ne $tm) {
                 # Team exists, check for description changes
                 $hasChanges = $false
 
                 $tmSplat = [ordered]@{
-                    ProjectName = $ProjectName
-                    TeamName    = $TeamName
+                    CollectionUri = $CollectionUri
+                    ProjectName   = $ProjectName
+                    TeamName      = $TeamName
                 }
 
                 # Only check description if it was explicitly provided
                 if ($PSBoundParameters.ContainsKey('Description')) {
-
                     # Normalize to empty string for comparison
                     $currentDesc = $tm.Description ?? ''
                     $newDesc = $Description ?? ''
@@ -249,48 +245,39 @@ process {
                 if ($hasChanges) {
                     if ($PSCmdlet.ShouldProcess($TeamName, 'Update team description')) {
 
-                        $tm = Set-AdoTeam @tmSplat -Id $tm.id -Confirm:$false
+                        $tm = Set-AdoTeam @tmSplat -Id $tm.id -Confirm:$false -Verbose:$false
 
                         $status = 'Updated'
-                        Write-Verbose "[UPDATED] Team description: '$TeamName' (ID: $($tm.Id))"
+                        Write-Verbose "[UPDATED]: Team description '$TeamName' (ID: $($tm.Id))"
                     } else {
                         $status = 'WouldUpdate'
-                        Write-Verbose "[WHATIF] Call Set-AdoTeam with parameters: $($tmSplat | ConvertTo-Json -Depth 5)"
+                        Write-Verbose "[WHATIF]: Call Set-AdoTeam with parameters: $($tmSplat | ConvertTo-Json -Depth 5)"
                     }
                 } else {
-                    $status = 'NoChange'
-                    Write-Verbose "[NOCHANGE] Team: '$TeamName' (ID: $($tm.Id))"
+                    # Only set NoChange if status is not already 'Created'
+                    if ($status -ne 'Created') {
+                        $status = 'NoChange'
+                    }
+                    Write-Verbose "[NOCHANGE]: Team '$TeamName' (ID: $($tm.Id))"
                 }
-            }
 
-            if ($tm -and $status -ne 'WouldCreate') {
+                # Team settings, iteration paths, area paths
                 $tmsSplat = [ordered]@{
-                    Project = [ordered]@{
-                        Id          = $prj.id
-                        Name        = $prj.name
-                        DefaultTeam = [ordered]@{
-                            Id   = $prj.defaultTeam.id
-                            Name = $prj.defaultTeam.name
-                        }
-                    }
-                    Team    = [ordered]@{
-                        Id   = $tm.id
-                        Name = $tm.name
-                    }
-                    Verbose = $VerbosePreference
-                    WhatIf  = $WhatIfPreference
-                    Confirm = $false
+                    CollectionUri = $CollectionUri
+                    Project       = $prj
+                    Team          = $tm
+                    Verbose       = $VerbosePreference
+                    WhatIf        = $WhatIfPreference
+                    Confirm       = $false
                 }
 
                 # Team settings
-                if ($null -ne $TeamSettings) {
-                    $tms = & (Join-Path -Path $PSScriptRoot -ChildPath 'modules\nested_teamSettings.ps1') @tmsSplat -TeamSettings $TeamSettings
-                    $status = if ($status -eq 'NoChange') { $tms.status } else { $status }
-                } else {
-                    # Get default(existing) team settings
-                    $tms = & (Join-Path -Path $PSScriptRoot -ChildPath 'modules\nested_teamSettings.ps1') @tmsSplat
-                    $status = if ($status -eq 'NoChange') { $tms.status } else { $status }
+                if ($PSBoundParameters.ContainsKey('TeamSettings')) {
+                    $tmsSplat['TeamSettings'] = $TeamSettings
                 }
+
+                $tms = & (Join-Path -Path $PSScriptRoot -ChildPath 'modules\nested_teamSettings.ps1') @tmsSplat
+                $tmsSplat.Remove('TeamSettings')
 
                 # Team iteration paths
                 & (Join-Path -Path $PSScriptRoot -ChildPath 'modules\nested_iterationPaths.ps1') @tmsSplat | Out-Null
@@ -306,7 +293,7 @@ process {
 
         if ($Rollback.IsPresent) {
             if ($null -ne $tm) {
-                $tmSplat = @{
+                $tmSplat = [ordered]@{
                     CollectionUri = $CollectionUri
                     ProjectName   = $ProjectName
                     TeamName      = $TeamName
@@ -317,19 +304,18 @@ process {
                     Remove-AdoTeam @tmSplat -Confirm:$false -ErrorAction Stop
 
                     $status = 'Removed'
-                    Write-Verbose "[REMOVED] Team: '$TeamName' (ID: $($tm.Id))"
+                    Write-Verbose "[REMOVED]: Team '$TeamName' (ID: $($tm.Id))"
                 } else {
                     $status = 'WouldRemove'
-                    Write-Verbose "[WHATIF] Call Remove-AdoTeam with parameters: $($tmSplat | ConvertTo-Json -Depth 5)"
+                    Write-Verbose "[WHATIF]: Call Remove-AdoTeam with parameters: $($tmSplat | ConvertTo-Json -Depth 5)"
                 }
             } else {
                 $status = 'NotFound'
                 $tm = [PSCustomObject]@{
-                    id          = $null
-                    name        = $TeamName
-                    description = $Description
+                    id   = $null
+                    name = $TeamName
                 }
-                Write-Verbose "[NOTFOUND] Team: '$TeamName' (ID: `$null)"
+                Write-Verbose "[NOTFOUND]: Team '$TeamName' (ID: `$null)"
             }
 
             # Return rollback result; rebuild object

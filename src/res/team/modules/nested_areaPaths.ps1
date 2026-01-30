@@ -15,7 +15,8 @@ begin {
     Write-Verbose ("[Enter]: ./modules/$($MyInvocation.MyCommand.Name)")
 
     # Root area path
-    $rapSplat = @{
+    $rapSplat = [ordered]@{
+        CollectionUri  = $CollectionUri
         ProjectName    = $Project.Name
         StructureGroup = 'Areas'
         Depth          = 2
@@ -59,7 +60,8 @@ process {
 
         # Project area path
         if ($null -eq $ap) {
-            $apSplat = @{
+            $apSplat = [ordered]@{
+                CollectionUri  = $CollectionUri
                 ProjectName    = $Project.Name
                 Name           = $Team.Name
                 StructureGroup = 'Areas'
@@ -85,7 +87,7 @@ process {
 
             $defaultValue = "$($Project.Name)\$($Team.Name)"
             $values = @(
-                @{
+                [ordered]@{
                     value           = $defaultValue
                     includeChildren = $false
                 }
@@ -102,21 +104,10 @@ process {
                 $tmfv = Set-AdoTeamFieldValue @tmfvSplat -Confirm:$false -Verbose:$false
 
                 $status = 'Succeeded'
-                Write-Verbose "[ADDED] Team area path: '$($tmfv.defaultValue)'"
+                Write-Verbose "[ADDED]: Team area path '$($tmfv.defaultValue)'"
             } else {
-                $tmfv = [PSCustomObject]@{
-                    field        = '<generated>'
-                    defaultValue = "$($Project.Name)\$($Team.Name)"
-                    values       = @(
-                        [ordered]@{
-                            value           = "$($Project.Name)\$($Team.Name)"
-                            includeChildren = $false
-                        }
-                    )
-                }
-
                 $status = 'WouldAdd'
-                Write-Verbose "[WHATIF] Call Set-AdoTeamFieldValue with parameters: $($tmfvSplat | ConvertTo-Json -Depth 5)"
+                Write-Verbose "[WHATIF]: Call Set-AdoTeamFieldValue with parameters: $($tmfvSplat | ConvertTo-Json -Depth 5)"
             }
         } else {
             $status = 'NoChange'
@@ -143,6 +134,12 @@ process {
 end {
     Write-Verbose ("[Exit]: ./modules/$($MyInvocation.MyCommand.Name)")
 }
+
+
+
+
+
+
 
 
 

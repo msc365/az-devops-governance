@@ -14,7 +14,7 @@
 
 $params = @{
     CollectionUri = 'https://dev.azure.com/e2egov-org'
-    ProjectName   = 'e2egov-prjHb72x9'
+    ProjectName   = 'e2egov-prjE2eT3st'
     TeamName      = 'Test Team A'
     Description   = 'Default team description'
 }

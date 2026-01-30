@@ -75,7 +75,7 @@ process {
                         # Restore to default backlog iteration
                         $mergedTeamSettings[$key] = $defaultTeamSettings.backlogIteration.id
                         $backlogIterationHasChanges = $true
-                        Write-Verbose "- Restored: $key -> $($mergedTeamSettings[$key])"
+                        Write-Verbose "[RESTORED]: $key -> $($mergedTeamSettings[$key])"
                     }
                     # Only update if TeamSettings is provided and value is different
                     elseif ($null -ne $TeamSettings -and
@@ -84,9 +84,9 @@ process {
                         # Update to provided backlog iteration
                         $mergedTeamSettings[$key] = $TeamSettings[$key]
                         $backlogIterationHasChanges = $true
-                        Write-Verbose "- Updated : $key -> $($mergedTeamSettings[$key])"
+                        Write-Verbose "[UPDATED]: $key -> $($mergedTeamSettings[$key])"
                     } else {
-                        Write-Verbose "- NoChange: $key"
+                        Write-Verbose "[NOCHANGE]: $key"
                     }
                 }
                 'backlogVisibilities' {
@@ -100,7 +100,7 @@ process {
                             if ($mergedBacklogVisibilities[$bvKey] -ne $TeamSettings[$key][$bvKey]) {
                                 $mergedBacklogVisibilities[$bvKey] = $TeamSettings[$key][$bvKey]
                                 $backlogVisibilitiesHasChanges = $true
-                                Write-Verbose "- Updated : $key -> $bvKey\$($TeamSettings[$key][$bvKey])"
+                                Write-Verbose "[UPDATED]: $key -> $bvKey\$($TeamSettings[$key][$bvKey])"
                             }
                         }
 
@@ -108,10 +108,10 @@ process {
                         if ($backlogVisibilitiesHasChanges) {
                             $mergedTeamSettings[$key] = $mergedBacklogVisibilities
                         } else {
-                            Write-Verbose "- NoChange: $key"
+                            Write-Verbose "[NOCHANGE]: $key"
                         }
                     } else {
-                        Write-Verbose "- NoChange: $key"
+                        Write-Verbose "[NOCHANGE]: $key"
                     }
                 }
                 'workingDays' {
@@ -140,12 +140,12 @@ process {
 
                         if ($workingDaysHasChanges) {
                             $mergedTeamSettings[$key] = $mergedWorkingDays
-                            Write-Verbose "- Updated : $key -> $($mergedWorkingDays -join ', ')"
+                            Write-Verbose "[UPDATED]: $key -> $($mergedWorkingDays -join ', ')"
                         } else {
-                            Write-Verbose "- NoChange: $key"
+                            Write-Verbose "[NOCHANGE]: $key"
                         }
                     } else {
-                        Write-Verbose "- NoChange: $key"
+                        Write-Verbose "[NOCHANGE]: $key"
                     }
                 }
 
@@ -163,9 +163,9 @@ process {
                             'defaultIterationMacro' { $defaultIterationMacroHasChanges = $true }
                         }
 
-                        Write-Verbose "- Updated : $key -> $($mergedTeamSettings[$key])"
+                        Write-Verbose "[UPDATED]: $key -> $($mergedTeamSettings[$key])"
                     } else {
-                        Write-Verbose "- NoChange: $key"
+                        Write-Verbose "[NOCHANGE]: $key"
                     }
                 }
             }
@@ -204,14 +204,14 @@ process {
                 $ts = Set-AdoTeamSettings @tsSplat -Confirm:$false
 
                 $status = 'Succeeded'
-                Write-Verbose "[UPDATED] Team settings: '$($Team.Name)' (ID: $($Team.Id))"
+                Write-Verbose "[UPDATED]: Team settings '$($Team.Name)' (ID: $($Team.Id))"
             } else {
                 $status = 'WouldUpdate'
-                Write-Verbose "[WHATIF] Call Set-AdoTeamSettings with parameters: $($tsSplat | ConvertTo-Json -Depth 5)"
+                Write-Verbose "[WHATIF]: Call Set-AdoTeamSettings with parameters: $($tsSplat | ConvertTo-Json -Depth 5)"
             }
         } else {
             $status = 'NoChange'
-            Write-Verbose "[NOCHANGE] Team settings: '$($Team.Name)' (ID: $($Team.Id))"
+            Write-Verbose "[NOCHANGE]: Team settings '$($Team.Name)' (ID: $($Team.Id))"
         }
 
         #endregion
@@ -234,6 +234,12 @@ process {
 end {
     Write-Verbose ("[Exit]: ./modules/$($MyInvocation.MyCommand.Name)")
 }
+
+
+
+
+
+
 
 
 

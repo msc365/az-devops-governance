@@ -27,7 +27,7 @@ process {
         $tmPaths = $null
 
         # Team Iteration Paths
-        $tmPathsSplat = @{
+        $tmPathsSplat = [ordered]@{
             CollectionUri = $CollectionUri
             ProjectName   = $Project.Name
             TeamName      = $Team.Name
@@ -40,7 +40,7 @@ process {
 
         if ($null -eq $tmPaths -or $tmPaths.Length -eq 0) {
             # Project iteration paths as default to add to team
-            $prjPathsSplat = @{
+            $prjPathsSplat = [ordered]@{
                 CollectionUri  = $CollectionUri
                 ProjectName    = $Project.Name
                 StructureGroup = 'Iterations'
@@ -61,23 +61,17 @@ process {
                         $tmPaths += (Add-AdoTeamIteration @tmPathsSplat -Confirm:$false -Verbose:$false)
 
                         $status = 'Succeeded'
-                        Write-Verbose "[ADDED] Iteration path: '$($path.path)' (ID: $($path.id))"
+                        Write-Verbose "[ADDED]: Iteration path '$($path.path)' (ID: $($path.id))"
                     } else {
-                        $tmPaths += [PSCustomObject]@{
-                            id         = '<generated>'
-                            name       = $path.name
-                            attributes = $path.attributes
-                        }
-
                         $status = 'WouldAdd'
-                        Write-Verbose "[WHATIF] Call Add-AdoTeamIteration with parameters: $($tmPathsSplat | ConvertTo-Json -Depth 5)"
+                        Write-Verbose "[WHATIF]: Call Add-AdoTeamIteration with parameters: $($tmPathsSplat | ConvertTo-Json -Depth 5)"
                     }
                 }
             }
         } else {
             $status = 'NoChange'
             foreach ($path in $tmPaths) {
-                Write-Verbose "- NoChange: $($path.name) (ID: $($path.id))"
+                Write-Verbose "[NOCHANGE]: $($path.name) (ID: $($path.id))"
             }
         }
 
@@ -101,6 +95,12 @@ process {
 end {
     Write-Verbose ("[Exit]: ./modules/$($MyInvocation.MyCommand.Name)")
 }
+
+
+
+
+
+
 
 
 
