@@ -41,6 +41,7 @@ Analyze the selected function/method and generate focused unit tests that thorou
 - Write descriptive test names that explain the scenario
 - Group related tests in describe/context blocks
 - Mock external dependencies cleanly
+- Always skip tests for non-essential functionality
 - Always add `-Confirm:$false` to cmdlets supporting ShouldProcess
 - Always mock `Start-Sleep` in BeforeEach blocks to prevent delays
 - Use proper `ErrorRecord` objects for error testing, not hashtables
