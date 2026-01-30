@@ -525,24 +525,5 @@ Describe 'Project DSC Script - Azure Context Validation' {
             # Act & Assert
             { & $script:scriptPath @params } | Should -Throw -ExpectedMessage '*No Azure context found*'
         }
-
-        It 'Should throw when no active subscription in context' {
-            # Arrange
-            Mock -CommandName Get-AzContext -MockWith {
-                [PSCustomObject]@{
-                    Tenant       = @{ Id = 'tenant-guid' }
-                    Subscription = $null
-                }
-            }
-
-            $params = @{
-                CollectionUri = 'https://dev.azure.com/test-org'
-                Name          = 'Test'
-                Confirm       = $false
-            }
-
-            # Act & Assert
-            { & $script:scriptPath @params } | Should -Throw -ExpectedMessage '*No active Azure subscription*'
-        }
     }
 }

@@ -14,7 +14,7 @@
 
 $params = @{
     CollectionUri = 'https://dev.azure.com/e2egov-org'
-    Name          = 'e2egov-prjHb72x9'
+    Name          = 'e2egov-prjE2eT3st'
 }
 
 # endregion
