@@ -1,5 +1,5 @@
 <!-- omit from toc -->
-# az-devops-governance
+# Automating Azure DevOps E2E Governance [`PowerShell/Bicep`]
 
 [![GitHub release (latest)](https://img.shields.io/github/v/release/msc365/az-devops-governance?include_prereleases&logo=github)](https://github.com/msc365/az-devops-governance/releases) [![License](https://img.shields.io/badge/license-MIT-purple)](https://github.com/msc365/az-devops-governance/blob/main/LICENSE)
 
