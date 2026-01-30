@@ -141,6 +141,7 @@ begin {
     if ([string]::IsNullOrWhiteSpace($CollectionUri)) {
         throw "CollectionUri is required. Provide via parameter or use Set-AdoDefault to set '`$env:DefaultAdoCollectionUri'."
     }
+
     if ([string]::IsNullOrWhiteSpace($ProjectName)) {
         throw "ProjectName is required. Provide via parameter or use Set-AdoDefault to set '`$env:DefaultAdoProjectName'."
     }
@@ -199,15 +200,10 @@ process {
                     $env = New-AdoEnvironment @envSplat -Confirm:$false -ErrorAction Stop
 
                     $status = 'Created'
-                    Write-Verbose "[CREATED] Environment: '$Name' (ID: $($env.Id))"
+                    Write-Verbose "[CREATED]: Environment '$Name' (ID: $($env.Id))"
                 } else {
-                    $env = [PSCustomObject]@{
-                        id          = '<generated>'
-                        name        = $Name
-                        description = $Description
-                    }
                     $status = 'WouldCreate'
-                    Write-Verbose "[WHATIF] Call New-AdoEnvironment with parameters: $($envSplat | ConvertTo-Json -Depth 5)"
+                    Write-Verbose "[WHATIF]: Call New-AdoEnvironment with parameters: $($envSplat | ConvertTo-Json -Depth 5)"
                 }
 
             } else {
@@ -239,14 +235,14 @@ process {
                         $env = Set-AdoEnvironment @envSplat -Confirm:$false -ErrorAction Stop
 
                         $status = 'Updated'
-                        Write-Verbose "[UPDATED] Environment: '$Name' (ID: $($env.Id))"
+                        Write-Verbose "[UPDATED]: Environment '$Name' (ID: $($env.Id))"
                     } else {
                         $status = 'WouldUpdate'
-                        Write-Verbose "[WHATIF] Call Set-AdoEnvironment with parameters: $($envSplat | ConvertTo-Json -Depth 5)"
+                        Write-Verbose "[WHATIF]: Call Set-AdoEnvironment with parameters: $($envSplat | ConvertTo-Json -Depth 5)"
                     }
                 } else {
                     $status = 'NoChange'
-                    Write-Verbose "[NOCHANGE] Environment: '$Name' (ID: $($env.Id))"
+                    Write-Verbose "[NOCHANGE]: Environment '$Name' (ID: $($env.Id))"
                 }
             }
         }
@@ -267,10 +263,10 @@ process {
                     Remove-AdoEnvironment @envSplat -Confirm:$false -ErrorAction Stop
 
                     $status = 'Removed'
-                    Write-Verbose "[REMOVED] Environment: '$Name' (ID: $($env.Id))"
+                    Write-Verbose "[REMOVED]: Environment '$Name' (ID: $($env.Id))"
                 } else {
                     $status = 'WouldRemove'
-                    Write-Verbose "[WHATIF] Call Remove-AdoEnvironment with parameters: $($envSplat | ConvertTo-Json -Depth 5)"
+                    Write-Verbose "[WHATIF]: Call Remove-AdoEnvironment with parameters: $($envSplat | ConvertTo-Json -Depth 5)"
                 }
             } else {
                 $status = 'NotFound'
@@ -278,7 +274,7 @@ process {
                     id   = $null
                     name = $Name
                 }
-                Write-Verbose "[NOTFOUND] Environment: '$Name' (ID: `$null)"
+                Write-Verbose "[NOTFOUND]: Environment '$Name' (ID: `$null)"
             }
 
             # Return rollback result; rebuild object

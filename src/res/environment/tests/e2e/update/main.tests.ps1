@@ -14,8 +14,8 @@
 
 $params = @{
     CollectionUri = 'https://dev.azure.com/e2egov-org'
-    ProjectName   = 'e2egov-prjHb72x9'
-    Name          = 'env-e2egov-prjHb72x9-tst'
+    ProjectName   = 'e2egov-prjE2eT3st'
+    Name          = 'env-e2egov-prjE2eT3st-tst'
     Description   = 'Updated environment description'
 }
 
