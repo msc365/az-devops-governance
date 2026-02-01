@@ -186,7 +186,7 @@ param (
 )
 
 begin {
-    Write-Verbose "[Enter]: ./src/res/project/$($MyInvocation.MyCommand.Name)"
+    Write-Verbose "[Enter]: ./src/res/core/project/$($MyInvocation.MyCommand.Name)"
 
     # Validate required parameters
     if ([string]::IsNullOrWhiteSpace($CollectionUri)) {
@@ -458,5 +458,5 @@ process {
 }
 
 end {
-    Write-Verbose "[Exit]: ./src/res/project/$($MyInvocation.MyCommand.Name)"
+    Write-Verbose "[Exit]: ./src/res/core/project/$($MyInvocation.MyCommand.Name)"
 }
