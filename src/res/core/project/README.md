@@ -1,6 +1,6 @@
 <!-- markdownlint-disable no-duplicate-heading -->
 <!-- omit from toc -->
-# Project `[res\project\main.ps1]`
+# Project `[res\core\project\main.ps1]`
 
 ![Version](https://img.shields.io/badge/script%20version-0.1.0-blue) [![License](https://img.shields.io/badge/license-MIT-purple)](https://github.com/msc365/az-devops-governance/blob/main/LICENSE)
 
@@ -50,7 +50,7 @@ $deploySplat = @{
     TemplateParameterFile = 'params/main.parameters.json'
 }
 
-.\deploy.ps1 @deploySplat -Verbose
+./deploy.ps1 @deploySplat -Verbose
 ```
 
 Deploys the project using the specified template and parameters.
@@ -62,10 +62,10 @@ Deploys the project using the specified template and parameters.
 ```powershell
 $customSplat = @{
     TemplateFile          = 'main.ps1'
-    TemplateParameterFile = 'params\custom.parameters.json'
+    TemplateParameterFile = 'params/custom.parameters.json'
 }
 
-.\deploy.ps1 @customSplat -Verbose
+./deploy.ps1 @customSplat -Verbose
 ```
 
 Deploys the project using the specified template and custom parameters.
@@ -80,7 +80,7 @@ $rollbackSplat = @{
     TemplateParameterFile = 'params/main.parameters.json'
 }
 
-.\deploy.ps1 @rollbackSplat -Rollback -Confirm:$false -Verbose
+./deploy.ps1 @rollbackSplat -Rollback -Confirm:$false -Verbose
 ```
 
 Rolls back (removes) the project and related resources without confirmation.
@@ -107,7 +107,7 @@ $paramSplat = @{
     }
 }
 
-.\src\res\project\main.ps1 @paramSplat
+./src/res/core/project/main.ps1 @paramSplat
 ```
 
 Deploys or updates a project in the specified Azure DevOps organization using the provided parameters in code.

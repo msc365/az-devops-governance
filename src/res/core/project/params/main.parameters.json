@@ -1,9 +1,9 @@
 {
-    "$schema": "../../../../schemas/project.schema.json",
+    "$schema": "../../../../../schemas/project.schema.json",
     "collectionUri": "{collectionUri}",
     "projects": [
         {
-            "name": "{prefix}-prj{uniqueId}",
+            "name": "{prefix}-{service}-{uniqueId}",
             "description": "Default project description",
             "defaultTeam": "Default Team",
             "sourceControl": "Git",

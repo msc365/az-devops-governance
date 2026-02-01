@@ -76,17 +76,17 @@
         TemplateParameterFile = 'params/main.parameters.json'
     }
 
-    .\deploy.ps1 @deploySplat -Verbose
+    ./deploy.ps1 @deploySplat -Verbose
 
     Deploys the project using the specified template and parameters.
 
 .EXAMPLE
     $customSplat = @{
         TemplateFile          = 'main.ps1'
-        TemplateParameterFile = 'params\custom.parameters.json'
+        TemplateParameterFile = 'params/custom.parameters.json'
     }
 
-    .\deploy.ps1 @customSplat -Verbose
+    ./deploy.ps1 @customSplat -Verbose
 
     Deploys the project using the specified template and custom parameters.
 
@@ -96,7 +96,7 @@
         TemplateParameterFile = 'params/main.parameters.json'
     }
 
-    .\deploy.ps1 @rollbackSplat -Rollback -Confirm:$false -Verbose
+    ./deploy.ps1 @rollbackSplat -Rollback -Confirm:$false -Verbose
 
     Rolls back (removes) the project and related resources without confirmation.
 
@@ -118,7 +118,7 @@
         }
     }
 
-    .\src\res\project\main.ps1 @paramSplat
+    ./src/res/core/project/main.ps1 @paramSplat
 
     Deploys or updates a project in the specified Azure DevOps organization using the provided parameters in code.
 
@@ -226,6 +226,7 @@ process {
             CollectionUri       = $CollectionUri
             Name                = $Name
             IncludeCapabilities = $true
+            WarningAction       = 'SilentlyContinue'
         }
         $prj = Get-AdoProject @prjSplat -ErrorAction SilentlyContinue
 

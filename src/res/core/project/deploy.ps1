@@ -7,7 +7,7 @@ param (
     [string]$TemplateParameterFile = 'params/main.parameters.json',
 
     [Parameter()]
-    [string]$ConfigFile = '../../../config/main.config.json',
+    [string]$ConfigFile = 'config/main.config.json',
 
     [Parameter()]
     [switch]$Rollback
@@ -17,13 +17,13 @@ begin {
     Write-Verbose "[Enter]: ./$($MyInvocation.MyCommand.Name)"
 
     # Import utility functions
-    . (Join-Path $PSScriptRoot -ChildPath '../../utl/Set-PlaceholderValue.ps1' -ErrorAction Stop)
+    . (Join-Path $PSScriptRoot -ChildPath '../../..' 'utl/Set-PlaceholderValue.ps1' -ErrorAction Stop)
 }
 
 process {
     try {
         # Load configuration from JSON file
-        $configAsJson = Get-Content -Path (Join-Path $PSScriptRoot -ChildPath $ConfigFile) -Raw
+        $configAsJson = Get-Content -Path (Join-Path $PSScriptRoot -ChildPath '../../../..' $ConfigFile) -Raw
 
         # Load parameters from JSON file
         $paramsAsJson = Get-Content -Path (Join-Path $PSScriptRoot -ChildPath $TemplateParameterFile) -Raw
@@ -33,6 +33,13 @@ process {
 
         # Convert JSON string to Hashtable
         $params = $paramsAsJson | ConvertFrom-Json
+
+        # Normalize feature definitions so downstream scripts always receive a hashtable
+        foreach ($project in $params.projects) {
+            if ($null -ne $project.features) {
+                $project.features = ConvertTo-Hashtable -InputObject $project.features
+            }
+        }
 
         Write-Verbose "Using params: $($params | ConvertTo-Json -Depth 5)"
 
@@ -45,17 +52,6 @@ process {
         }
 
         Write-Verbose "Processing $($projects.Count) project(s) via pipeline..."
-
-        # Convert PSCustomObject properties to Hashtables for pipeline binding
-        $projects = $projects | ForEach-Object {
-            if ($_.features -and $_.features -is [PSCustomObject]) {
-                $features = @{}
-                $_.features.PSObject.Properties | ForEach-Object {
-                    $features[$_.Name] = $_.Value
-                }
-                $_.features = $features
-            }; $_
-        }
 
         # Prepare script parameters for common values
         $scriptParams = @{
