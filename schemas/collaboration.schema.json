@@ -1,0 +1,381 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://raw.githubusercontent.com/msc365/az-devops-governance/main/schemas/collaboration.schema.json",
+    "type": "object",
+    "required": [
+        "collectionUri",
+        "projects"
+    ],
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "JSON Schema reference"
+        },
+        "collectionUri": {
+            "type": "string",
+            "description": "The Azure DevOps collection URI"
+        },
+        "projects": {
+            "type": "array",
+            "description": "Array of collaborative Azure DevOps project definitions",
+            "items": {
+                "$ref": "#/definitions/project"
+            },
+            "minItems": 1
+        }
+    },
+    "additionalProperties": false,
+    "definitions": {
+        "project": {
+            "type": "object",
+            "required": [
+                "data"
+            ],
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/projectDetails"
+                },
+                "teams": {
+                    "type": "array",
+                    "description": "Optional array of additional teams to configure for the project",
+                    "items": {
+                        "$ref": "#/definitions/team"
+                    }
+                },
+                "memberships": {
+                    "type": "array",
+                    "description": "Security group memberships that should be applied to the project",
+                    "items": {
+                        "$ref": "#/definitions/membership"
+                    },
+                    "minItems": 1
+                },
+                "environments": {
+                    "type": "array",
+                    "description": "Azure DevOps environments to provision for the project",
+                    "items": {
+                        "$ref": "#/definitions/environment"
+                    },
+                    "minItems": 1
+                },
+                "connections": {
+                    "type": "array",
+                    "description": "Service connections that rely on managed identities",
+                    "items": {
+                        "$ref": "#/definitions/connection"
+                    },
+                    "minItems": 1
+                }
+            },
+            "additionalProperties": false
+        },
+        "projectDetails": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The name of the project"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "The description of the project"
+                },
+                "defaultTeam": {
+                    "type": "string",
+                    "description": "The name of the default team"
+                },
+                "sourceControl": {
+                    "type": "string",
+                    "enum": [
+                        "Git",
+                        "Tfvc"
+                    ],
+                    "description": "The source control type (Git or Tfvc)"
+                },
+                "process": {
+                    "type": "string",
+                    "enum": [
+                        "Agile",
+                        "Scrum",
+                        "CMMI",
+                        "Basic"
+                    ],
+                    "description": "The inherited process template"
+                },
+                "features": {
+                    "$ref": "#/definitions/projectFeatures"
+                },
+                "visibility": {
+                    "type": "string",
+                    "enum": [
+                        "Private",
+                        "Public"
+                    ],
+                    "description": "The visibility of the project (Private or Public)"
+                }
+            },
+            "additionalProperties": false
+        },
+        "projectFeatures": {
+            "type": "object",
+            "description": "Feature visibility settings for the project",
+            "properties": {
+                "boards": {
+                    "type": "string",
+                    "enum": [
+                        "enabled",
+                        "disabled"
+                    ],
+                    "description": "Boards feature visibility"
+                },
+                "repos": {
+                    "type": "string",
+                    "enum": [
+                        "enabled",
+                        "disabled"
+                    ],
+                    "description": "Repos feature visibility"
+                },
+                "pipelines": {
+                    "type": "string",
+                    "enum": [
+                        "enabled",
+                        "disabled"
+                    ],
+                    "description": "Pipelines feature visibility"
+                },
+                "artifacts": {
+                    "type": "string",
+                    "enum": [
+                        "enabled",
+                        "disabled"
+                    ],
+                    "description": "Artifacts feature visibility"
+                },
+                "testPlans": {
+                    "type": "string",
+                    "enum": [
+                        "enabled",
+                        "disabled"
+                    ],
+                    "description": "Test Plans feature visibility"
+                }
+            },
+            "additionalProperties": false
+        },
+        "team": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The name of the team"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "Description of the team"
+                },
+                "teamSettings": {
+                    "type": "object",
+                    "description": "Team settings configuration",
+                    "oneOf": [
+                        {
+                            "required": [
+                                "defaultIterationMacro"
+                            ],
+                            "not": {
+                                "required": [
+                                    "defaultIteration"
+                                ]
+                            }
+                        },
+                        {
+                            "required": [
+                                "defaultIteration"
+                            ],
+                            "not": {
+                                "required": [
+                                    "defaultIterationMacro"
+                                ]
+                            }
+                        }
+                    ],
+                    "properties": {
+                        "backlogVisibilities": {
+                            "type": "object",
+                            "description": "Visibility settings for backlog categories",
+                            "properties": {
+                                "Microsoft.EpicCategory": {
+                                    "type": "boolean",
+                                    "description": "Whether Epic category is visible"
+                                },
+                                "Microsoft.FeatureCategory": {
+                                    "type": "boolean",
+                                    "description": "Whether Feature category is visible"
+                                },
+                                "Microsoft.RequirementCategory": {
+                                    "type": "boolean",
+                                    "description": "Whether Requirement category is visible"
+                                }
+                            },
+                            "additionalProperties": {
+                                "type": "boolean"
+                            }
+                        },
+                        "bugsBehavior": {
+                            "type": "string",
+                            "enum": [
+                                "asRequirements",
+                                "asTasks",
+                                "off"
+                            ],
+                            "description": "How bugs should be treated"
+                        },
+                        "defaultIterationMacro": {
+                            "type": "string",
+                            "description": "Default iteration macro for the team",
+                            "examples": [
+                                "@currentIteration",
+                                "@currentIteration + 1"
+                            ]
+                        },
+                        "defaultIteration": {
+                            "type": "string",
+                            "description": "Default iteration ID (GUID)",
+                            "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                        },
+                        "workingDays": {
+                            "type": "array",
+                            "description": "Working days for the team",
+                            "items": {
+                                "type": "string",
+                                "enum": [
+                                    "monday",
+                                    "tuesday",
+                                    "wednesday",
+                                    "thursday",
+                                    "friday",
+                                    "saturday",
+                                    "sunday"
+                                ]
+                            },
+                            "uniqueItems": true
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "groupMembership": {
+                    "type": "array",
+                    "description": "List of Azure DevOps groups the team should be part of",
+                    "items": {
+                        "type": "string"
+                    },
+                    "uniqueItems": true
+                }
+            },
+            "additionalProperties": false
+        },
+        "membership": {
+            "type": "object",
+            "required": [
+                "uniqueName",
+                "groupMembership"
+            ],
+            "properties": {
+                "uniqueName": {
+                    "type": "string",
+                    "description": "The unique name (mailNickname) of the Microsoft Entra ID security group"
+                },
+                "groupMembership": {
+                    "type": "string",
+                    "description": "The Azure DevOps project group that the security group should be added to"
+                }
+            },
+            "additionalProperties": false
+        },
+        "environment": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The name of the environment"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "Description of the environment"
+                }
+            },
+            "additionalProperties": false
+        },
+        "connection": {
+            "type": "object",
+            "required": [
+                "name",
+                "managedIdentity"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The name of the service connection"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "Description of the service connection"
+                },
+                "managedIdentity": {
+                    "$ref": "#/definitions/managedIdentity"
+                }
+            },
+            "additionalProperties": false
+        },
+        "managedIdentity": {
+            "type": "object",
+            "required": [
+                "name",
+                "subscriptionId",
+                "resourceGroupName",
+                "federatedIdentityCredential"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The name of the managed identity"
+                },
+                "subscriptionId": {
+                    "type": "string",
+                    "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+                    "description": "The Azure subscription ID that hosts the managed identity"
+                },
+                "resourceGroupName": {
+                    "type": "string",
+                    "description": "Resource group containing the managed identity"
+                },
+                "federatedIdentityCredential": {
+                    "$ref": "#/definitions/federatedIdentityCredential"
+                }
+            },
+            "additionalProperties": false
+        },
+        "federatedIdentityCredential": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The name of the federated identity credential"
+                }
+            },
+            "additionalProperties": false
+        }
+    }
+}
