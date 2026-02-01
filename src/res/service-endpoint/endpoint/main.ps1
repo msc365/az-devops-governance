@@ -138,7 +138,7 @@ param (
 )
 
 begin {
-    Write-Verbose "[Enter]: ./src/res/connection/$($MyInvocation.MyCommand.Name)"
+    Write-Verbose "[Enter]: ./src/res/service-endpoint/endpoint/$($MyInvocation.MyCommand.Name)"
 
     # Validate required parameters
     if ([string]::IsNullOrWhiteSpace($CollectionUri)) {
@@ -422,5 +422,5 @@ process {
 }
 
 end {
-    Write-Verbose "[Exit]: ./src/res/connection/$($MyInvocation.MyCommand.Name)"
+    Write-Verbose "[Exit]: ./src/res/service-endpoint/endpoint/$($MyInvocation.MyCommand.Name)"
 }

@@ -1,6 +1,6 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema#",
-    "$id": "https://raw.githubusercontent.com/msc365/az-devops-governance/main/schemas/connection.schema.json",
+    "$id": "https://raw.githubusercontent.com/msc365/az-devops-governance/main/schemas/endpoint.schema.json",
     "type": "object",
     "required": [
         "collectionUri",
@@ -54,8 +54,8 @@
                             },
                             "subscriptionId": {
                                 "type": "string",
-                                "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
-                                "description": "The subscription ID (must be a valid GUID)"
+                                "pattern": "^(?:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}|\\{[a-zA-Z][a-zA-Z0-9-]*\\})$",
+                                "description": "The subscription ID (GUID) or replacement token (e.g., {subscriptionId})"
                             },
                             "resourceGroupName": {
                                 "type": "string",
