@@ -425,3 +425,6 @@ FodyWeavers.xsd
 
 *.sbx.json
 *.sbx.bicepparam
+
+# Local upstream folder
+upstream/
