@@ -2,7 +2,7 @@
     "$schema": "../../../../schemas/membership.schema.json",
     "collectionUri": "{collectionUri}",
     "projectName": "{prefix}-prj{uniqueId}",
-    "securityGroups": [
+    "memberships": [
         {
             "uniqueName": "{prefix}-prj{uniqueId}-admins",
             "groupMembership": "Project Administrators"

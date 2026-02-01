@@ -42,13 +42,13 @@ process {
         # Extract common parameters
         $collectionUri = $params.collectionUri
         $projectName = $params.projectName
-        $securityGroups = $params.securityGroups
+        $memberships = $params.memberships
 
-        if ($null -eq $securityGroups -or $securityGroups.Count -eq 0) {
-            throw 'No security groups found in parameter file. At least one security group is required.'
+        if ($null -eq $memberships -or $memberships.Count -eq 0) {
+            throw 'No memberships found in parameter file. At least one membership is required.'
         }
 
-        Write-Verbose "Processing $($securityGroups.Count) security group(s) via pipeline..."
+        Write-Verbose "Processing $($memberships.Count) membership(s) via pipeline..."
 
         # Prepare script parameters for common values
         $scriptParams = @{
@@ -60,8 +60,8 @@ process {
             Verbose       = $VerbosePreference
         }
 
-        # Pipe security groups to main.ps1
-        $securityGroups | & (Join-Path $PSScriptRoot -ChildPath $TemplateFile) @scriptParams
+        # Pipe memberships to main.ps1
+        $memberships | & (Join-Path $PSScriptRoot -ChildPath $TemplateFile) @scriptParams
     } catch {
         throw $_
     }
