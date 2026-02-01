@@ -18,22 +18,22 @@
         },
         "uniqueId": {
             "type": "string",
-            "pattern": "^(?:[a-zA-Z0-9]{3,10})?$",
+            "pattern": "^(?:[a-z0-9]{3,10})?$",
             "maxLength": 10,
-            "description": "The unique identifier (3-10 lowercase alphanumeric characters, or empty)"
+            "description": "The lowercase unique identifier (3-10 alphanumeric characters, or empty)"
         },
         "prefix": {
             "type": "string",
             "pattern": "^[a-z0-9]{2,10}$",
             "maxLength": 10,
-            "description": "A prefix to be used in resource names (max 10 lowercase alphanumeric characters)"
+            "description": "A lowercase prefix to be used in resource names (max 10 alphanumeric characters)"
         },
         "service": {
             "type": "string",
             "minLength": 1,
             "maxLength": 20,
-            "pattern": "^[a-z0-9-]+$",
-            "description": "Short lowercase identifier for the service or product area"
+            "pattern": "^[a-zA-Z0-9]{2,10}$",
+            "description": "A service name to be used in resource names (2-10 alphanumeric characters)"
         },
         "location": {
             "type": "string",
