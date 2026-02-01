@@ -4,7 +4,7 @@ param (
     [string]$TemplateFile = 'src/res/core/project/main.ps1',
 
     [Parameter()]
-    [string]$TemplateParameterFile = 'params/core_project.main.json',
+    [string]$TemplateParameterFile = 'params/devops/core_project.main.parameters.json',
 
     [Parameter()]
     [string]$ConfigFile = 'config/main.config.json',

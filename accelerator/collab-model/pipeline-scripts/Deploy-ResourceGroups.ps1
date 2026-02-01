@@ -11,7 +11,7 @@ param (
     [string]$TemplateFile = 'iac/ptn/resources/resource-group/main.bicep',
 
     [Parameter()]
-    [string]$TemplateParameterFile = 'params/resources_resource-group.main.bicepparam'
+    [string]$TemplateParameterFile = 'params/azure/resources_resource-group.main.bicepparam'
 )
 
 begin {
