@@ -271,7 +271,6 @@ process {
 
                 $sepSplat = [ordered]@{
                     CollectionUri = $CollectionUri
-                    ProjectName   = $ProjectName
                     Configuration = $sepConfig
                 }
 
