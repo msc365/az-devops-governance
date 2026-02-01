@@ -1,18 +1,18 @@
-using '../../../iac/ptn/resources/resource-group/main.bicep'
+using '../../../../iac/ptn/resources/resource-group/main.bicep'
 
 import {
   getLocationCode
-} from '../../../iac/utl/functions/custom-functions/main.bicep'
+} from '../../../../iac/utl/functions/custom-functions/main.bicep'
 
 // --------- //
 // VARIABLES //
 // --------- //
 
-var config = loadJsonContent('../config/main.config.json')
+var config = loadJsonContent('../../config/main.config.json')
 
 var location = config.location
 var geoCode = getLocationCode(location)
-var serviceShort = '${config.prefix}-${config.service}-${config.uniqueId}'
+var serviceShort = '${config.prefix}-${toLower(config.service)}-${config.uniqueId}'
 
 // ---------- //
 // PARAMETERS //

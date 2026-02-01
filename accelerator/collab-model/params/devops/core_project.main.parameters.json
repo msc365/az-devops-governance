@@ -1,11 +1,11 @@
 {
-    "$schema": "../../../schemas/project.schema.json",
+    "$schema": "../../../../schemas/project.schema.json",
     "collectionUri": "{collectionUri}",
     "projects": [
         {
             "name": "{prefix}-{service}",
-            "description": "European Building Materials - CCoE Collaboration Project",
-            "defaultTeam": "CCoE Team",
+            "description": "Collaboration project with many teams, boards, repos, pipelines and artifacts.",
+            "defaultTeam": "{service} Team",
             "sourceControl": "Git",
             "process": "Agile",
             "features": {
