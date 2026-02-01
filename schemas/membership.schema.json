@@ -5,7 +5,7 @@
     "required": [
         "collectionUri",
         "projectName",
-        "securityGroups"
+        "memberships"
     ],
     "properties": {
         "$schema": {
@@ -20,7 +20,7 @@
             "type": "string",
             "description": "The Azure DevOps project name"
         },
-        "securityGroups": {
+        "memberships": {
             "type": "array",
             "description": "Array of security groups and their project memberships",
             "items": {
@@ -32,7 +32,7 @@
                 "properties": {
                     "uniqueName": {
                         "type": "string",
-                        "description": "The unique name (mailNickname of the Microsoft Entra ID security group"
+                        "description": "The unique name (mailNickname) of the Microsoft Entra ID security group"
                     },
                     "groupMembership": {
                         "type": "string",
