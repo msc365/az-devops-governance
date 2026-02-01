@@ -1,0 +1,19 @@
+{
+    "$schema": "../../../../schemas/team.schema.json",
+    "collectionUri": "{collectionUri}",
+    "projectName": "{prefix}-{service}",
+    "teams": [
+        {
+            "name": "Team Netherlands",
+            "description": "Team Netherlands team description"
+        },
+        {
+            "name": "Team Portugal",
+            "description": "Team Portugal team description"
+        },
+        {
+            "name": "Team Switzerland",
+            "description": "Team Switzerland team description"
+        }
+    ]
+}
