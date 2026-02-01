@@ -137,7 +137,7 @@ param (
 )
 
 begin {
-    Write-Verbose ("[Enter]: ./rsc/team/$($MyInvocation.MyCommand.Name)")
+    Write-Verbose ("[Enter]: ./src/res/core/team/$($MyInvocation.MyCommand.Name)")
 
     # Validate required parameters
     if ([string]::IsNullOrWhiteSpace($CollectionUri)) {
@@ -193,7 +193,7 @@ process {
             ProjectName   = $ProjectName
             TeamName      = $Name
         }
-        $tm = Get-AdoTeam @tmSplat -Verbose:$false
+        $tm = Get-AdoTeam @tmSplat -Verbose:$false -WarningAction SilentlyContinue
 
         #endregion
 
@@ -343,5 +343,5 @@ process {
 }
 
 end {
-    Write-Verbose ("[Exit]: ./rsc/team/$($MyInvocation.MyCommand.Name)")
+    Write-Verbose ("[Exit]: ./src/res/core/team/$($MyInvocation.MyCommand.Name)")
 }
