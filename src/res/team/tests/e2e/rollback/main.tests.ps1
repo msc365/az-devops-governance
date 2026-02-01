@@ -15,7 +15,7 @@
 $params = @{
     CollectionUri = 'https://dev.azure.com/e2egov-org'
     ProjectName   = 'e2egov-prjE2eT3st'
-    TeamName      = 'Test Team A'
+    Name          = 'Test Team A'
     Rollback      = $true
 }
 

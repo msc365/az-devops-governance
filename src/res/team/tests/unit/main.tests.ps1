@@ -122,7 +122,7 @@ Describe 'Team DSC Script - Core Functionality' {
             $params = @{
                 CollectionUri = 'https://dev.azure.com/test-org'
                 ProjectName   = 'test-project'
-                TeamName      = 'Test Team'
+                Name          = 'Test Team'
                 Description   = 'Test team description'
                 Confirm       = $false
             }
@@ -156,7 +156,7 @@ Describe 'Team DSC Script - Core Functionality' {
             $params = @{
                 CollectionUri = 'https://dev.azure.com/test-org'
                 ProjectName   = 'test-project'
-                TeamName      = 'Test Team'
+                Name          = 'Test Team'
                 Description   = 'Test team description'
                 TeamSettings  = $teamSettings
                 Confirm       = $false
@@ -200,7 +200,7 @@ Describe 'Team DSC Script - Core Functionality' {
             $params = @{
                 CollectionUri = 'https://dev.azure.com/test-org'
                 ProjectName   = 'test-project'
-                TeamName      = 'Test Team'
+                Name          = 'Test Team'
                 Description   = 'New description'
                 Confirm       = $false
             }
@@ -234,7 +234,7 @@ Describe 'Team DSC Script - Core Functionality' {
             $params = @{
                 CollectionUri = 'https://dev.azure.com/test-org'
                 ProjectName   = 'test-project'
-                TeamName      = 'Test Team'
+                Name          = 'Test Team'
                 Description   = 'Test team description'
                 Confirm       = $false
             }
@@ -254,7 +254,7 @@ Describe 'Team DSC Script - Core Functionality' {
             $params = @{
                 CollectionUri = 'https://dev.azure.com/test-org'
                 ProjectName   = 'test-project'
-                TeamName      = 'Test Team'
+                Name          = 'Test Team'
                 Confirm       = $false
             }
 
@@ -284,7 +284,7 @@ Describe 'Team DSC Script - Core Functionality' {
             $params = @{
                 CollectionUri = 'https://dev.azure.com/test-org'
                 ProjectName   = 'test-project'
-                TeamName      = 'Test Team'
+                Name          = 'Test Team'
                 Rollback      = $true
                 Confirm       = $false
             }
@@ -305,7 +305,7 @@ Describe 'Team DSC Script - Core Functionality' {
             $params = @{
                 CollectionUri = 'https://dev.azure.com/test-org'
                 ProjectName   = 'test-project'
-                TeamName      = 'Test Team'
+                Name          = 'Test Team'
                 Rollback      = $true
                 Confirm       = $false
             }
@@ -341,7 +341,7 @@ Describe 'Team DSC Script - Parameter Validation' {
             # Arrange
             $params = @{
                 ProjectName = 'test-project'
-                TeamName    = 'Test Team'
+                Name        = 'Test Team'
                 Confirm     = $false
             }
 
@@ -353,7 +353,7 @@ Describe 'Team DSC Script - Parameter Validation' {
             # Arrange
             $params = @{
                 CollectionUri = 'https://dev.azure.com/test-org'
-                TeamName      = 'Test Team'
+                Name          = 'Test Team'
                 Confirm       = $false
             }
 
@@ -361,9 +361,9 @@ Describe 'Team DSC Script - Parameter Validation' {
             { & $script:scriptPath @params } | Should -Throw -ExpectedMessage '*ProjectName is required*'
         }
 
-        It 'Should validate TeamName parameter is mandatory via metadata' {
+        It 'Should validate Name parameter is mandatory via metadata' {
             # Arrange
-            $metadata = (Get-Command $script:scriptPath).Parameters['TeamName']
+            $metadata = (Get-Command $script:scriptPath).Parameters['Name']
 
             # Assert
             $metadata.Attributes.Mandatory | Should -Contain $true
@@ -380,7 +380,7 @@ Describe 'Team DSC Script - Azure Context Validation' {
             $params = @{
                 CollectionUri = 'https://dev.azure.com/test-org'
                 ProjectName   = 'test-project'
-                TeamName      = 'Test Team'
+                Name          = 'Test Team'
                 Confirm       = $false
             }
 
@@ -399,7 +399,7 @@ Describe 'Team DSC Script - Project Validation' {
             $params = @{
                 CollectionUri = 'https://dev.azure.com/test-org'
                 ProjectName   = 'nonexistent-project'
-                TeamName      = 'Test Team'
+                Name          = 'Test Team'
                 Confirm       = $false
             }
 

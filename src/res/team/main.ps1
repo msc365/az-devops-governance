@@ -124,7 +124,7 @@ param (
     [string]$ProjectName = $env:DefaultAdoProjectName,
 
     [Parameter(Mandatory, ValueFromPipelineByPropertyName)]
-    [string]$TeamName,
+    [string]$Name,
 
     [Parameter(ValueFromPipelineByPropertyName)]
     [string]$Description,
@@ -191,7 +191,7 @@ process {
         $tmSplat = [ordered]@{
             CollectionUri = $CollectionUri
             ProjectName   = $ProjectName
-            TeamName      = $TeamName
+            TeamName      = $Name
         }
         $tm = Get-AdoTeam @tmSplat -Verbose:$false
 
@@ -207,12 +207,12 @@ process {
                     $tmSplat['Description'] = $Description
                 }
 
-                if ($PSCmdlet.ShouldProcess($ProjectName, "Create team: $($TeamName)")) {
+                if ($PSCmdlet.ShouldProcess($ProjectName, "Create team: $($Name)")) {
 
                     $tm = New-AdoTeam @tmSplat -Confirm:$false -Verbose:$false
 
                     $status = 'Created'
-                    Write-Verbose "[CREATED]: Team '$TeamName' (ID: $($tm.Id))"
+                    Write-Verbose "[CREATED]: Team '$Name' (ID: $($tm.Id))"
                 } else {
                     $status = 'WouldCreate'
                     $tmSplat['teamSettings'] = $TeamSettings
@@ -227,7 +227,7 @@ process {
                 $tmSplat = [ordered]@{
                     CollectionUri = $CollectionUri
                     ProjectName   = $ProjectName
-                    TeamName      = $TeamName
+                    TeamName      = $Name
                 }
 
                 # Only check description if it was explicitly provided
@@ -243,12 +243,12 @@ process {
                 }
 
                 if ($hasChanges) {
-                    if ($PSCmdlet.ShouldProcess($TeamName, 'Update team description')) {
+                    if ($PSCmdlet.ShouldProcess($Name, 'Update team description')) {
 
                         $tm = Set-AdoTeam @tmSplat -Id $tm.id -Confirm:$false -Verbose:$false
 
                         $status = 'Updated'
-                        Write-Verbose "[UPDATED]: Team description '$TeamName' (ID: $($tm.Id))"
+                        Write-Verbose "[UPDATED]: Team description '$Name' (ID: $($tm.Id))"
                     } else {
                         $status = 'WouldUpdate'
                         Write-Verbose "[WHATIF]: Call Set-AdoTeam with parameters: $($tmSplat | ConvertTo-Json -Depth 5)"
@@ -258,7 +258,7 @@ process {
                     if ($status -ne 'Created') {
                         $status = 'NoChange'
                     }
-                    Write-Verbose "[NOCHANGE]: Team '$TeamName' (ID: $($tm.Id))"
+                    Write-Verbose "[NOCHANGE]: Team '$Name' (ID: $($tm.Id))"
                 }
 
                 # Team settings, iteration paths, area paths
@@ -296,15 +296,15 @@ process {
                 $tmSplat = [ordered]@{
                     CollectionUri = $CollectionUri
                     ProjectName   = $ProjectName
-                    TeamName      = $TeamName
+                    TeamName      = $Name
                 }
 
-                if ($PSCmdlet.ShouldProcess($ProjectName, "Remove team: $($TeamName)")) {
+                if ($PSCmdlet.ShouldProcess($ProjectName, "Remove team: $($Name)")) {
 
                     Remove-AdoTeam @tmSplat -Confirm:$false -ErrorAction Stop
 
                     $status = 'Removed'
-                    Write-Verbose "[REMOVED]: Team '$TeamName' (ID: $($tm.Id))"
+                    Write-Verbose "[REMOVED]: Team '$Name' (ID: $($tm.Id))"
                 } else {
                     $status = 'WouldRemove'
                     Write-Verbose "[WHATIF]: Call Remove-AdoTeam with parameters: $($tmSplat | ConvertTo-Json -Depth 5)"
@@ -313,9 +313,9 @@ process {
                 $status = 'NotFound'
                 $tm = [PSCustomObject]@{
                     id   = $null
-                    name = $TeamName
+                    name = $Name
                 }
-                Write-Verbose "[NOTFOUND]: Team '$TeamName' (ID: `$null)"
+                Write-Verbose "[NOTFOUND]: Team '$Name' (ID: `$null)"
             }
 
             # Return rollback result; rebuild object
