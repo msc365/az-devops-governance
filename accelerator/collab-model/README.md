@@ -1,10 +1,22 @@
+<!-- omit from toc -->
 # Collaboration Model
 
-## Scenario Overview
+This accelerator follows the "One project, many teams" guidance from the _Project decision framework_ article. A single Azure DevOps project anchors shared artifacts, while each feature or platform team keeps autonomy through its own repository, board area path, and security scope. This layout reduces the clutter of many small projects, centralizes governance, but still lets teams deploy independently.
 
-This accelerator follows the "One project, many teams" guidance from the [Azure DevOps organization planning](https://learn.microsoft.com/en-us/azure/devops/user-guide/plan-your-azure-devops-org-structure?view=azure-devops#project-decision-framework) article. A single Azure DevOps project anchors shared artifacts, while each feature or platform team keeps autonomy through its own repository, board area path, and security scope. This layout reduces the clutter of many small projects, centralizes governance, but still lets teams deploy independently.
+> [!NOTE]
+> _Use your business structure as a guide for the number of organizations, projects, and teams you create in Azure DevOps. This comprehensive planning guide helps you design optimal organizational structures that align development workflows with business objectives._
+>
+> See [Plan your organizational structure](https://learn.microsoft.com/en-us/azure/devops/user-guide/plan-your-azure-devops-org-structure?view=azure-devops#project-decision-framework) for more information.
 
-### Reference Scenario - European Building Materials
+<!-- omit from toc -->
+## Table of Contents
+- [Reference Scenario](#reference-scenario)
+- [Collaboration Topology](#collaboration-topology)
+- [Deployment Steps](#deployment-steps)
+- [Types of Deployment](#types-of-deployment)
+
+
+## Reference Scenario
 
 The collaboration model mirrors the fictitious _European Building Materials_ organization described in the root README to keep technical decisions tied to business drivers:
 
@@ -37,7 +49,7 @@ The collaboration model mirrors the fictitious _European Building Materials_ org
 - **Scoped security groups**  
   Entra groups control who can touch Azure resources; Azure DevOps groups govern work management and pipeline operations.
 
-## Deployment Sequence
+## Deployment Steps
 
 To avoid dependency errors, run the deployment in two stages. Complete the Azure foundations first (Bicep) so identities and scopes exist before Azure DevOps entities reference them. After Azure prerequisites finish, run the DevOps automation. Re-run a step only if its prerequisites are already present.
 
@@ -75,7 +87,9 @@ To avoid dependency errors, run the deployment in two stages. Complete the Azure
 5. **Service Connections**  
    Bind the managed identities to the environments, completing the pipeline-to-Azure trust chain.
 
-## Difference Between Azure and Azure DevOps Deployments
+## Types of Deployment
+
+The difference between _Azure_ and _Azure DevOps_ Deployments.
 
 - **Scope**  
   Azure deployments create or configure cloud resources (resource groups, identities, RBAC). Azure DevOps deployments configure the developer platform (projects, teams, environments, service connections).
