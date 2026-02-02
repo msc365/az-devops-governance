@@ -3,6 +3,9 @@
 
 This accelerator follows the "One project, many teams" guidance from the _Project decision framework_ article. A single Azure DevOps project anchors shared artifacts, while each feature or platform team keeps autonomy through its own repository, board area path, and security scope. This layout reduces the clutter of many small projects, centralizes governance, but still lets teams deploy independently.
 
+![alt text](../../.assets/e2egov-one-project.png)  
+<sub>Image: One CCoE project, many teams</sub>
+
 > [!NOTE]
 > _Use your business structure as a guide for the number of organizations, projects, and teams you create in Azure DevOps. This comprehensive planning guide helps you design optimal organizational structures that align development workflows with business objectives._
 >
@@ -14,7 +17,6 @@ This accelerator follows the "One project, many teams" guidance from the _Projec
 - [Collaboration Topology](#collaboration-topology)
 - [Deployment Steps](#deployment-steps)
 - [Types of Deployment](#types-of-deployment)
-
 
 ## Reference Scenario
 
@@ -31,6 +33,11 @@ The collaboration model mirrors the fictitious _European Building Materials_ org
 
 - **Cloud journey**  
   The org is consolidating formerly isolated OpCo projects into a shared `CCoE` project to reduce silos while still honoring local autonomy.
+  
+  <br>
+
+  ![alt text](../../.assets/e2egov-many-teams.png)  
+  <sub>Image: Consolidating teams in shared CCoE project</sub>
 
 ## Collaboration Topology
 
