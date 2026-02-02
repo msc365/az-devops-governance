@@ -172,9 +172,7 @@ To successfully secure your workloads, you must use a combination of security pe
 
 The following concepts and questions are important to consider when designing a governance model. Bear in mind the [potential use cases](#potential-use-cases) of the demo organization.
 
-### Safeguard your environments with branch policies
-
-![bullet 1](.assets/e2egov-no1.png) ![bullet 2](.assets/e2egov-no2.png)
+### Safeguard your environments with branch policies ![bullet 1](.assets/e2egov-no1.png) ![bullet 2](.assets/e2egov-no2.png)
 
 Because your source code defines and triggers deployments, your first line of defense is to secure your source code management (SCM) repository. In practice, this is achieved by using the [pull request workflow](https://learn.microsoft.com/en-us/azure/devops/repos/git/about-pull-requests) in combination with [branch policies](https://learn.microsoft.com/en-us/azure/devops/repos/git/branch-policies), which define checks and requirements before code can be accepted.
 
@@ -205,9 +203,7 @@ Note that the workflow in the example is vendor agnostic. The pull request and b
 
 Once the code has been accepted into a protected branch, the next layer of access controls will be applied by the build server (such as [Azure Pipelines](https://azure.microsoft.com/products/devops/pipelines/)).
 
-### What access do security principals need?
-
-![bullet 3](.assets/e2egov-no3.png)
+### What access do security principals need? ![bullet 3](.assets/e2egov-no3.png)
 
 In Azure, a [security principal](https://learn.microsoft.com/en-us/azure/role-based-access-control/overview#security-principal) can be either a _user principal_ or a _headless principal_, such as a service principal or managed identity. In all environments, security principals should follow the [principle of least privilege](https://learn.microsoft.com/en-us/azure/role-based-access-control/best-practices#only-grant-the-access-users-need). While security principals might have expanded access in pre-production environments, production Azure environments should minimize standing permissions, favoring just-in-time (JIT) access and Microsoft Entra Conditional Access. Craft your Azure RBAC role assignments for user principals to align with these least privilege principals.
 
@@ -215,9 +211,7 @@ It's also important to model Azure RBAC distinctly from Azure DevOps RBAC. The p
 
 For Azure Pipeline service principals, consider using a [custom role](https://learn.microsoft.com/en-us/azure/role-based-access-control/custom-roles) that prevents it from removing resource locks and performing other destructive actions out of scope for its purpose.
 
-### Create a custom role for the service principal
-
-![bullet 4](.assets/e2egov-no4.png)
+### Create a custom role for the service principal ![bullet 4](.assets/e2egov-no4.png)
 
 It's a common mistake to give CI/CD build agents Owner roles and permissions. Contributor permissions are not enough if your pipeline also needs to perform identity role assignments or other privileged operations like Key Vault policy management.
 
