@@ -237,7 +237,7 @@ process {
                     GroupId         = $mgGrp.Id
                 }
 
-                if ($PSCmdlet.ShouldProcess($ProjectName, "Add group membership: $($GroupMembership)")) {
+                if ($PSCmdlet.ShouldProcess($mgGrp.mailNickname, "Add group membership: $GroupMembership")) {
 
                     $addGrpMshp = Add-AdoGroupMember @addMembershipSplat -Confirm:$false -Verbose:$false
 
