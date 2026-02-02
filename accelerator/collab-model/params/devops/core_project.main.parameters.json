@@ -4,7 +4,7 @@
     "projects": [
         {
             "name": "{prefix}-{service}",
-            "description": "Collaboration project with many teams, boards, repos, pipelines and artifacts.",
+            "description": "Demo - 1 project, many teams, many repos, pipelines and artifacts.",
             "defaultTeam": "{service} Team",
             "sourceControl": "Git",
             "process": "Agile",
