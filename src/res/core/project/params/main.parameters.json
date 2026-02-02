@@ -3,7 +3,7 @@
     "collectionUri": "{collectionUri}",
     "projects": [
         {
-            "name": "{prefix}-{service}-{uniqueId}",
+            "name": "{prefix}-{service}",
             "description": "Default project description",
             "defaultTeam": "Default Team",
             "sourceControl": "Git",

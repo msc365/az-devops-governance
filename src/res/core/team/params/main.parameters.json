@@ -1,7 +1,7 @@
 {
-    "$schema": "../../../../schemas/team.schema.json",
+    "$schema": "../../../../../schemas/team.schema.json",
     "collectionUri": "{collectionUri}",
-    "projectName": "{prefix}-prj{uniqueId}",
+    "projectName": "{prefix}-{service}",
     "teams": [
         {
             "name": "Other Team",
