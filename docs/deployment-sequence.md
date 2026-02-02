@@ -1,15 +1,15 @@
 # Deployment Sequence
 
 1. ## Bicep templates
-   1. Role definition
-   2. Resource group
-   3. Managed identities
-   4. Graph security groups
-   5. Role assignments
+   1. Custom Role Definition
+   2. Resource Groups
+   3. Managed Identities
+   4. Graph Security groups
+   5. Role Assignments
 
 2. ## PowerShell templates
    1. Project
-   2. Team (optional)
-   3. Membership
-   4. Environment
-   5. Connection
+   2. Teams (optional)
+   3. Group Memberships
+   4. Environments
+   5. Service Connections
