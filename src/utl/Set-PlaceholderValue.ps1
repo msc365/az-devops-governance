@@ -68,8 +68,14 @@ function Set-PlaceholderValue {
                     )
 
                     foreach ($variant in $placeholderVariants) {
-                        Write-Verbose ('Set {0} with value: {1}' -f $variant.Token, $variant.Value)
-                        $outputJson = $outputJson -replace [regex]::Escape($variant.Token), $variant.Value
+                        $pattern = [regex]::Escape($variant.Token)
+                        $matchCount = [regex]::Matches($outputJson, $pattern).Count
+
+                        if ($matchCount -gt 0) {
+                            $replacementValue = $variant.Value
+                            $outputJson = [regex]::Replace($outputJson, $pattern, { param($match) $replacementValue })
+                            Write-Verbose ('Set {0} with value: {1} (replaced {2})' -f $variant.Token, $replacementValue, $matchCount)
+                        }
                     }
                 }
             }
