@@ -6,7 +6,8 @@
 .DESCRIPTION
     This function takes a parameter JSON string and replaces placeholder values (e.g.: {uniqueId}, {prefix}, {organization})
     with actual values from a configuration hashtable. This centralizes the parameter placeholder resolution logic
-    that is commonly used across deployment scripts.
+    that is commonly used across deployment scripts. Add optional casing hints by appending |upper or |lower to any
+    placeholder (e.g. {prefix|upper}).
 
 .PARAMETER ParamsJson
     The parameter JSON string containing placeholders to replace.
@@ -56,12 +57,20 @@ function Set-PlaceholderValue {
 
             # Iterate through each configuration key and replace its placeholder
             foreach ($key in $config.Keys) {
-                $placeholder = '{{{0}}}' -f $key
                 $value = $config[$key]
 
                 if ($null -ne $value) {
-                    Write-Verbose ('Set {0} with value: {1}' -f $placeholder, $value)
-                    $outputJson = $outputJson -replace [regex]::Escape($placeholder), $value
+                    $valueString = [string]$value
+                    $placeholderVariants = @(
+                        @{ Token = '{{{0}}}' -f $key; Value = $valueString },
+                        @{ Token = '{{{0}|upper}}' -f $key; Value = $valueString.ToUpperInvariant() },
+                        @{ Token = '{{{0}|lower}}' -f $key; Value = $valueString.ToLowerInvariant() }
+                    )
+
+                    foreach ($variant in $placeholderVariants) {
+                        Write-Verbose ('Set {0} with value: {1}' -f $variant.Token, $variant.Value)
+                        $outputJson = $outputJson -replace [regex]::Escape($variant.Token), $variant.Value
+                    }
                 }
             }
 
