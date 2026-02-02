@@ -1,7 +1,9 @@
 {
     "$schema": "../schemas/config.schema.json",
-    "uniqueId": "Hb72x9",
+    "uniqueId": "hb72x9",
     "prefix": "e2egov",
+    "service": "Demo",
     "location": "westeurope",
+    "subscriptionId": "a8919718-a1aa-41b6-9146-139e67bc7ad2",
     "collectionUri": "https://dev.azure.com/e2egov-org"
 }
