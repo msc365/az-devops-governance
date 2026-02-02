@@ -39,6 +39,11 @@
             "type": "string",
             "description": "The Azure location for resource deployment"
         },
+        "subscriptionId": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$",
+            "description": "Optional Azure subscription identifier (GUID)"
+        },
         "collectionUri": {
             "type": "string",
             "description": "The Azure DevOps collection URI"
