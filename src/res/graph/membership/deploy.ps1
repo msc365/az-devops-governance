@@ -7,7 +7,7 @@ param (
     [string]$TemplateParameterFile = 'params/main.parameters.json',
 
     [Parameter()]
-    [string]$ConfigFile = '../../../config/main.config.json',
+    [string]$ConfigFile = 'config/main.config.json',
 
     [Parameter()]
     [switch]$Rollback
@@ -17,7 +17,7 @@ begin {
     Write-Verbose "[Enter]: ./$($MyInvocation.MyCommand.Name)"
 
     # Import utility functions
-    . (Join-Path $PSScriptRoot -ChildPath '../../utl/Set-PlaceholderValue.ps1' -ErrorAction Stop)
+    . (Join-Path $PSScriptRoot -ChildPath '../../..' 'utl/Set-PlaceholderValue.ps1' -ErrorAction Stop)
 
     # Connect to Microsoft Graph with required scopes
     Connect-MgGraph -Scopes 'Group.Read.All' -NoWelcome
@@ -26,7 +26,7 @@ begin {
 process {
     try {
         # Load configuration from JSON file
-        $configAsJson = Get-Content -Path (Join-Path $PSScriptRoot -ChildPath $ConfigFile) -Raw
+        $configAsJson = Get-Content -Path (Join-Path $PSScriptRoot -ChildPath '../../../..' $ConfigFile) -Raw
 
         # Load parameters from JSON file
         $paramsAsJson = Get-Content -Path (Join-Path $PSScriptRoot -ChildPath $TemplateParameterFile) -Raw
