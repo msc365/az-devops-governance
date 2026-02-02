@@ -135,7 +135,7 @@ param (
 )
 
 begin {
-    Write-Verbose "[Enter]: ./src/res/environment/$($MyInvocation.MyCommand.Name)"
+    Write-Verbose "[Enter]: ./src/res/pipeline/environment/$($MyInvocation.MyCommand.Name)"
 
     # Validate required parameters
     if ([string]::IsNullOrWhiteSpace($CollectionUri)) {
@@ -302,5 +302,5 @@ process {
 }
 
 end {
-    Write-Verbose "[Exit]: ./src/res/environment/$($MyInvocation.MyCommand.Name)"
+    Write-Verbose "[Exit]: ./src/res/pipeline/environment/$($MyInvocation.MyCommand.Name)"
 }
