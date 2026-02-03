@@ -1,9 +1,0 @@
-{
-    "$schema": "../../../schemas/config.schema.json",
-    "uniqueId": "u8j3",
-    "prefix": "eubm",
-    "service": "CCoE",
-    "location": "westeurope",
-    "subscriptionId": "00000000-0000-0000-0000-000000000000",
-    "collectionUri": "https://dev.azure.com/e2egov-org"
-}
