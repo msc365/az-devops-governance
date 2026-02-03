@@ -246,8 +246,19 @@ Install-Module -Name Azure.DevOps.PSModule -Scope CurrentUser
 
 # Set environment variables for Bicep deployments
 $env:LOCATION = 'westeurope'
-$env:SUBSCRIPTION_ID = 'a8919718-a1aa-41b6-9146-139e67bc7ad2'
-$env:CUSTOM_ROLE_DEFINITION_ID = 'd71dc0cc-cb2e-52dd-b167-928dbda9d909'
+$env:SUBSCRIPTION_ID = '00000000-0000-0000-0000-000000000000'
+$env:CUSTOM_ROLE_DEFINITION_ID = '11111111-1111-1111-1111-111111111111'
+
+# Set global configuration
+{
+    "$schema": "../../../schemas/config.schema.json",
+    "uniqueId": "2vk6",
+    "prefix": "demo",
+    "service": "e2egov",
+    "location": "westeurope",
+    "subscriptionId": "00000000-0000-0000-0000-000000000000",
+    "collectionUri": "https://dev.azure.com/your-org"
+}
 
 # Login to Azure (authenticates both Azure and Azure DevOps)
 Connect-AzAccount

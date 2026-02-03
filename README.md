@@ -268,7 +268,53 @@ This scenario extends beyond Azure Resource Manager. This is why we use **PowerS
 
 ### Quick Start
 
-🚧 Sorry, we're working on it.
+Once you've completed the prerequisites and configuration, deploying is straightforward. See [Deploy this Demo](accelerator/demo/README.md) for detailed information about prerequisites, configuration and deploying the demo.
+
+Here's a quick reference:
+
+**PowerShell:**
+```powershell
+# Install required modules (one-time setup)
+Install-Module -Name Az.Accounts -Scope CurrentUser
+Install-Module -Name Azure.DevOps.PSModule -Scope CurrentUser
+
+# Set environment variables for Bicep deployments
+$env:LOCATION = 'westeurope'
+$env:SUBSCRIPTION_ID = '00000000-0000-0000-0000-000000000000'
+$env:CUSTOM_ROLE_DEFINITION_ID = '11111111-1111-1111-1111-111111111111'
+
+# Set global configuration
+{
+    "$schema": "../../../schemas/config.schema.json",
+    "uniqueId": "2vk6",
+    "prefix": "demo",
+    "service": "e2egov",
+    "location": "westeurope",
+    "subscriptionId": "00000000-0000-0000-0000-000000000000",
+    "collectionUri": "https://dev.azure.com/your-org"
+}
+
+# Login to Azure (authenticates both Azure and Azure DevOps)
+Connect-AzAccount
+Set-AzContext -SubscriptionId $env:SUBSCRIPTION_ID
+
+# Navigate to pipeline scripts directory
+cd accelerator/demo/pipeline-scripts
+
+# Stage 1 - Azure Infrastructure
+./Deploy-ResourceGroups.ps1
+./Deploy-ManagedIndentities.ps1
+./Deploy-SecurityGroups.ps1
+./Deploy-RoleAssignments.ps1
+
+# Stage 2 - Azure DevOps
+./Deploy-Projects.ps1
+./Deploy-Teams.ps1
+./Deploy-Memberships.ps1
+./Deploy-Environments.ps1
+./Deploy-ServiceConnections.ps1
+```
+
 
 ## Support
 
