@@ -1,0 +1,9 @@
+{
+    "$schema": "../../../schemas/config.schema.json",
+    "uniqueId": "2vk6",
+    "prefix": "demo",
+    "service": "e2egov",
+    "location": "westeurope",
+    "subscriptionId": "00000000-0000-0000-0000-000000000000",
+    "collectionUri": "https://dev.azure.com/e2egov-org"
+}

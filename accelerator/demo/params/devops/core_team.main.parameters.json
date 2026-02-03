@@ -1,0 +1,23 @@
+{
+    "$schema": "../../../../schemas/team.schema.json",
+    "collectionUri": "{collectionUri}",
+    "projects": [
+        {
+            "projectName": "projects-CCoE",
+            "teams": [
+                {
+                    "name": "Team Netherlands",
+                    "description": "Team Netherlands team description"
+                },
+                {
+                    "name": "Team Portugal",
+                    "description": "Team Portugal team description"
+                },
+                {
+                    "name": "Team Switzerland",
+                    "description": "Team Switzerland team description"
+                }
+            ]
+        }
+    ]
+}

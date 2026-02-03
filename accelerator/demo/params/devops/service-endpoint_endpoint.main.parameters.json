@@ -1,0 +1,64 @@
+{
+    "$schema": "../../../../schemas/endpoint.schema.json",
+    "collectionUri": "{collectionUri}",
+    "projects": [
+        {
+            "projectName": "projects-CCoE",
+            "endpoints": [
+                {
+                    "name": "rg-{prefix}-ccoe-{uniqueId}-dev-weu",
+                    "description": "Service Connection for Managed Identity 'id-{prefix}-ccoe-{uniqueId}-dev' to access resources in subscription '{subscriptionId}'",
+                    "managedIdentity": {
+                        "name": "id-{prefix}-ccoe-{uniqueId}-dev",
+                        "subscriptionId": "{subscriptionId}",
+                        "resourceGroupName": "rg-{prefix}-ccoe-{uniqueId}-dev-weu",
+                        "federatedIdentityCredential": {
+                            "name": "fic-{prefix}-ccoe-{uniqueId}-dev"
+                        }
+                    }
+                },
+                {
+                    "name": "rg-{prefix}-ccoe-{uniqueId}-prd-weu",
+                    "description": "Service Connection for Managed Identity 'id-{prefix}-ccoe-{uniqueId}-prd' to access resources in subscription '{subscriptionId}'",
+                    "managedIdentity": {
+                        "name": "id-{prefix}-ccoe-{uniqueId}-prd",
+                        "subscriptionId": "{subscriptionId}",
+                        "resourceGroupName": "rg-{prefix}-ccoe-{uniqueId}-prd-weu",
+                        "federatedIdentityCredential": {
+                            "name": "fic-{prefix}-ccoe-{uniqueId}-prd"
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "projectName": "projects-Portugal",
+            "endpoints": [
+                {
+                    "name": "rg-{prefix}-portugal-{uniqueId}-dev-weu",
+                    "description": "Service Connection for Managed Identity 'id-{prefix}-portugal-{uniqueId}-dev' to access resources in subscription '{subscriptionId}'",
+                    "managedIdentity": {
+                        "name": "id-{prefix}-portugal-{uniqueId}-dev",
+                        "subscriptionId": "{subscriptionId}",
+                        "resourceGroupName": "rg-{prefix}-portugal-{uniqueId}-dev-weu",
+                        "federatedIdentityCredential": {
+                            "name": "fic-{prefix}-portugal-{uniqueId}-dev"
+                        }
+                    }
+                },
+                {
+                    "name": "rg-{prefix}-portugal-{uniqueId}-prd-weu",
+                    "description": "Service Connection for Managed Identity 'id-{prefix}-portugal-{uniqueId}-prd' to access resources in subscription '{subscriptionId}'",
+                    "managedIdentity": {
+                        "name": "id-{prefix}-portugal-{uniqueId}-prd",
+                        "subscriptionId": "{subscriptionId}",
+                        "resourceGroupName": "rg-{prefix}-portugal-{uniqueId}-prd-weu",
+                        "federatedIdentityCredential": {
+                            "name": "fic-{prefix}-portugal-{uniqueId}-prd"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

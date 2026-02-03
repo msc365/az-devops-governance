@@ -1,0 +1,45 @@
+{
+    "$schema": "../../../../schemas/environment.schema.json",
+    "collectionUri": "{collectionUri}",
+    "projects": [
+        {
+            "projectName": "projects-CCoE",
+            "environments": [
+                {
+                    "name": "env-{prefix}-ccoe-{uniqueId}-dev",
+                    "description": ""
+                },
+                {
+                    "name": "env-{prefix}-ccoe-{uniqueId}-prd",
+                    "description": ""
+                }
+            ]
+        },
+        {
+            "projectName": "projects-Portugal",
+            "environments": [
+                {
+                    "name": "env-{prefix}-portugal-{uniqueId}-dev",
+                    "description": ""
+                },
+                {
+                    "name": "env-{prefix}-portugal-{uniqueId}-prd",
+                    "description": ""
+                }
+            ]
+        },
+        {
+            "projectName": "shared-Services",
+            "environments": [
+                {
+                    "name": "env-{prefix}-service-{uniqueId}-dev",
+                    "description": ""
+                },
+                {
+                    "name": "env-{prefix}-service-{uniqueId}-prd",
+                    "description": ""
+                }
+            ]
+        }
+    ]
+}
