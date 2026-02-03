@@ -1,16 +1,14 @@
 <!-- omit from toc -->
 # Deploy this Demo
 
-How to deploy this example in your own Azure account(s) and Azure DevOps organization. This demo uses the fictitious _European Building Materials_ organization described in the [root README](../../README.md) to illustrate end-to-end governance patterns across Azure and Azure DevOps.
+How to deploy this example in your own Azure account(s) and Azure DevOps organization. This demo uses the fictitious _European Building Materials_ organization described in the root [README](../../README.md) to illustrate end-to-end governance patterns across Azure and Azure DevOps.
 
 > [!WARNING]
-> **Disclaimer - Not for Production**
->
+> **Disclaimer - Not for Production**  
 > This code is NOT meant to be used for production. While great efforts were taken for code quality and best practices, certain decisions were made for convenience. For example, this demo uses resource groups to separate environments. In practice, however, [Azure subscriptions are a better choice](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/govern/guides/standard/#governance-best-practices) per Microsoft's [Cloud Adoption Framework (CAF)](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework).
 
 > [!NOTE]
-> **Local Deployment**
->
+> **Local Deployment**  
 > This guide describes a local deployment process using PowerShell scripts. To automate this process, a pipeline-based deployment will be available soon.
 
 <!-- omit from toc -->
@@ -286,12 +284,13 @@ After successful deployment, you will have the following resources:
 - **Managed Identities**  
   User-assigned identities for workload identity federation, for example:
   - `id-demo-portugal-2vk6-dev-weu`
+  - `id-demo-portugal-2vk6-prd-weu`
 
 - **Entra Security Groups**  
   Groups for access control, for example:
-  - `sg-portugal-admins`
-  - `sg-portugal-devs`
-  - `sg-portugal-stakes`
+  - `demo-portugal-2vk6-admins`
+  - `demo-portugal-2vk6-devs`
+  - `demo-portugal-2vk6-stakes`
 
 - **Role Assignments**  
   RBAC assignments linking groups and identities to resource scopes
@@ -300,17 +299,19 @@ After successful deployment, you will have the following resources:
 
 - **Projects**  
   One project per OpCo, for example:
-  - `portugal`
-  - `netherlands`
-  - `ccoe`
+  - `projects-CCoE`
+  - `projects-Portugal`
+  - `projects-Netherlands`
+  - `shared-Collaboration`
+  - `shared-Services`
 
 - **Teams**  
   Additional teams within projects for specialized workloads
 
 - **Environments**  
   Deployment environments with approval gates, for example:
-  - `portugal-dev`
-  - `portugal-prd`
+  - `env-demo-portugal-2vk6-dev`
+  - `env-demo-portugal-2vk6-prd`
 
 - **Service Connections**  
   Workload identity federation connections to Azure subscriptions
@@ -324,7 +325,7 @@ All resources follow a structured naming pattern defined in [`config/main.abbrev
 
 - `rg-*`: Resource groups
 - `id-*`: User-assigned managed identities
-- `SG *`: Security groups (Entra ID)
+- `env-*`: Environments
 - Pattern:
   - `{type}-${config.prefix}-{opco}-${config.uniqueId}-{environment}-{location}`
 - Example:
