@@ -1,27 +1,31 @@
 {
     "$schema": "../../../../../schemas/team.schema.json",
     "collectionUri": "{collectionUri}",
-    "projectName": "{prefix}-{service}",
-    "teams": [
+    "projects": [
         {
-            "name": "Other Team",
-            "description": "Other team description",
-            "teamSettings": {
-                "backlogVisibilities": {
-                    "Microsoft.EpicCategory": false,
-                    "Microsoft.FeatureCategory": true,
-                    "Microsoft.RequirementCategory": true
-                },
-                "bugsBehavior": "asRequirements",
-                "defaultIterationMacro": "@currentIteration",
-                "workingDays": [
-                    "monday",
-                    "tuesday",
-                    "wednesday",
-                    "thursday",
-                    "friday"
-                ]
-            }
+            "projectName": "{prefix}-{service}",
+            "teams": [
+                {
+                    "name": "Other Team",
+                    "description": "Other team description",
+                    "teamSettings": {
+                        "backlogVisibilities": {
+                            "Microsoft.EpicCategory": false,
+                            "Microsoft.FeatureCategory": true,
+                            "Microsoft.RequirementCategory": true
+                        },
+                        "bugsBehavior": "asRequirements",
+                        "defaultIterationMacro": "@currentIteration",
+                        "workingDays": [
+                            "monday",
+                            "tuesday",
+                            "wednesday",
+                            "thursday",
+                            "friday"
+                        ]
+                    }
+                }
+            ]
         }
     ]
 }

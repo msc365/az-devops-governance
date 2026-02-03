@@ -26,6 +26,8 @@
 
 .DESCRIPTION
     This PowerShell script creates, updates or rolls back an Azure DevOps Environment.
+    For multi-project deployments, use deploy.ps1 to iterate projects and pipe each environment
+    object into this script `main.ps1` intentionally operates on a single environment per invocation.
 
     It provides comprehensive environment management capabilities including creation, updating properties, and removal of environments.
 
@@ -218,7 +220,6 @@ process {
 
                 # Only check description if it was explicitly provided
                 if ($PSBoundParameters.ContainsKey('Description')) {
-
                     # Normalize to empty string for comparison
                     $currentDesc = $env.Description ?? ''
                     $newDesc = $Description ?? ''

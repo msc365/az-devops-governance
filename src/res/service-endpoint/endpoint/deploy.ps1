@@ -36,30 +36,43 @@ process {
 
         Write-Verbose "Using params: $($params | ConvertTo-Json -Depth 5)"
 
-        # Extract common parameters
         $collectionUri = $params.collectionUri
-        $projectName = $params.projectName
-        $endpoints = $params.endpoints
-
-        if ($null -eq $endpoints -or $endpoints.Count -eq 0) {
-            throw 'No endpoints found in parameter file. At least one endpoint is required.'
+        if ([string]::IsNullOrWhiteSpace($collectionUri)) {
+            throw 'collectionUri is required in the parameter file.'
         }
 
-        Write-Verbose "Processing $($endpoints.Count) endpoint(s) via pipeline..."
-
-        # Prepare script parameters for common values
-        $scriptParams = @{
-            CollectionUri = $collectionUri
-            ProjectName   = $projectName
-            Rollback      = $Rollback.IsPresent
-            WhatIf        = $WhatIfPreference
-            Confirm       = $ConfirmPreference
-            Verbose       = $VerbosePreference
+        $projects = $params.projects
+        if ($null -eq $projects -or $projects.Count -eq 0) {
+            throw 'No projects found in parameter file. At least one project entry is required.'
         }
 
-        # Pipe endpoints to main.ps1
-        $endpoints | & (Join-Path $PSScriptRoot -ChildPath $TemplateFile) @scriptParams
+        Write-Verbose "Processing $($projects.Count) project(s)..."
 
+        foreach ($project in $projects) {
+
+            $projectName = $project.projectName
+            if ([string]::IsNullOrWhiteSpace($projectName)) {
+                throw 'Each project entry must include a projectName.'
+            }
+
+            $endpoints = $project.endpoints
+            if ($null -eq $endpoints -or $endpoints.Count -eq 0) {
+                throw "Project '$projectName' does not define any endpoints."
+            }
+
+            Write-Verbose "Processing $($endpoints.Count) endpoint(s)..."
+
+            $scriptParams = @{
+                CollectionUri = $collectionUri
+                ProjectName   = $projectName
+                Rollback      = $Rollback.IsPresent
+                Confirm       = $ConfirmPreference
+                WhatIf        = $WhatIfPreference
+                Verbose       = $VerbosePreference
+            }
+
+            $endpoints | & (Join-Path $PSScriptRoot -ChildPath $TemplateFile) @scriptParams
+        }
     } catch {
         throw $_
     }

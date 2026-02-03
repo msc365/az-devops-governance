@@ -36,29 +36,43 @@ process {
 
         Write-Verbose "Using params: $($params | ConvertTo-Json -Depth 5)"
 
-        # Extract common parameters
         $collectionUri = $params.collectionUri
-        $projectName = $params.projectName
-        $environments = $params.environments
-
-        if ($null -eq $environments -or $environments.Count -eq 0) {
-            throw 'No environments found in parameter file. At least one environment is required.'
+        if ([string]::IsNullOrWhiteSpace($collectionUri)) {
+            throw 'collectionUri is required in the parameter file.'
         }
 
-        Write-Verbose "Processing $($environments.Count) environment(s) via pipeline..."
-
-        # Prepare script parameters for common values
-        $scriptParams = @{
-            CollectionUri = $collectionUri
-            ProjectName   = $projectName
-            Rollback      = $Rollback.IsPresent
-            WhatIf        = $WhatIfPreference
-            Confirm       = $ConfirmPreference
-            Verbose       = $VerbosePreference
+        $projects = $params.projects
+        if ($null -eq $projects -or $projects.Count -eq 0) {
+            throw 'No projects found in parameter file. At least one project entry is required.'
         }
 
-        # Pipe environments to main.ps1
-        $environments | & (Join-Path $PSScriptRoot -ChildPath $TemplateFile) @scriptParams
+        Write-Verbose "Processing $($projects.Count) project(s)..."
+
+        foreach ($project in $projects) {
+
+            $projectName = $project.projectName
+            if ([string]::IsNullOrWhiteSpace($projectName)) {
+                throw 'Each project entry must include a projectName.'
+            }
+
+            $environments = $project.environments
+            if ($null -eq $environments -or $environments.Count -eq 0) {
+                throw "Project '$projectName' does not define any environments."
+            }
+
+            Write-Verbose "Processing $($environments.Count) environment(s)..."
+
+            $scriptParams = @{
+                CollectionUri = $collectionUri
+                ProjectName   = $projectName
+                Rollback      = $Rollback.IsPresent
+                Confirm       = $ConfirmPreference
+                WhatIf        = $WhatIfPreference
+                Verbose       = $VerbosePreference
+            }
+
+            $environments | & (Join-Path $PSScriptRoot -ChildPath $TemplateFile) @scriptParams
+        }
     } catch {
         throw $_
     }

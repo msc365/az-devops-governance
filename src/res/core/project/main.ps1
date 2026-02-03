@@ -241,17 +241,20 @@ process {
                     Name          = $Name
                 }
 
-                # Only add optional parameters if they were explicitly provided
+                # Only add optional parameters if they were explicitly provided and not empty
                 if ($PSBoundParameters.ContainsKey('Description')) {
                     $prjSplat['Description'] = $Description
                 }
-                if ($PSBoundParameters.ContainsKey('Process')) {
+                if ($PSBoundParameters.ContainsKey('Process') -and
+                    -not [string]::IsNullOrWhiteSpace($Process)) {
                     $prjSplat['Process'] = $Process
                 }
-                if ($PSBoundParameters.ContainsKey('SourceControl')) {
+                if ($PSBoundParameters.ContainsKey('SourceControl') -and
+                    -not [string]::IsNullOrWhiteSpace($SourceControl)) {
                     $prjSplat['SourceControl'] = $SourceControl
                 }
-                if ($PSBoundParameters.ContainsKey('Visibility')) {
+                if ($PSBoundParameters.ContainsKey('Visibility') -and
+                    -not [string]::IsNullOrWhiteSpace($Visibility)) {
                     $prjSplat['Visibility'] = $Visibility
                 }
 
@@ -280,7 +283,6 @@ process {
 
                 # Only check description if it was explicitly provided
                 if ($PSBoundParameters.ContainsKey('Description')) {
-
                     # Normalize to empty string for comparison
                     $currentDesc = $prj.Description ?? ''
                     $newDesc = $Description ?? ''
@@ -292,7 +294,8 @@ process {
                 }
 
                 # Only check visibility if it was explicitly provided
-                if ($PSBoundParameters.ContainsKey('Visibility')) {
+                if ($PSBoundParameters.ContainsKey('Visibility') -and
+                    -not [string]::IsNullOrWhiteSpace($Visibility)) {
                     if ($Visibility -ne $prj.Visibility) {
                         $prjSplat['Visibility'] = $Visibility
                         $hasChanges = $true
@@ -314,7 +317,8 @@ process {
                 }
 
                 # Only check default team if it was explicitly provided
-                if ($PSBoundParameters.ContainsKey('DefaultTeam')) {
+                if ($PSBoundParameters.ContainsKey('DefaultTeam') -and
+                    -not [string]::IsNullOrWhiteSpace($DefaultTeam)) {
                     $teamSplat = @{
                         CollectionUri = $CollectionUri
                         ProjectName   = $Name
@@ -347,7 +351,8 @@ process {
                 }
 
                 # Only check features if it was explicitly provided
-                if ($PSBoundParameters.ContainsKey('Features')) {
+                if ($PSBoundParameters.ContainsKey('Features') -and
+                    $Features.Count -gt 0) {
                     $featureStatesSplat = @{
                         CollectionUri = $CollectionUri
                         ProjectName   = $Name

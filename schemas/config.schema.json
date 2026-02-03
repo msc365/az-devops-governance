@@ -32,8 +32,8 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 20,
-            "pattern": "^[a-zA-Z0-9]{2,10}$",
-            "description": "A service name to be used in resource names (2-10 alphanumeric characters)"
+            "pattern": "^[a-zA-Z0-9]{2,20}$",
+            "description": "A service name to be used in resource names (2-20 alphanumeric characters)"
         },
         "location": {
             "type": "string",

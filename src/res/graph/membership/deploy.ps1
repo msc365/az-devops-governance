@@ -39,29 +39,43 @@ process {
 
         Write-Verbose "Using params: $($params | ConvertTo-Json -Depth 5)"
 
-        # Extract common parameters
         $collectionUri = $params.collectionUri
-        $projectName = $params.projectName
-        $memberships = $params.memberships
-
-        if ($null -eq $memberships -or $memberships.Count -eq 0) {
-            throw 'No memberships found in parameter file. At least one membership is required.'
+        if ([string]::IsNullOrWhiteSpace($collectionUri)) {
+            throw 'collectionUri is required in the parameter file.'
         }
 
-        Write-Verbose "Processing $($memberships.Count) membership(s) via pipeline..."
-
-        # Prepare script parameters for common values
-        $scriptParams = @{
-            CollectionUri = $collectionUri
-            ProjectName   = $projectName
-            Rollback      = $Rollback.IsPresent
-            WhatIf        = $WhatIfPreference
-            Confirm       = $ConfirmPreference
-            Verbose       = $VerbosePreference
+        $projects = $params.projects
+        if ($null -eq $projects -or $projects.Count -eq 0) {
+            throw 'No projects found in parameter file. At least one project entry is required.'
         }
 
-        # Pipe memberships to main.ps1
-        $memberships | & (Join-Path $PSScriptRoot -ChildPath $TemplateFile) @scriptParams
+        Write-Verbose "Processing $($projects.Count) project(s)..."
+
+        foreach ($project in $projects) {
+
+            $projectName = $project.projectName
+            if ([string]::IsNullOrWhiteSpace($projectName)) {
+                throw 'Each project entry must include a projectName.'
+            }
+
+            $memberships = $project.memberships
+            if ($null -eq $memberships -or $memberships.Count -eq 0) {
+                throw "Project '$projectName' does not define any memberships."
+            }
+
+            Write-Verbose "Processing $($memberships.Count) membership(s)..."
+
+            $scriptParams = @{
+                CollectionUri = $collectionUri
+                ProjectName   = $projectName
+                Rollback      = $Rollback.IsPresent
+                Confirm       = $ConfirmPreference
+                WhatIf        = $WhatIfPreference
+                Verbose       = $VerbosePreference
+            }
+
+            $memberships | & (Join-Path $PSScriptRoot -ChildPath $TemplateFile) @scriptParams
+        }
     } catch {
         throw $_
     }

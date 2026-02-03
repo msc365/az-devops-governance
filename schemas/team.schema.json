@@ -4,8 +4,7 @@
     "type": "object",
     "required": [
         "collectionUri",
-        "projectName",
-        "teams"
+        "projects"
     ],
     "properties": {
         "$schema": {
@@ -16,17 +15,32 @@
             "type": "string",
             "description": "The Azure DevOps collection URI"
         },
-        "projectName": {
-            "type": "string",
-            "description": "The Azure DevOps project name"
-        },
-        "teams": {
+        "projects": {
             "type": "array",
-            "description": "Array of teams to create or configure",
+            "description": "Array of projects and their teams",
+            "minItems": 1,
             "items": {
-                "$ref": "#/definitions/team"
-            },
-            "minItems": 1
+                "type": "object",
+                "required": [
+                    "projectName",
+                    "teams"
+                ],
+                "properties": {
+                    "projectName": {
+                        "type": "string",
+                        "description": "The Azure DevOps project name"
+                    },
+                    "teams": {
+                        "type": "array",
+                        "description": "Array of teams to create or configure",
+                        "items": {
+                            "$ref": "#/definitions/team"
+                        },
+                        "minItems": 1
+                    }
+                },
+                "additionalProperties": false
+            }
         }
     },
     "additionalProperties": false,

@@ -4,8 +4,7 @@
     "type": "object",
     "required": [
         "collectionUri",
-        "projectName",
-        "memberships"
+        "projects"
     ],
     "properties": {
         "$schema": {
@@ -16,27 +15,42 @@
             "type": "string",
             "description": "The Azure DevOps collection URI"
         },
-        "projectName": {
-            "type": "string",
-            "description": "The Azure DevOps project name"
-        },
-        "memberships": {
+        "projects": {
             "type": "array",
-            "description": "Array of security groups and their project memberships",
+            "description": "Array of projects and their memberships",
             "items": {
                 "type": "object",
                 "required": [
-                    "uniqueName",
-                    "groupMembership"
+                    "projectName",
+                    "memberships"
                 ],
                 "properties": {
-                    "uniqueName": {
+                    "projectName": {
                         "type": "string",
-                        "description": "The unique name (mailNickname) of the Microsoft Entra ID security group"
+                        "description": "The Azure DevOps project name"
                     },
-                    "groupMembership": {
-                        "type": "string",
-                        "description": "The Azure DevOps project group that the security group should be added to"
+                    "memberships": {
+                        "type": "array",
+                        "description": "Array of security groups and their project memberships",
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "uniqueName",
+                                "groupMembership"
+                            ],
+                            "properties": {
+                                "uniqueName": {
+                                    "type": "string",
+                                    "description": "The unique name (mailNickname) of the Microsoft Entra ID security group"
+                                },
+                                "groupMembership": {
+                                    "type": "string",
+                                    "description": "The Azure DevOps project group that the security group should be added to"
+                                }
+                            },
+                            "additionalProperties": false
+                        },
+                        "minItems": 1
                     }
                 },
                 "additionalProperties": false

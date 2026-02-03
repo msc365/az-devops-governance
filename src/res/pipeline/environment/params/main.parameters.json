@@ -1,15 +1,19 @@
 {
     "$schema": "../../../../../schemas/environment.schema.json",
     "collectionUri": "{collectionUri}",
-    "projectName": "{prefix}-{service}",
-    "environments": [
+    "projects": [
         {
-            "name": "env-{prefix}-{service|lower}-{uniqueId}-dev",
-            "description": ""
-        },
-        {
-            "name": "env-{prefix}-{service|lower}-{uniqueId}-prd",
-            "description": ""
+            "projectName": "{prefix}-{service}",
+            "environments": [
+                {
+                    "name": "env-{prefix}-{service|lower}-{uniqueId}-dev",
+                    "description": ""
+                },
+                {
+                    "name": "env-{prefix}-{service|lower}-{uniqueId}-prd",
+                    "description": ""
+                }
+            ]
         }
     ]
 }

@@ -6,37 +6,43 @@
       "value": "<custom-role-definition-id>"
     },
     "securityGroups": {
-      "value": {
-        "administrators": {
-          "name": "e2egov-prjHb72x9-admins"
-        },
-        "developers": {
-          "name": "e2egov-prjHb72x9-devs"
-        },
-        "stakeholders": {
-          "name": "e2egov-prjHb72x9-stakes"
+      "value": [
+        {
+          "administrators": {
+            "name": "e2egov-prjhb72x9-admins"
+          },
+          "developers": {
+            "name": "e2egov-prjhb72x9-devs"
+          },
+          "stakeholders": {
+            "name": "e2egov-prjhb72x9-stakes"
+          }
         }
-      }
+      ]
     },
     "managedIdentities": {
-      "value": {
-        "development": {
-          "name": "id-e2egov-prjHb72x9-dev"
-        },
-        "production": {
-          "name": "id-e2egov-prjHb72x9-prd"
+      "value": [
+        {
+          "development": {
+            "name": "id-e2egov-prjhb72x9-dev"
+          },
+          "production": {
+            "name": "id-e2egov-prjhb72x9-prd"
+          }
         }
-      }
+      ]
     },
     "resourceGroups": {
-      "value": {
-        "development": {
-          "name": "rg-e2egov-prjHb72x9-dev-weu"
-        },
-        "production": {
-          "name": "rg-e2egov-prjHb72x9-prd-weu"
+      "value": [
+        {
+          "development": {
+            "name": "rg-e2egov-prjhb72x9-dev-weu"
+          },
+          "production": {
+            "name": "rg-e2egov-prjhb72x9-prd-weu"
+          }
         }
-      }
+      ]
     }
   }
 }
