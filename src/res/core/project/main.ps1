@@ -118,7 +118,7 @@
         }
     }
 
-    ./src/res/core/project/main.ps1 @paramSplat
+    ./main.ps1 @paramSplat -Verbose
 
     Deploys or updates a project in the specified Azure DevOps organization using the provided parameters in code.
 

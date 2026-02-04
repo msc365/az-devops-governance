@@ -53,7 +53,8 @@ $deploySplat = @{
 ./deploy.ps1 @deploySplat -Verbose
 ```
 
-Deploys the project using the specified template and parameters.
+Deploys the project using the specified template and parameters.
+
 
 ### Example 2
 
@@ -68,7 +69,8 @@ $customSplat = @{
 ./deploy.ps1 @customSplat -Verbose
 ```
 
-Deploys the project using the specified template and custom parameters.
+Deploys the project using the specified template and custom parameters.
+
 
 ### Example 3
 
@@ -83,7 +85,8 @@ $rollbackSplat = @{
 ./deploy.ps1 @rollbackSplat -Rollback -Confirm:$false -Verbose
 ```
 
-Rolls back (removes) the project and related resources without confirmation.
+Rolls back (removes) the project and related resources without confirmation.
+
 
 ### Example 4
 
@@ -107,10 +110,11 @@ $paramSplat = @{
     }
 }
 
-./src/res/core/project/main.ps1 @paramSplat
+./main.ps1 @paramSplat -Verbose
 ```
 
-Deploys or updates a project in the specified Azure DevOps organization using the provided parameters in code.
+Deploys or updates a project in the specified Azure DevOps organization using the provided parameters in code.
+
 
 ## OUTPUTS
 
