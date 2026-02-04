@@ -1,7 +1,7 @@
 <!-- omit from toc -->
 # Deploy this Demo
 
-How to deploy this example in your own Azure account(s) and Azure DevOps organization. This demo uses the fictitious _European Building Materials_ organization described in the root [README](../../README.md) to illustrate end-to-end governance patterns across Azure and Azure DevOps.
+How to deploy this example in your own Azure account(s) and Azure DevOps organization. This demo uses the fictitious _European Building Materials_ organization described in [this article](../../docs/end-to-end-governance.md) to illustrate end-to-end governance patterns across Azure and Azure DevOps.
 
 > [!WARNING]
 > **Disclaimer - Not for Production**  
@@ -371,8 +371,8 @@ All resources follow a structured naming pattern defined in [`config/main.abbrev
 
 For detailed architecture and governance patterns, see:
 
-- [README](../../README.md) - Complete governance model overview
-- [Architecture Diagram](../../README.md#architecture) - End-to-end governance architecture
+- [Azure Governance](../../docs/end-to-end-governance.md) - Complete governance model overview
+- [Architecture Diagram](../../docs/end-to-end-governance.md#architecture) - End-to-end governance architecture
 - [Deployment Sequence](../../docs/deployment-sequence.md) - Detailed deployment order
 - [Cross-Project Collaboration](../../docs/cross-project-collaboration-scenario.md) - Multi-project scenarios
 
