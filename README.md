@@ -61,7 +61,7 @@ This script creates, updates or rolls back an Azure DevOps Project within a spec
    - `features`
    - `visibility`
 
-5. Execute the `deploy.ps1` script (from repo root):
+5. Execute the `deploy.ps1` script:
 
     ```powershell
     cd src/res/core/project
@@ -69,7 +69,7 @@ This script creates, updates or rolls back an Azure DevOps Project within a spec
     ./deploy.ps1 -Verbose -WhatIf
     ```
 
-For ad-hoc runs, pass parameters inline as shown in [README](src/res/core/project/README.md#example-4). The script is idempotent, so rerunning it updates existing projects, and `-Rollback` safely removes them when needed.
+For ad-hoc runs, pass parameters inline as shown in [this sample](src/res/core/project/README.md#example-4). The script is idempotent, so rerunning it updates existing projects, and `-Rollback` safely removes them when needed.
 
 ## Governance
 
