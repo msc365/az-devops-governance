@@ -162,6 +162,12 @@ begin {
         Import-Module $requiredModule -Force -Verbose:$false -ErrorAction Stop
         Write-Verbose "Module '$requiredModule' imported successfully."
     }
+
+    # Azure DevOps Governance Demo mode
+    if ($env:AZ_DEVOPS_GOVERNANCE_DEMO_MODE -eq 'true') {
+        $ctxSubscriptionId = (Get-AzContext).Subscription.Id
+        Write-Warning "!!! Demo mode is enabled !!! Operations will use subscription '$ctxSubscriptionId' for creating resources."
+    }
 }
 
 process {
@@ -185,6 +191,11 @@ process {
 
         if ($null -eq $prj) {
             throw "Project with ID $ProjectName does not exist, cannot proceed."
+        }
+
+        # !!! Azure DevOps Governance Demo mode !!!
+        if ($env:AZ_DEVOPS_GOVERNANCE_DEMO_MODE -eq 'true') {
+            $ManagedIdentity.subscriptionId = $ctxSubscriptionId
         }
 
         # Managed service identity

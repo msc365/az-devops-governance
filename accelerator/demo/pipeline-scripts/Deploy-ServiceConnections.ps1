@@ -1,6 +1,12 @@
 ﻿[CmdletBinding(SupportsShouldProcess)]
 param (
     [Parameter()]
+    [string]$Location = "$($env:LOCATION)",
+
+    [Parameter()]
+    [string]$SubscriptionId = "$($env:SUBSCRIPTION_ID)",
+
+    [Parameter()]
     [string]$TemplateFile = 'src/res/service-endpoint/endpoint/main.ps1',
 
     [Parameter()]
@@ -14,7 +20,14 @@ param (
 )
 
 begin {
-    Write-Verbose "[Enter]: ./$($MyInvocation.MyCommand.Name)"
+    $params = [ordered]@{
+        Location              = $Location
+        SubscriptionId        = $SubscriptionId
+        TemplateFile          = $TemplateFile
+        TemplateParameterFile = $TemplateParameterFile
+    } | ConvertTo-Json -Depth 3
+
+    Write-Verbose "[Enter]: $($MyInvocation.MyCommand.Name) with parameters: $params"
 
     # Import utility functions
     . (Join-Path $PSScriptRoot -ChildPath '../../..' 'src/utl/Set-PlaceholderValue.ps1' -ErrorAction Stop)
@@ -22,6 +35,17 @@ begin {
 
 process {
     try {
+        # HACK: Explicitly set -WhatIf:$false, for switching targeted subscription in the context.
+        Set-AzContext -TenantId (Get-AzContext).Tenant.Id -SubscriptionId $SubscriptionId -WhatIf:$false | Out-Null
+
+        $ctx = Get-AzContext
+        $ctxInfo = [ordered]@{
+            Account      = $ctx.Account.Id
+            Tenant       = $ctx.Tenant.Id
+            Subscription = $ctx.Subscription.Name
+        }
+        Write-Verbose "Call Main.ps1 deployment with context: $($ctxInfo | ConvertTo-Json -Depth 3)"
+
         # Load configuration from JSON file
         $configAsJson = Get-Content -Path (Join-Path $PSScriptRoot -ChildPath '..' $ConfigFile) -Raw
 
@@ -34,7 +58,7 @@ process {
         # Convert JSON string to PSCustomObject to preserve pipeline property binding
         $params = $paramsAsJson | ConvertFrom-Json
 
-        Write-Verbose "Using params: $($params | ConvertTo-Json -Depth 5)"
+        Write-Verbose "Using params: $($params | ConvertTo-Json -Depth 10)"
 
         $collectionUri = $params.collectionUri
         if ([string]::IsNullOrWhiteSpace($collectionUri)) {
