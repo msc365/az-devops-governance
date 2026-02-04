@@ -1,0 +1,37 @@
+{
+    "$schema": "../schemas/abbreviations.schema.json",
+    "azure": {
+        "automationAccounts": "aa",
+        "azureFirewallPolicies": "afwp",
+        "azureFirewalls": "afw",
+        "bastionHosts": "bas",
+        "dataCollectionRules": "dcr",
+        "ddosProtectionPlans": "ddosp",
+        "diagnosticSettings": "ids",
+        "expressRouteGateways": "ergw",
+        "managementGroups": "mg",
+        "networkSecurityGroups": "nsg",
+        "networkWatchers": "nnw",
+        "operationalInsightsWorkspaces": "log",
+        "publicIPAddresses": "pip",
+        "resourceGroups": "rg",
+        "routeTables": "rt",
+        "userAssignedIdentities": "id",
+        "virtualNetworks": "vnet",
+        "vpnGateways": "vngw"
+    },
+    "entra": {
+        "applications": "app",
+        "groups": "grp",
+        "managedIdentities": "id",
+        "securityGroups": "sgp",
+        "servicePrincipals": "sp"
+    },
+    "environments": {
+        "development": "dev",
+        "testing": "tst",
+        "staging": "stg",
+        "production": "prd",
+        "sandbox": "sbx"
+    }
+}

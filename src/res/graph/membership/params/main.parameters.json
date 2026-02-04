@@ -1,0 +1,23 @@
+{
+    "$schema": "../../../../../schemas/membership.schema.json",
+    "collectionUri": "{collectionUri}",
+    "projects": [
+        {
+            "projectName": "{prefix}-{service}",
+            "memberships": [
+                {
+                    "uniqueName": "{prefix}-{service|lower}-{uniqueId}-admins",
+                    "groupMembership": "Project Administrators"
+                },
+                {
+                    "uniqueName": "{prefix}-{service|lower}-{uniqueId}-devs",
+                    "groupMembership": "Contributors"
+                },
+                {
+                    "uniqueName": "{prefix}-{service|lower}-{uniqueId}-stakes",
+                    "groupMembership": "Readers"
+                }
+            ]
+        }
+    ]
+}

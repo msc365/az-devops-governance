@@ -1,0 +1,13 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "assignableScopes": {
+      "value": [
+        "/providers/Microsoft.Management/managementGroups/<your-management-group>",
+        "/subscriptions/<your-subscription-id-dev>",
+        "/subscriptions/<your-subscription-id-prd>"
+      ]
+    }
+  }
+}

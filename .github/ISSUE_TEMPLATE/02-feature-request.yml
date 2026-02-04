@@ -1,0 +1,74 @@
+---
+name: "Feature request \U0001F680"
+description: 'Suggest an idea for this project'
+title: '[Request] '
+labels: ['needs triage :wave:']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to fill out a feature request.
+  - type: checkboxes
+    attributes:
+      label: Is there an existing issue for this?
+      description: Please search to see if an issue already exists for the proposed feature.
+      options:
+        - label: I have searched the existing issues
+          required: true
+  - type: dropdown
+    attributes:
+      label: Related template
+      description: Which template are you using?
+      multiple: false
+      options:
+        - Project
+        - Team
+        - Membership
+        - Environment
+        - Service Connection
+        - Role Assignment
+        - Security Group
+        - Managed Identity
+        - Resource Group
+        - Other
+        - Not relevant
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: Infra as Code type
+      description: Are you using Bicep or PowerShell?
+      multiple: false
+      options:
+        - Bicep
+        - PowerShell
+        - Both
+        - Not relevant
+    validations:
+      required: false
+  - type: textarea
+    id: usecase
+    attributes:
+      label: Use case
+      description: Describe the use case for this feature
+      value: |
+        **As a** [Role]
+        Define the role of the user who will benefit from the feature.
+
+        **I want** [Feature]
+        Describe the feature you would like to use.
+
+        **So that** [Benefit]
+        Explain the benefit that you will gain from the feature.
+
+        **Notes**
+        Any additional notes or considerations related to the user story.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: Describe how this feature could be implemented
+    validations:
+      required: false

@@ -1,0 +1,100 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://raw.githubusercontent.com/msc365/az-devops-governance/main/schemas/endpoint.schema.json",
+    "type": "object",
+    "required": [
+        "collectionUri",
+        "projects"
+    ],
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "JSON Schema reference"
+        },
+        "collectionUri": {
+            "type": "string",
+            "description": "The Azure DevOps collection URI"
+        },
+        "projects": {
+            "type": "array",
+            "description": "Array of projects and their service endpoints",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "required": [
+                    "projectName",
+                    "endpoints"
+                ],
+                "properties": {
+                    "projectName": {
+                        "type": "string",
+                        "description": "The Azure DevOps project name"
+                    },
+                    "endpoints": {
+                        "type": "array",
+                        "description": "Array of service endpoint/connection configurations",
+                        "minItems": 1,
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "name",
+                                "managedIdentity"
+                            ],
+                            "properties": {
+                                "name": {
+                                    "type": "string",
+                                    "description": "The name of the service endpoint/connection"
+                                },
+                                "description": {
+                                    "type": "string",
+                                    "description": "The description of the service connection"
+                                },
+                                "managedIdentity": {
+                                    "type": "object",
+                                    "required": [
+                                        "name",
+                                        "subscriptionId",
+                                        "resourceGroupName",
+                                        "federatedIdentityCredential"
+                                    ],
+                                    "properties": {
+                                        "name": {
+                                            "type": "string",
+                                            "description": "The name of the managed identity"
+                                        },
+                                        "subscriptionId": {
+                                            "type": "string",
+                                            "pattern": "^(?:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}|\\{[a-zA-Z][a-zA-Z0-9-]*\\})$",
+                                            "description": "The subscription ID (GUID) or replacement token (e.g., {subscriptionId})"
+                                        },
+                                        "resourceGroupName": {
+                                            "type": "string",
+                                            "description": "The name of the resource group containing the managed identity"
+                                        },
+                                        "federatedIdentityCredential": {
+                                            "type": "object",
+                                            "required": [
+                                                "name"
+                                            ],
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string",
+                                                    "description": "The name of the federated identity credential"
+                                                }
+                                            },
+                                            "additionalProperties": false
+                                        }
+                                    },
+                                    "additionalProperties": false
+                                }
+                            },
+                            "additionalProperties": false
+                        }
+                    }
+                },
+                "additionalProperties": false
+            }
+        }
+    },
+    "additionalProperties": false
+}

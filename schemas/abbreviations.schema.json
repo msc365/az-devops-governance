@@ -1,0 +1,59 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://raw.githubusercontent.com/msc365/az-devops-governance/main/schemas/abbreviations.schema.json",
+    "title": "Abbreviations Schema",
+    "description": "Schema for abbreviation mappings for Azure resources, Entra ID resources, and environments",
+    "type": "object",
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "Reference to the JSON schema"
+        },
+        "prefix": {
+            "type": "string",
+            "pattern": "^[a-z0-9]{1,10}$",
+            "maxLength": 10,
+            "description": "Prefix to be used in resource names (max 10 lowercase alphanumeric characters)"
+        },
+        "azure": {
+            "type": "object",
+            "description": "Abbreviation mappings for Azure resources",
+            "patternProperties": {
+                "^[a-zA-Z]+$": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]{1,5}$",
+                    "maxLength": 5,
+                    "description": "Abbreviation for the Azure resource type (max 5 characters)"
+                }
+            },
+            "additionalProperties": false
+        },
+        "entra": {
+            "type": "object",
+            "description": "Abbreviation mappings for Entra ID resources",
+            "patternProperties": {
+                "^[a-zA-Z]+$": {
+                    "type": "string",
+                    "pattern": "^[a-z0-9]{1,3}$",
+                    "maxLength": 3,
+                    "description": "Abbreviation for the Entra ID resource type (max 3 characters)"
+                }
+            },
+            "additionalProperties": false
+        },
+        "environments": {
+            "type": "object",
+            "description": "Environment name abbreviations",
+            "patternProperties": {
+                "^[a-zA-Z]+$": {
+                    "type": "string",
+                    "pattern": "^[a-z]{1,3}$",
+                    "maxLength": 3,
+                    "description": "Abbreviation for the environment (max 3 characters)"
+                }
+            },
+            "additionalProperties": false
+        }
+    },
+    "additionalProperties": false
+}

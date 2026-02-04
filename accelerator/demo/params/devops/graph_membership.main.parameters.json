@@ -1,0 +1,74 @@
+{
+    "$schema": "../../../../schemas/membership.schema.json",
+    "collectionUri": "{collectionUri}",
+    "projects": [
+        {
+            "projectName": "projects-CCoE",
+            "memberships": [
+                {
+                    "uniqueName": "{prefix}-ccoe-{uniqueId}-admins",
+                    "groupMembership": "Project Administrators"
+                },
+                {
+                    "uniqueName": "{prefix}-ccoe-{uniqueId}-devs",
+                    "groupMembership": "Contributors"
+                },
+                {
+                    "uniqueName": "{prefix}-ccoe-{uniqueId}-stakes",
+                    "groupMembership": "Readers"
+                }
+            ]
+        },
+        {
+            "projectName": "projects-Portugal",
+            "memberships": [
+                {
+                    "uniqueName": "{prefix}-portugal-{uniqueId}-admins",
+                    "groupMembership": "Project Administrators"
+                },
+                {
+                    "uniqueName": "{prefix}-portugal-{uniqueId}-devs",
+                    "groupMembership": "Contributors"
+                },
+                {
+                    "uniqueName": "{prefix}-portugal-{uniqueId}-stakes",
+                    "groupMembership": "Readers"
+                }
+            ]
+        },
+        {
+            "projectName": "shared-Services",
+            "memberships": [
+                {
+                    "uniqueName": "{prefix}-services-{uniqueId}-admins",
+                    "groupMembership": "Project Administrators"
+                },
+                {
+                    "uniqueName": "{prefix}-services-{uniqueId}-devs",
+                    "groupMembership": "Contributors"
+                },
+                {
+                    "uniqueName": "{prefix}-services-{uniqueId}-stakes",
+                    "groupMembership": "Readers"
+                }
+            ]
+        },
+        {
+            "projectName": "shared-Collaboration",
+            "memberships": [
+                {
+                    "uniqueName": "{prefix}-collaboration-{uniqueId}-admins",
+                    "groupMembership": "Project Administrators"
+                },
+                {
+                    "uniqueName": "{prefix}-collaboration-{uniqueId}-devs",
+                    "groupMembership": "Contributors"
+                },
+                {
+                    "uniqueName": "{prefix}-collaboration-{uniqueId}-stakes",
+                    "groupMembership": "Readers"
+                }
+            ]
+        }
+    ]
+}

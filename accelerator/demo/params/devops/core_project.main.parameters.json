@@ -1,0 +1,81 @@
+{
+    "$schema": "../../../../schemas/project.schema.json",
+    "collectionUri": "{collectionUri}",
+    "projects": [
+        {
+            "name": "projects-CCoE",
+            "description": "Demo - One project, many teams, many repos, pipelines and artifacts.",
+            "defaultTeam": "Team CCoE",
+            "sourceControl": "Git",
+            "process": "Agile",
+            "features": {
+                "boards": "enabled",
+                "repos": "enabled",
+                "pipelines": "enabled",
+                "artifacts": "enabled",
+                "testPlans": "disabled"
+            },
+            "visibility": "Private"
+        },
+        {
+            "name": "projects-Netherlands",
+            "description": "Demo - A project using Entra groups, boards and repos, no service connections, etc.",
+            "defaultTeam": "Team Netherlands",
+            "sourceControl": "Git",
+            "process": "Agile",
+            "features": {
+                "boards": "enabled",
+                "repos": "enabled",
+                "pipelines": "disabled",
+                "artifacts": "disabled",
+                "testPlans": "disabled"
+            },
+            "visibility": "Private"
+        },
+        {
+            "name": "projects-Portugal",
+            "description": "Demo - A project with memberships, repos, service connections, etc.",
+            "defaultTeam": "Team Portugal",
+            "sourceControl": "Git",
+            "process": "Agile",
+            "features": {
+                "boards": "enabled",
+                "repos": "enabled",
+                "pipelines": "enabled",
+                "artifacts": "disabled",
+                "testPlans": "disabled"
+            },
+            "visibility": "Private"
+        },
+        {
+            "name": "shared-Services",
+            "description": "Demo - A project with memberships, repos, pipelines and artifacts, no boards, no service connections.",
+            "defaultTeam": "Service Team",
+            "sourceControl": "Git",
+            "process": "Agile",
+            "features": {
+                "boards": "disabled",
+                "repos": "enabled",
+                "pipelines": "enabled",
+                "artifacts": "enabled",
+                "testPlans": "disabled"
+            },
+            "visibility": "Private"
+        },
+        {
+            "name": "shared-Collaboration",
+            "description": "Demo - A project with memberships, boards, no repos, no service connections, etc.",
+            "defaultTeam": "Collab Team",
+            "sourceControl": "Git",
+            "process": "Agile",
+            "features": {
+                "boards": "enabled",
+                "repos": "disabled",
+                "pipelines": "disabled",
+                "artifacts": "disabled",
+                "testPlans": "disabled"
+            },
+            "visibility": "Private"
+        }
+    ]
+}

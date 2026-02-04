@@ -1,0 +1,21 @@
+{
+    "$schema": "../../../../../schemas/project.schema.json",
+    "collectionUri": "{collectionUri}",
+    "projects": [
+        {
+            "name": "{prefix}-{service}",
+            "description": "Default project description",
+            "defaultTeam": "Default Team",
+            "sourceControl": "Git",
+            "process": "Agile",
+            "features": {
+                "boards": "enabled",
+                "repos": "enabled",
+                "pipelines": "enabled",
+                "artifacts": "enabled",
+                "testPlans": "disabled"
+            },
+            "visibility": "Private"
+        }
+    ]
+}

@@ -1,0 +1,163 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://raw.githubusercontent.com/msc365/az-devops-governance/main/schemas/team.schema.json",
+    "type": "object",
+    "required": [
+        "collectionUri",
+        "projects"
+    ],
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "JSON Schema reference"
+        },
+        "collectionUri": {
+            "type": "string",
+            "description": "The Azure DevOps collection URI"
+        },
+        "projects": {
+            "type": "array",
+            "description": "Array of projects and their teams",
+            "minItems": 1,
+            "items": {
+                "type": "object",
+                "required": [
+                    "projectName",
+                    "teams"
+                ],
+                "properties": {
+                    "projectName": {
+                        "type": "string",
+                        "description": "The Azure DevOps project name"
+                    },
+                    "teams": {
+                        "type": "array",
+                        "description": "Array of teams to create or configure",
+                        "items": {
+                            "$ref": "#/definitions/team"
+                        },
+                        "minItems": 1
+                    }
+                },
+                "additionalProperties": false
+            }
+        }
+    },
+    "additionalProperties": false,
+    "definitions": {
+        "team": {
+            "type": "object",
+            "required": [
+                "name"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "The name of the team"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "Description of the team"
+                },
+                "teamSettings": {
+                    "type": "object",
+                    "description": "Team settings configuration",
+                    "oneOf": [
+                        {
+                            "required": [
+                                "defaultIterationMacro"
+                            ],
+                            "not": {
+                                "required": [
+                                    "defaultIteration"
+                                ]
+                            }
+                        },
+                        {
+                            "required": [
+                                "defaultIteration"
+                            ],
+                            "not": {
+                                "required": [
+                                    "defaultIterationMacro"
+                                ]
+                            }
+                        }
+                    ],
+                    "properties": {
+                        "backlogVisibilities": {
+                            "type": "object",
+                            "description": "Visibility settings for different backlog categories",
+                            "properties": {
+                                "Microsoft.EpicCategory": {
+                                    "type": "boolean",
+                                    "description": "Whether Epic category is visible"
+                                },
+                                "Microsoft.FeatureCategory": {
+                                    "type": "boolean",
+                                    "description": "Whether Feature category is visible"
+                                },
+                                "Microsoft.RequirementCategory": {
+                                    "type": "boolean",
+                                    "description": "Whether Requirement category is visible"
+                                }
+                            },
+                            "additionalProperties": {
+                                "type": "boolean"
+                            }
+                        },
+                        "bugsBehavior": {
+                            "type": "string",
+                            "description": "How bugs should be treated",
+                            "enum": [
+                                "asRequirements",
+                                "asTasks",
+                                "off"
+                            ]
+                        },
+                        "defaultIterationMacro": {
+                            "type": "string",
+                            "description": "Default iteration macro for the team",
+                            "examples": [
+                                "@currentIteration",
+                                "@currentIteration + 1"
+                            ]
+                        },
+                        "defaultIteration": {
+                            "type": "string",
+                            "description": "Default iteration ID (GUID)",
+                            "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$"
+                        },
+                        "workingDays": {
+                            "type": "array",
+                            "description": "Working days for the team",
+                            "items": {
+                                "type": "string",
+                                "enum": [
+                                    "monday",
+                                    "tuesday",
+                                    "wednesday",
+                                    "thursday",
+                                    "friday",
+                                    "saturday",
+                                    "sunday"
+                                ]
+                            },
+                            "uniqueItems": true
+                        }
+                    },
+                    "additionalProperties": false
+                },
+                "groupMembership": {
+                    "type": "array",
+                    "description": "List of Azure DevOps groups the team should be a member of",
+                    "items": {
+                        "type": "string"
+                    },
+                    "uniqueItems": true
+                }
+            },
+            "additionalProperties": false
+        }
+    }
+}

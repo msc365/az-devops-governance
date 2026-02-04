@@ -1,0 +1,36 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "managedIdentities": {
+      "value": [
+        {
+          "name": "id-e2egov-prjHb72x9-dev",
+          "resourceGroup": "rg-e2egov-prjHb72x9-dev-weu",
+          "location": "westeurope",
+          "tags": {
+            "public": "false",
+            "service": "e2egov-prjHb72x9",
+            "environment": "dev",
+            "security": "rbac",
+            "iac": "bicep",
+            "ci": "azure-pipelines"
+          }
+        },
+        {
+          "name": "id-e2egov-prjHb72x9-prd",
+          "resourceGroup": "rg-e2egov-prjHb72x9-prd-weu",
+          "location": "westeurope",
+          "tags": {
+            "public": "false",
+            "service": "e2egov-prjHb72x9",
+            "environment": "prd",
+            "security": "rbac",
+            "iac": "bicep",
+            "ci": "azure-pipelines"
+          }
+        }
+      ]
+    }
+  }
+}

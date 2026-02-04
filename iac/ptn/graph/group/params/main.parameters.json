@@ -1,0 +1,28 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "securityGroups": {
+      "value": [
+        {
+          "displayName": "SG e2egov-prjHb72x9 Administrators",
+          "uniqueName": "e2egov-prjHb72x9-admins",
+          "mailNickname": "e2egov-prjHb72x9-admins",
+          "description": "Administrators group for e2egov-prjHb72x9 project."
+        },
+        {
+          "displayName": "SG e2egov-prjHb72x9 Developers",
+          "uniqueName": "e2egov-prjHb72x9-devs",
+          "mailNickname": "e2egov-prjHb72x9-devs",
+          "description": "Developers group for e2egov-prjHb72x9 project."
+        },
+        {
+          "displayName": "SG e2egov-prjHb72x9 Stakeholders",
+          "uniqueName": "e2egov-prjHb72x9-stakes",
+          "mailNickname": "e2egov-prjHb72x9-stakes",
+          "description": "Stakeholders group for e2egov-prjHb72x9 project."
+        }
+      ]
+    }
+  }
+}
