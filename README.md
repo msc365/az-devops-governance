@@ -26,7 +26,9 @@ The implementation combines **Bicep templates** for Azure infrastructure and Mic
 
 ## Quick Start
 
-Use the reusable Project template in [src/res/core/project](src/res/core/project) to provision Azure DevOps Projects consistently.
+Use the [Project template](src/res/core/project) to provision Azure DevOps projects.
+
+This script creates, updates or rolls back an Azure DevOps Project within a specified organization. It provides options to configure project properties such as description, default team, process template, source control type, visibility, and feature states.
 
 1. Install the required modules:
    - `Az.Accounts`
