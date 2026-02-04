@@ -94,6 +94,9 @@ For ad-hoc runs, pass parameters inline as shown in [this sample](src/res/core/p
 
 For a deeper walkthrough based on a reference scenario covering a fictional _European Building Materials_ organization with _OpCo_ use cases see the [Azure Governance from CI/CD Pipelines to Azure Resource Manager](docs/end-to-end-governance.md) walkthrough.
 
+[![e2e governance projects](.assets/e2egov-projects.png)](.assets/e2egov-projects-large.png)  
+<sub>Image: Reference scenario European Building Materials</sub>
+
 ## Support
 
 This project uses GitHub Issues to track bugs and feature requests.
