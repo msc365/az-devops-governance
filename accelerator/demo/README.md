@@ -13,12 +13,61 @@ How to deploy this example in your own Azure account(s) and Azure DevOps organiz
 
 <!-- omit from toc -->
 ## Table of Contents
+- [Just the Commands](#just-the-commands)
 - [Prerequisites](#prerequisites)
 - [Configuration](#configuration)
 - [Deployment - Stage 1 (Azure)](#deployment---stage-1-azure)
 - [Deployment - Stage 2 (Azure DevOps)](#deployment---stage-2-azure-devops)
-- [Just the Commands](#just-the-commands)
 - [What Gets Deployed](#what-gets-deployed)
+
+## Just the Commands
+
+Make sure you read the full document because the pre-configuration of permissions is more complex. But once you've done it properly, deploying is straightforward:
+
+**PowerShell:**
+```powershell
+# Install required modules (one-time setup)
+Install-Module -Name Az.Accounts -Scope CurrentUser
+Install-Module -Name Az.Resources -Scope CurrentUser
+Install-Module -Name Microsoft.Graph.Authentication -Scope CurrentUser
+Install-Module -Name Azure.DevOps.PSModule -Scope CurrentUser
+
+# Set environment variables for Bicep deployments
+$env:LOCATION = 'westeurope'
+$env:SUBSCRIPTION_ID = '00000000-0000-0000-0000-000000000000'
+$env:CUSTOM_ROLE_DEFINITION_ID = '11111111-1111-1111-1111-111111111111'
+$env:AZ_DEVOPS_GOVERNANCE_DEMO_MODE = 'true'
+
+# Set global configuration
+{
+    "$schema": "../../../schemas/config.schema.json",
+    "uniqueId": "2vk6",
+    "prefix": "demo",
+    "service": "e2egov",
+    "location": "westeurope",
+    "collectionUri": "https://dev.azure.com/your-org"
+}
+
+# Login to Azure (authenticates both Azure and Azure DevOps)
+Connect-AzAccount
+Set-AzContext -SubscriptionId $env:SUBSCRIPTION_ID
+
+# Navigate to pipeline scripts directory
+cd accelerator/demo/pipeline-scripts
+
+# Stage 1 - Azure Infrastructure
+./Deploy-ResourceGroups.ps1
+./Deploy-ManagedIndentities.ps1
+./Deploy-SecurityGroups.ps1
+./Deploy-RoleAssignments.ps1
+
+# Stage 2 - Azure DevOps
+./Deploy-Projects.ps1
+./Deploy-Teams.ps1
+./Deploy-Memberships.ps1
+./Deploy-Environments.ps1
+./Deploy-ServiceConnections.ps1
+```
 
 ## Prerequisites
 
@@ -130,7 +179,7 @@ Set environment variables for Bicep deployments. These provide default values fo
 $env:LOCATION = 'westeurope'
 $env:SUBSCRIPTION_ID = '00000000-0000-0000-0000-000000000000'  # Your subscription ID
 $env:CUSTOM_ROLE_DEFINITION_ID = '11111111-1111-1111-1111-111111111111'  # Optional: custom role ID
-$env:AZ_DEVOPS_GOVERNANCE_DEMO_MODE = 'true' # Optional: use $env:SUBSCRIPTION_ID to create managed identity resources
+$env:AZ_DEVOPS_GOVERNANCE_DEMO_MODE = 'true' # Optional: use $env:SUBSCRIPTION_ID to configure service connections
 ```
 
 ### 3. Login to Azure
@@ -173,7 +222,7 @@ cd '../../iac/ptn/authorization/role-definition'
 
 ### 2. Resource Groups
 
-Create resource groups for each environment and OpCo:
+Create resource groups for each relevant environment (OpCo):
 
 ```powershell
 # From accelerator/demo/pipeline-scripts directory
@@ -253,55 +302,8 @@ Create service connections using workload identity federation:
 ./Deploy-ServiceConnections.ps1
 ```
 
-## Just the Commands
-
-Once you've completed the prerequisites and configuration, deploying is straightforward. Here's the complete sequence:
-
-**PowerShell:**
-```powershell
-# Install required modules (one-time setup)
-Install-Module -Name Az.Accounts -Scope CurrentUser
-Install-Module -Name Az.Resources -Scope CurrentUser
-Install-Module -Name Microsoft.Graph.Authentication -Scope CurrentUser
-Install-Module -Name Azure.DevOps.PSModule -Scope CurrentUser
-
-# Set environment variables for Bicep deployments
-$env:LOCATION = 'westeurope'
-$env:SUBSCRIPTION_ID = '00000000-0000-0000-0000-000000000000'
-$env:CUSTOM_ROLE_DEFINITION_ID = '11111111-1111-1111-1111-111111111111'
-$env:AZ_DEVOPS_GOVERNANCE_DEMO_MODE = 'true'
-
-# Set global configuration
-{
-    "$schema": "../../../schemas/config.schema.json",
-    "uniqueId": "2vk6",
-    "prefix": "demo",
-    "service": "e2egov",
-    "location": "westeurope",
-    "subscriptionId": "00000000-0000-0000-0000-000000000000",
-    "collectionUri": "https://dev.azure.com/your-org"
-}
-
-# Login to Azure (authenticates both Azure and Azure DevOps)
-Connect-AzAccount
-Set-AzContext -SubscriptionId $env:SUBSCRIPTION_ID
-
-# Navigate to pipeline scripts directory
-cd accelerator/demo/pipeline-scripts
-
-# Stage 1 - Azure Infrastructure
-./Deploy-ResourceGroups.ps1
-./Deploy-ManagedIndentities.ps1
-./Deploy-SecurityGroups.ps1
-./Deploy-RoleAssignments.ps1
-
-# Stage 2 - Azure DevOps
-./Deploy-Projects.ps1
-./Deploy-Teams.ps1
-./Deploy-Memberships.ps1
-./Deploy-Environments.ps1
-./Deploy-ServiceConnections.ps1
-```
+> [!NOTE]
+> Set `$env:AZ_DEVOPS_GOVERNANCE_DEMO_MODE` to `true` to reuse `$env:SUBSCRIPTION_ID` for every service connection deployment. When it is `false`, specify the `subscriptionId` per service connection in the matching parameter JSON files (for example files under `accelerator/demo/params/devops/*`).
 
 ## What Gets Deployed
 
