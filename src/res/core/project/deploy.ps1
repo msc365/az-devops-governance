@@ -18,6 +18,7 @@ begin {
 
     # Import utility functions
     . (Join-Path $PSScriptRoot -ChildPath '../../..' 'utl/Set-PlaceholderValue.ps1' -ErrorAction Stop)
+    . (Join-Path $PSScriptRoot -ChildPath '../../..' 'utl/ConvertTo-Hashtable.ps1' -ErrorAction Stop)
 }
 
 process {
