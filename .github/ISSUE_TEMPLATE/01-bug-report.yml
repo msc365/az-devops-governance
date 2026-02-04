@@ -1,8 +1,8 @@
 ---
 name: "Bug report \U0001F41B"
 description: Report errors or unexpected behavior
-title: 'Bug: '
-labels: ['needs triage :wave:', 'bug :beetle:']
+title: '[Bug]: '
+labels: ['needs triage :wave:']
 body:
   - type: checkboxes
     attributes:
@@ -14,23 +14,32 @@ body:
   - type: input
     attributes:
       label: PowerShell version
-      description: Please provide the version of the PowerShell you are using if relevant.
+      description: Please provide the version of the PowerShell you are using.
+      placeholder: 5.1, 7.2, etc.
     validations:
       required: false
   - type: input
     attributes:
       label: Azure.DevOps.Governance version
       description: Please provide the version of the Azure.DevOps.Governance you are using.
+      placeholder: 0.1.0-pre1, 0.2.0, etc.
     validations:
-      required: true
+      required: false
   - type: dropdown
     attributes:
-      label: Related script
-      description: Which script are you using?
+      label: Related template
+      description: Which template are you using?
       multiple: false
       options:
-        - Project Deployment
-        - Team Deployment
+        - Project
+        - Team
+        - Membership
+        - Environment
+        - Service Connection
+        - Role Assignment
+        - Security Group
+        - Managed Identity
+        - Resource Group
         - Other
         - Not relevant
     validations:
@@ -38,11 +47,11 @@ body:
   - type: dropdown
     attributes:
       label: Infra as Code type
-      description: Are you using Bicep or Terraform?
+      description: Are you using Bicep or PowerShell?
       multiple: false
       options:
         - Bicep
-        - Terraform
+        - PowerShell
         - Both
         - Not relevant
     validations:
@@ -50,8 +59,8 @@ body:
   - type: textarea
     id: inputs
     attributes:
-      label: Input arguments of the related script
-      description: Please provide any relevant input arguments of the script that can reproduce the issue.
+      label: Input arguments of the related template
+      description: Please provide any relevant input arguments of the template that can reproduce the issue.
     validations:
       required: false
   - type: textarea

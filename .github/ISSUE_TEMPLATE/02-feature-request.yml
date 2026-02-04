@@ -2,7 +2,7 @@
 name: "Feature request \U0001F680"
 description: 'Suggest an idea for this project'
 title: '[Request] '
-labels: ['needs triage :wave:', 'enhancement :sparkles:']
+labels: ['needs triage :wave:']
 body:
   - type: markdown
     attributes:
@@ -17,12 +17,19 @@ body:
           required: true
   - type: dropdown
     attributes:
-      label: Related script
-      description: Which script is related to your request?
+      label: Related template
+      description: Which template are you using?
       multiple: false
       options:
-        - Project Deployment
-        - Team Deployment
+        - Project
+        - Team
+        - Membership
+        - Environment
+        - Service Connection
+        - Role Assignment
+        - Security Group
+        - Managed Identity
+        - Resource Group
         - Other
         - Not relevant
     validations:
@@ -30,11 +37,11 @@ body:
   - type: dropdown
     attributes:
       label: Infra as Code type
-      description: Are you using Bicep or Terraform?
+      description: Are you using Bicep or PowerShell?
       multiple: false
       options:
         - Bicep
-        - Terraform
+        - PowerShell
         - Both
         - Not relevant
     validations:
@@ -44,6 +51,18 @@ body:
     attributes:
       label: Use case
       description: Describe the use case for this feature
+      value: |
+        **As a** [Role]
+        Define the role of the user who will benefit from the feature.
+
+        **I want** [Feature]
+        Describe the feature you would like to use.
+
+        **So that** [Benefit]
+        Explain the benefit that you will gain from the feature.
+
+        **Notes**
+        Any additional notes or considerations related to the user story.
     validations:
       required: true
   - type: textarea
@@ -52,4 +71,4 @@ body:
       label: Proposed solution
       description: Describe how this feature could be implemented
     validations:
-      required: true
+      required: false
