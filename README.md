@@ -1,11 +1,11 @@
 <!-- omit from toc -->
-# Automating Azure DevOps with End-to-End Governance [`Bicep/PowerShell`]
+# Azure DevOps Governance [`from CI/CD to ARM`]
 
 [![GitHub release (latest)](https://img.shields.io/github/v/release/msc365/az-devops-governance?include_prereleases&logo=github)](https://github.com/msc365/az-devops-governance/releases) [![License](https://img.shields.io/badge/license-MIT-purple)](https://github.com/msc365/az-devops-governance/blob/main/LICENSE)
 
 This repository demonstrates a complete **Azure governance model** using _Bicep templates_ and _PowerShell scripts_. It shows how to implement end-to-end governance from _Azure DevOps_ and CI/CD pipelines through to _Azure_ deployments, following enterprise-grade cloud architecture best practices.
 
-While Terraform and Bicep excel at Azure infrastructure provisioning, they, _like the Azure DevOps REST API_, lack a cohesive approach for provisioning complete Azure DevOps projects with all necessary configurations. Simple tasks like creating a team require multiple sequential API calls to configure area paths, iteration paths, and group memberships separately. This repository solves these challenges with fully functional PowerShell scripts built on the [Azure.DevOps.PSModule](https://github.com/msc365/az-devops-psmodule), providing a streamlined, declarative approach to Azure DevOps resource management.
+While `Terraform` and `Bicep` excel at Azure infrastructure provisioning, they, _like the Azure DevOps REST API_, lack a cohesive approach for provisioning complete Azure DevOps projects with all necessary configurations. Simple tasks like creating a team require multiple sequential API calls to configure area paths, iteration paths, and group memberships separately. This repository solves these challenges with fully functional PowerShell scripts built on the [Azure.DevOps.PSModule](https://github.com/msc365/az-devops-psmodule), providing a streamlined, declarative approach to Azure DevOps resource management.
 
 The implementation combines **Bicep templates** for Azure infrastructure and Microsoft Entra ID group management with **PowerShell scripts** for Azure DevOps automation. It adopts modern security practices including [workload identity federation](https://devblogs.microsoft.com/devops/workload-identity-federation-for-azure-deployments-is-now-generally-available/) for Azure Pipelines, replacing traditional service principals to improve security and manageability.
 
@@ -14,7 +14,7 @@ The implementation combines **Bicep templates** for Azure infrastructure and Mic
 
 - [Key Features](#key-features)
 - [Quick Start](#quick-start)
-- [Reference Scenario](#reference-scenario)
+- [Governance](#governance)
 - [Support](#support)
 - [License](#license)
 
@@ -26,27 +26,39 @@ The implementation combines **Bicep templates** for Azure infrastructure and Mic
 
 ## Quick Start
 
-Use the reusable project resource in [src/res/core/project](src/res/core/project) to provision Azure DevOps projects consistently.
+Use the reusable Project template in [src/res/core/project](src/res/core/project) to provision Azure DevOps Projects consistently.
 
-1. Install the required modules (`Az.Accounts`, `Azure.DevOps.PSModule`)
-2. Authenticate via `Connect-AzAccount` so the scripts can reuse your context.
-3. Copy or edit one of the sample parameter files under [project/params](src/res/core/project/params) to match your `CollectionUri`, `ProjectName`, `Process`, `Features`, and `Visibility`.
-4. Execute the wrapper script (or call `main.ps1` directly) from the repo root:
+1. Install the required modules:
+   - `Az.Accounts`
+   - `Azure.DevOps.PSModule`
+
+2. Authenticate via `Connect-AzAccount` so the scripts can reuse your Azure context.
+
+3. Copy or edit the [sample parameter file](src/res/core/project/params) to match parameters:
+   - `CollectionUri`
+   - `ProjectName`
+   - `Process`
+   - `Features`
+   - `Visibility`
+
+4. Execute the `deploy.ps1` script (from repo root):
 
 ```powershell
 $deploySplat = @{
- TemplateFile          = 'src/res/core/project/main.ps1'
- TemplateParameterFile = 'src/res/core/project/params/main.parameters.json'
+ TemplateFile          = 'main.ps1'
+ TemplateParameterFile = 'params/main.parameters.json'
+ ConfigFile            = 'config/main.config.json'
+ Rollback              = $false
 }
 
 ./src/res/core/project/deploy.ps1 @deploySplat -Verbose -WhatIf
 ```
 
-For ad-hoc runs, pass parameters inline as shown in [project/README](src/res/core/project/README.md#example-4). The script is idempotent, so rerunning it updates existing projects, and `-Rollback` safely removes them when needed.
+For ad-hoc runs, pass parameters inline as shown in [README](src/res/core/project/README.md#example-4). The script is idempotent, so rerunning it updates existing projects, and `-Rollback` safely removes them when needed.
 
-## Reference Scenario
+## Governance
 
-For a deeper walkthrough of the reference scenario covering a fictional _European Building Materials_ organization with _OpCo_ use cases, branching model, architecture diagrams, RBAC mappings, and service connection safeguards see [Reference Scenario Walkthrough](docs/end-to-end-governance.md).
+For a deeper walkthrough based on a reference scenario covering a fictional _European Building Materials_ organization with _OpCo_ use cases, architecture diagrams, RBAC mappings, and service connection safeguards see the [Azure Governance from CI/CD Pipelines to Azure Resource Manager](docs/end-to-end-governance.md) walkthrough.
 
 ## Support
 
