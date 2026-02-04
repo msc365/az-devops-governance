@@ -32,27 +32,41 @@ Use the reusable Project template in [src/res/core/project](src/res/core/project
    - `Az.Accounts`
    - `Azure.DevOps.PSModule`
 
-2. Authenticate via `Connect-AzAccount` so the scripts can reuse your Azure context.
+2. Authenticate with `Connect-AzAccount`.  
+   The scripts will reuse your Azure context to authenticate with Azure DevOps.
 
-3. Copy or edit the [sample parameter file](src/res/core/project/params) to match parameters:
-   - `CollectionUri`
-   - `ProjectName`
-   - `Process`
-   - `Features`
-   - `Visibility`
+3. Copy or edit the sample [config file](config/main.config.json) and set global configuration:
 
-4. Execute the `deploy.ps1` script (from repo root):
+    ```json
+    {
+        "$schema": "../../../schemas/config.schema.json",
+        "uniqueId": "2vk6",
+        "prefix": "demo",
+        "service": "e2egov",
+        "location": "westeurope",
+        "collectionUri": "https://dev.azure.com/<your-org>"
+    }
+    ```
 
-```powershell
-$deploySplat = @{
- TemplateFile          = 'main.ps1'
- TemplateParameterFile = 'params/main.parameters.json'
- ConfigFile            = 'config/main.config.json'
- Rollback              = $false
-}
+4. Copy or edit the sample [parameter file](src/res/core/project/params) to match parameters:
+   - `collectionUri`
+   - `name`
+   - `description`
+   - `defaultTeam`
+   - `sourceControl`
+   - `process`
+   - `features`
+   - `visibility`
+  
+   Placeholder like `{prefix}-{service}` will be replaced with values set in the global config file.
 
-./src/res/core/project/deploy.ps1 @deploySplat -Verbose -WhatIf
-```
+5. Execute the `deploy.ps1` script (from repo root):
+
+    ```powershell
+    cd src/res/core/project
+
+    ./deploy.ps1 -Verbose -WhatIf
+    ```
 
 For ad-hoc runs, pass parameters inline as shown in [README](src/res/core/project/README.md#example-4). The script is idempotent, so rerunning it updates existing projects, and `-Rollback` safely removes them when needed.
 
