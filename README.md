@@ -276,12 +276,15 @@ Here's a quick reference:
 ```powershell
 # Install required modules (one-time setup)
 Install-Module -Name Az.Accounts -Scope CurrentUser
+Install-Module -Name Az.Resources -Scope CurrentUser
+Install-Module -Name Microsoft.Graph.Authentication -Scope CurrentUser
 Install-Module -Name Azure.DevOps.PSModule -Scope CurrentUser
 
 # Set environment variables for Bicep deployments
 $env:LOCATION = 'westeurope'
 $env:SUBSCRIPTION_ID = '00000000-0000-0000-0000-000000000000'
 $env:CUSTOM_ROLE_DEFINITION_ID = '11111111-1111-1111-1111-111111111111'
+$env:AZ_DEVOPS_GOVERNANCE_DEMO_MODE = 'true'
 
 # Set global configuration
 {
@@ -290,7 +293,6 @@ $env:CUSTOM_ROLE_DEFINITION_ID = '11111111-1111-1111-1111-111111111111'
     "prefix": "demo",
     "service": "e2egov",
     "location": "westeurope",
-    "subscriptionId": "00000000-0000-0000-0000-000000000000",
     "collectionUri": "https://dev.azure.com/your-org"
 }
 
@@ -314,7 +316,6 @@ cd accelerator/demo/pipeline-scripts
 ./Deploy-Environments.ps1
 ./Deploy-ServiceConnections.ps1
 ```
-
 
 ## Support
 
