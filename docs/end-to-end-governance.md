@@ -1,9 +1,7 @@
 <!-- omit from toc -->
-# Reference Scenario Walkthrough
+# Azure Governance from CI/CD Pipelines to Azure Resource Manager
 
-When designing a governance model, _Azure Resource Manager_ should be treated as one of several control planes for resources, not the only one. Azure DevOps and CI/CD automation can create unintended security gaps if they aren't properly secured, so pipeline and project artifacts must be protected by applying the same _Role‑based Access Control_ (RBAC) principles used for Azure Resource Manager.
-
-End‑to‑end governance is platform‑agnostic. This repository illustrates one way to implement it using _Azure DevOps_, but the same patterns can be applied to alternative tools and platforms.
+When designing a governance model, _Azure Resource Manager_ should be treated as one of several control planes for resources, not the only one. Azure DevOps and CI/CD automation can create unintended security gaps if they aren't properly secured, so pipeline and project artifacts must be protected by applying the same _Role‑based Access Control_ (RBAC) principles used for Azure Resource Manager. End‑to‑end governance is platform‑agnostic. This repository illustrates one way to implement it using _Azure DevOps_, but the same patterns can be applied to alternative tools and platforms.
 
 <!-- omit from toc -->
 ## Table of Contents
