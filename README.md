@@ -49,6 +49,7 @@ This script creates, updates or rolls back an Azure DevOps Project within a spec
         "collectionUri": "https://dev.azure.com/<your-org>"
     }
     ```
+    Parameter files  can use placeholder like `{prefix}-{service}`. These placeholders will be replaced with values set in this global config file.
 
 4. Copy or edit the sample [parameter file](src/res/core/project/params) to match parameters:
    - `collectionUri`
@@ -59,8 +60,6 @@ This script creates, updates or rolls back an Azure DevOps Project within a spec
    - `process`
    - `features`
    - `visibility`
-  
-   Placeholder like `{prefix}-{service}` will be replaced with values set in the global config file.
 
 5. Execute the `deploy.ps1` script (from repo root):
 
