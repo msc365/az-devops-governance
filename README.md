@@ -13,8 +13,8 @@ The implementation combines **Bicep templates** for Azure infrastructure and Mic
 ## Table of Contents
 
 - [Key Features](#key-features)
+- [Quick Start](#quick-start)
 - [Reference Scenario](#reference-scenario)
-- [Deploy the Demo](#deploy-the-demo)
 - [Support](#support)
 - [License](#license)
 
@@ -24,64 +24,29 @@ The implementation combines **Bicep templates** for Azure infrastructure and Mic
 - Template scripts and CI/CD pipelines for resource provisioning, and policy enforcement
 - Secure authentication with workload identity federation
 
+## Quick Start
+
+Use the reusable project resource in [src/res/core/project](src/res/core/project) to provision Azure DevOps projects consistently.
+
+1. Install the required modules (`Az.Accounts`, `Azure.DevOps.PSModule`)
+2. Authenticate via `Connect-AzAccount` so the scripts can reuse your context.
+3. Copy or edit one of the sample parameter files under [project/params](src/res/core/project/params) to match your `CollectionUri`, `ProjectName`, `Process`, `Features`, and `Visibility`.
+4. Execute the wrapper script (or call `main.ps1` directly) from the repo root:
+
+```powershell
+$deploySplat = @{
+ TemplateFile          = 'src/res/core/project/main.ps1'
+ TemplateParameterFile = 'src/res/core/project/params/main.parameters.json'
+}
+
+./src/res/core/project/deploy.ps1 @deploySplat -Verbose -WhatIf
+```
+
+For ad-hoc runs, pass parameters inline as shown in [project/README](src/res/core/project/README.md#example-4). The script is idempotent, so rerunning it updates existing projects, and `-Rollback` safely removes them when needed.
+
 ## Reference Scenario
 
 For a deeper walkthrough of the reference scenario covering a fictional _European Building Materials_ organization with _OpCo_ use cases, branching model, architecture diagrams, RBAC mappings, and service connection safeguards see [Reference Scenario Walkthrough](docs/end-to-end-governance.md).
-
-## Deploy the Demo
-
-This implementation extends beyond Azure Resource Manager. This is why we use **Bicep templates** for _Azure infrastructure provisioning_ and _Microsoft Entra ID group management_, and use **PowerShell scripts** for _Azure DevOps resource provisioning_. This combination provides declarative infrastructure-as-code for Azure resources and identity while leveraging PowerShell's flexibility for DevOps operations in a declarative DSC like approach.
-
-### Quick Start
-
-Once you've completed the prerequisites and configuration, deploying is straightforward. See [Deploy this Demo](accelerator/demo/README.md) for detailed information about prerequisites, configuration and deploying the demo.
-
-Here's a quick reference:
-
-**PowerShell:**
-```powershell
-# Install required modules (one-time setup)
-Install-Module -Name Az.Accounts -Scope CurrentUser
-Install-Module -Name Az.Resources -Scope CurrentUser
-Install-Module -Name Microsoft.Graph.Authentication -Scope CurrentUser
-Install-Module -Name Azure.DevOps.PSModule -Scope CurrentUser
-
-# Set environment variables for Bicep deployments
-$env:LOCATION = 'westeurope'
-$env:SUBSCRIPTION_ID = '00000000-0000-0000-0000-000000000000'
-$env:CUSTOM_ROLE_DEFINITION_ID = '11111111-1111-1111-1111-111111111111'
-$env:AZ_DEVOPS_GOVERNANCE_DEMO_MODE = 'true'
-
-# Set global configuration
-{
-    "$schema": "../../../schemas/config.schema.json",
-    "uniqueId": "2vk6",
-    "prefix": "demo",
-    "service": "e2egov",
-    "location": "westeurope",
-    "collectionUri": "https://dev.azure.com/your-org"
-}
-
-# Login to Azure (authenticates both Azure and Azure DevOps)
-Connect-AzAccount
-Set-AzContext -SubscriptionId $env:SUBSCRIPTION_ID
-
-# Navigate to pipeline scripts directory
-cd accelerator/demo/pipeline-scripts
-
-# Stage 1 - Azure Infrastructure
-./Deploy-ResourceGroups.ps1
-./Deploy-ManagedIndentities.ps1
-./Deploy-SecurityGroups.ps1
-./Deploy-RoleAssignments.ps1
-
-# Stage 2 - Azure DevOps
-./Deploy-Projects.ps1
-./Deploy-Teams.ps1
-./Deploy-Memberships.ps1
-./Deploy-Environments.ps1
-./Deploy-ServiceConnections.ps1
-```
 
 ## Support
 
