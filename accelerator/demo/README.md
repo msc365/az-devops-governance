@@ -166,6 +166,11 @@ cd '../../iac/ptn/authorization/role-definition'
 './deploy.ps1'
 ```
 
+> [!NOTE]
+> After deployment, update `$env:CUSTOM_ROLE_DEFINITION_ID` with the role definition ID returned by the script so downstream steps can reference it.
+
+
+
 ### 2. Resource Groups
 
 Create resource groups for each environment and OpCo:
