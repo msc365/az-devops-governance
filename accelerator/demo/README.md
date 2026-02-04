@@ -30,12 +30,12 @@ This demo requires the following resources and permissions. If you have a [Visua
   An active Azure subscription where you will deploy resources.
 
 - **Permissions**  
-  User or Service Principal with `Owner` permissions on the subscription (or resource group scope) to:
+  User or Service Principal with `Owner` permissions on the subscription to:
   - Create resource groups, managed identities, and role assignments
   - Configure RBAC at subscription or resource group level
-  - Create custom role definitions
+  - Create a custom `Headless Owner (DevOps CI/CD)` role definition
 
-### 2. Microsoft Entra ID (formerly Azure AD)
+### 2. Microsoft Entra ID
 
 > [!CAUTION]
 > Please consider carefully which Microsoft Entra ID tenant you will use. If possible, use a **non-production tenant** for this demo because the deployment requires elevated privileges to manage Entra ID groups.
@@ -47,6 +47,13 @@ This demo requires the following resources and permissions. If you have a [Visua
   User or Service Principal with one of the following:
   - **Directory Role**: `Groups Administrator` or higher (recommended)
   - **API Permissions**: Microsoft Graph API with `Group.ReadWrite.All` permission
+
+- **Microsoft Graph Authentication**  
+  Authenticate with Microsoft Graph before running any script that provisions security groups:
+  
+  ```powershell
+  Connect-MgGraph -Scopes "Group.ReadWrite.All"
+  ```
 
 ### 3. Azure DevOps Organization
 
@@ -66,16 +73,32 @@ This demo requires the following resources and permissions. If you have a [Visua
 ### 4. Tools
 
 - **PowerShell 7+**  
-  [Install PowerShell](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell) for running deployment scripts.
+  Install [PowerShell](https://learn.microsoft.com/en-us/powershell/scripting/install/installing-powershell) for running deployment scripts.
 
 - **Az.Accounts PowerShell Module**  
-  [Install Az.Accounts](https://learn.microsoft.com/en-us/powershell/azure/install-azure-powershell) for Azure authentication:
+  Install [Az.Accounts](https://www.powershellgallery.com/packages/Az.Accounts) for Azure authentication:
+  
   ```powershell
   Install-Module -Name Az.Accounts -Scope CurrentUser
   ```
 
+- **Az.Resources PowerShell Module**  
+  Install [Az.Resources](https://www.powershellgallery.com/packages/Az.Resources) for resource group deployment and resource permissions:
+  
+  ```powershell
+  Install-Module -Name Az.Resources -Scope CurrentUser
+  ```
+
+- **Microsoft.Graph.Authentication PowerShell Module**  
+  Install [Microsoft.Graph.Authentication](https://www.powershellgallery.com/packages/Microsoft.Graph.Authentication) to authenticate against Microsoft Graph when provisioning Entra security groups:
+  
+  ```powershell
+  Install-Module -Name Microsoft.Graph.Authentication -Scope CurrentUser
+  ```
+
 - **Azure.DevOps.PSModule**  
-  Install the custom PowerShell module from PSGallery:
+  Install [Azure.DevOps.PSModule](https://www.powershellgallery.com/packages/Azure.DevOps.PSModule) PowerShell module from PSGallery:
+  
   ```powershell
   Install-Module -Name Azure.DevOps.PSModule -Scope CurrentUser
   ```
@@ -95,7 +118,6 @@ Edit [`config/main.config.json`](config/main.config.json) with your values:
     "prefix": "demo",
     "service": "e2egov",
     "location": "westeurope",
-    "subscriptionId": "00000000-0000-0000-0000-000000000000",
     "collectionUri": "https://dev.azure.com/your-org"
 }
 ```
@@ -108,25 +130,16 @@ Set environment variables for Bicep deployments. These provide default values fo
 $env:LOCATION = 'westeurope'
 $env:SUBSCRIPTION_ID = '00000000-0000-0000-0000-000000000000'  # Your subscription ID
 $env:CUSTOM_ROLE_DEFINITION_ID = '11111111-1111-1111-1111-111111111111'  # Optional: custom role ID
+$env:AZ_DEVOPS_GOVERNANCE_DEMO_MODE = 'true' # Optional: use $env:SUBSCRIPTION_ID to create managed identity resources
 ```
 
-### 3. Install Azure.DevOps.PSModule
-
-Install the custom PowerShell module that handles Azure DevOps authentication:
-
-```powershell
-Install-Module -Name Azure.DevOps.PSModule -Scope CurrentUser
-```
-
-The module authenticates to Azure DevOps automatically using your Azure credentials established via `Connect-AzAccount`, eliminating the need for Personal Access Tokens (PATs).
-
-### 4. Login to Azure
+### 3. Login to Azure
 
 Authenticate to Azure with the subscription you'll use for deployment. This authentication will be used for both Azure resources and Azure DevOps operations:
 
 ```powershell
 Connect-AzAccount
-Set-AzContext -SubscriptionId <SUBSCRIPTION_ID>
+Set-AzContext -SubscriptionId $env:SUBSCRIPTION_ID
 ```
 
 > [!NOTE]
@@ -143,14 +156,14 @@ cd accelerator/demo/pipeline-scripts
 
 ### 1. Custom Role Definition (Optional)
 
-Deploy a custom RBAC role that prevents managed identities from removing management locks:
+Deploy the optional [Headless Owner (DevOps CI/CD)](../../iac/ptn/authorization/role-definition) custom role definition, which prevents managed identities from removing management locks:
 
 ```powershell
 # Navigate to role definition template
-cd ../../iac/ptn/authorization/role-definition
+cd '../../iac/ptn/authorization/role-definition'
 
 # Deploy using the included script
-./deploy.ps1
+'./deploy.ps1'
 ```
 
 ### 2. Resource Groups
@@ -160,6 +173,7 @@ Create resource groups for each environment and OpCo:
 ```powershell
 # From accelerator/demo/pipeline-scripts directory
 cd pipeline-scripts
+
 ./Deploy-ResourceGroups.ps1
 ```
 
@@ -173,7 +187,7 @@ Create user-assigned managed identities for workload identity federation:
 
 ### 4. Entra Security Groups
 
-Create Microsoft Entra security groups for admins, developers, and stakeholders:
+Create Microsoft Entra security groups for admins, developers, and stakeholders. This script loads Microsoft.Graph.Authentication to request Microsoft Graph tokens, so be sure the module is installed before continuing:
 
 ```powershell
 ./Deploy-SecurityGroups.ps1
@@ -242,12 +256,15 @@ Once you've completed the prerequisites and configuration, deploying is straight
 ```powershell
 # Install required modules (one-time setup)
 Install-Module -Name Az.Accounts -Scope CurrentUser
+Install-Module -Name Az.Resources -Scope CurrentUser
+Install-Module -Name Microsoft.Graph.Authentication -Scope CurrentUser
 Install-Module -Name Azure.DevOps.PSModule -Scope CurrentUser
 
 # Set environment variables for Bicep deployments
 $env:LOCATION = 'westeurope'
 $env:SUBSCRIPTION_ID = '00000000-0000-0000-0000-000000000000'
 $env:CUSTOM_ROLE_DEFINITION_ID = '11111111-1111-1111-1111-111111111111'
+$env:AZ_DEVOPS_GOVERNANCE_DEMO_MODE = 'true'
 
 # Set global configuration
 {
