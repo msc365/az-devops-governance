@@ -199,7 +199,6 @@ It's a common mistake to give CI/CD build agents Owner roles and permissions. Co
 
 But a CI/CD Build Agent will delete your entire production environment if told to do so. To avoid **irreversible destructive changes**, we create a custom role that:
 
-- Removes Key Vault access policies
 - Removes [management locks](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/lock-resources) that by design should prevent resources from being deleted (a common requirement in regulated industries)
 
 To do this, we create a custom role that removes destructive permissions. See [this role-definition](../iac/ptn/authorization/role-definition/main.bicep) for a working deployable example.
