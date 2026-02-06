@@ -239,7 +239,6 @@ If that removes too many permissions for your purposes, refer to the full list i
 - Microsoft Entra ID tenant
 - PowerShell 7.x or later
 - Azure PowerShell modules
-- PSake module for build tasks
 - Required Azure RBAC permissions  
   (Subscription Owner or User Access Administrator)
 
