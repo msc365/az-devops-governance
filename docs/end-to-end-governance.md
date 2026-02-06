@@ -221,7 +221,7 @@ To do this, we create a custom role that removes destructive permissions. See [t
 }
 ```
 
-If that removes too many permissions for your purposes, refer to the full list in the [official documentation for Azure RBAC resource provider operations](https://learn.microsoft.com/en-us/azure/role-based-access-control/resource-provider-operations) and adjust your role definition as needed.
+If that removes too many permissions for your purposes, refer to the full list in the official documentation for [Azure RBAC resource provider operations](https://learn.microsoft.com/en-us/azure/role-based-access-control/resource-provider-operations) and adjust your role definition as needed.
 
 ## Components
 
