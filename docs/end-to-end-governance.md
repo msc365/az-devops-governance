@@ -18,10 +18,10 @@ When designing a governance model, _Azure Resource Manager_ should be treated as
 > [!IMPORTANT]
 > Please read this scenario carefully to understand the decisions behind the model used in this sample repository.
 
-Any governance model must be tied to the organization's business rules, which are reflected in any technical implementation of access controls. This example model uses a fictitious _European Building Materials_ company with the following common scenario (with business requirements):
+Any governance model must be tied to the organization's business rules, which are reflected in any technical implementation of access controls. This example model uses a fictitious _European Cloud Company_ with the following common scenario (and business requirements):
 
 - **Align with OpCo's and permissions models**  
-  The international organization has multiple Operational Companies (OpCos) across Europe, including countries such as "_Portugal_" and the "_Netherlands_", which operate largely independently. In each OpCo, there are three levels or privileges, which are mapped to distinct `*-admin(istrator)s`, `*-dev(eloper)s` or `*-stake(holder)s` Microsoft Entra groups. This allows developers and stakeholders to be targeted when configuring permissions in the cloud.
+  This European company has multiple Operational Companies (OpCos) across Europe, including countries such as "_Portugal_" and the "_Netherlands_", which operate largely independently. In each OpCo, there are three levels or privileges, which are mapped to distinct `*-admin(istrator)s`, `*-dev(eloper)s` or `*-stake(holder)s` Microsoft Entra groups. This allows developers and stakeholders to be targeted when configuring permissions in the cloud.
 
 - **Staged deployment environments**  
   Every business domain has two environments:
@@ -34,7 +34,7 @@ Any governance model must be tied to the organization's business rules, which ar
   Every application should implement Azure DevOps not just for _continuous integration_ (CI), but also for _continuous deployment_ (CD). For example, deployments can be automatically triggered by changes to the Git repository, see [branch strategy diagram](#branch-strategy) sample.
 
 - **Cloud journey**  
-  The organization started with an isolated project model to accelerate the OpCo's journey to the cloud. But now they are exploring options to break silos and encourage collaboration by creating an `ccoe` project; Cloud Center of Excellence (CCoE).
+  The _European Cloud Company_ started with an isolated project model to accelerate the OpCo's journey to the cloud. But now they are exploring options to break silos and encourage collaboration by creating an `ccoe` project; Cloud Center of Excellence (CCoE).
 
 ### Branch strategy
 
