@@ -64,7 +64,7 @@ The numbering reflects the order in which administrators and enterprise architec
    For each business domain, you create:
 
    - _Entra groups_  
-     Two groups per business domain (explained later)
+     Three groups per business domain (explained later)
 
    - _Managed identities_  
      One explicit user managed identity per environment
@@ -108,7 +108,6 @@ The numbering reflects the order in which administrators and enterprise architec
 
    | Group name | Scope | Azure role | Azure DevOps role |
    | :-- | :-- | :-- | :-- |
-   | `sg-portugal-collab-on-repo-a` ¹ | Repo-scoped permissions only | - | - |
    | `sg-portugal-stakes` | `rg-portugal-prd` | Reader | Reader |
    | `sg-portugal-devs` | `rg-portugal-dev` | Contributor | Contributor |
    | `sg-portugal-admins` | `rg-portugal-prd` | Owner | Project Administrators |
@@ -117,11 +116,12 @@ The numbering reflects the order in which administrators and enterprise architec
    | `sg-netherlands-admins` | `rg-netherlands-prd` | Owner | Project Administrators |
    | `sg-shared-devs` | `rg-shared-dev` | Contributor | Contributor |
    | `sg-shared-admins` | `rg-shared-prd` | Owner | Project Administrators |
+   | `sg-portugal-collab-on-repo-a` ¹ | Repo-scoped permissions only | - | - |
 
    ¹ Limited collaboration group. For cross-project scenarios where the Portugal team needs to share a single repository with Netherlands team. See [Cross-project Collaboration Scenario](./cross-project-collaboration-scenario.md) for details.
 
 6. **Service connections**  
-   In Azure DevOps, a [Service Connection](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints) is a generic wrapper around a credential. This demo creates a service connection that holds the [App Registration](https://learn.microsoft.com/en-us/azure/devops/pipelines/release/configure-workload-identity?view=azure-devops&tabs=app-registration) and [Workload Identity Federation](https://learn.microsoft.com/en-us/azure/devops/pipelines/release/configure-workload-identity?view=azure-devops&tabs=managed-identity) configuration. Project Administrators can configure access to this [protected resource](https://learn.microsoft.com/en-us/azure/devops/pipelines/security/resources#protected-resources) when needed, such as when requiring human approval before deploying. This reference architecture has two minimum protections on the service connection:
+   In Azure DevOps, a [Service Connection](https://learn.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints) is a generic wrapper around a credential. This demo creates a service connection that holds the [Workload Identity Federation](https://learn.microsoft.com/en-us/azure/devops/pipelines/release/configure-workload-identity?view=azure-devops&tabs=managed-identity) configuration. Project Administrators can configure access to this [protected resource](https://learn.microsoft.com/en-us/azure/devops/pipelines/security/resources#protected-resources) when needed, such as when requiring human approval before deploying. This reference architecture has two minimum protections on the service connection:
 
    - Admins must configure [pipeline permissions](https://learn.microsoft.com/en-us/azure/devops/pipelines/security/resources#permissions) to control which pipelines can access the credentials.
    - Admins must also configure a [branch control](https://learn.microsoft.com/en-us/azure/devops/pipelines/process/approvals#branch-control) check so that only pipelines running in the context of the `production` branch might use the `prod-connection`.
@@ -199,7 +199,6 @@ It's a common mistake to give CI/CD build agents Owner roles and permissions. Co
 
 But a CI/CD Build Agent will delete your entire production environment if told to do so. To avoid **irreversible destructive changes**, we create a custom role that:
 
-- Removes Key Vault access policies
 - Removes [management locks](https://learn.microsoft.com/en-us/azure/azure-resource-manager/management/lock-resources) that by design should prevent resources from being deleted (a common requirement in regulated industries)
 
 To do this, we create a custom role that removes destructive permissions. See [this role-definition](../iac/ptn/authorization/role-definition/main.bicep) for a working deployable example.
@@ -222,7 +221,7 @@ To do this, we create a custom role that removes destructive permissions. See [t
 }
 ```
 
-If that removes too many permissions for your purposes, refer to the full list in the [official documentation for Azure RBAC resource provider operations](https://learn.microsoft.com/en-us/azure/role-based-access-control/resource-provider-operations) and adjust your role definition as needed.
+If that removes too many permissions for your purposes, refer to the full list in the official documentation for [Azure RBAC resource provider operations](https://learn.microsoft.com/en-us/azure/role-based-access-control/resource-provider-operations) and adjust your role definition as needed.
 
 ## Components
 
@@ -240,7 +239,6 @@ If that removes too many permissions for your purposes, refer to the full list i
 - Microsoft Entra ID tenant
 - PowerShell 7.x or later
 - Azure PowerShell modules
-- PSake module for build tasks
 - Required Azure RBAC permissions  
   (Subscription Owner or User Access Administrator)
 

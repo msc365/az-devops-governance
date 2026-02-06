@@ -14,7 +14,6 @@ The full implementation combines **Bicep templates** for Azure infrastructure an
 
 <!-- omit from toc -->
 ## Table of Contents
-
 - [Key Features](#key-features)
 - [Quick Start](#quick-start)
 - [Governance](#governance)
@@ -103,6 +102,7 @@ This project uses GitHub Issues to track bugs and feature requests.
 Please [search the existing issues](https://github.com/msc365/az-devops-governance/issues?q=is%3Aissue) before filing
 new issues to avoid duplicates.
 
+- For latest unreleased changes, please see [CHANGELOG](CHANGELOG.md).
 - For new issues, file your bug or feature request as a [new issue](https://github.com/msc365/az-devops-governance/issues/new/choose).
 - For help and questions, please raise an issue or start a [new discussion](https://github.com/msc365/az-devops-governance/discussions).
 
