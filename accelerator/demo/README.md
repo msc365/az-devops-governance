@@ -1,7 +1,7 @@
 <!-- omit from toc -->
 # Deploy this Demo
 
-How to deploy this example in your own Azure account(s) and Azure DevOps organization. This demo uses the fictitious _European Building Materials_ organization described in [this article](../../docs/end-to-end-governance.md) to illustrate end-to-end governance patterns across Azure and Azure DevOps.
+How to deploy this example in your own Azure account(s) and Azure DevOps organization. This demo uses the fictitious _European Cloud Company_ described in [this article](../../docs/end-to-end-governance.md) to illustrate end-to-end governance patterns across Azure and Azure DevOps.
 
 > [!WARNING]
 > **Disclaimer - Not for Production**  
