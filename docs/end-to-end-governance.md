@@ -108,7 +108,6 @@ The numbering reflects the order in which administrators and enterprise architec
 
    | Group name | Scope | Azure role | Azure DevOps role |
    | :-- | :-- | :-- | :-- |
-   | `sg-portugal-collab-on-repo-a` ¹ | Repo-scoped permissions only | - | - |
    | `sg-portugal-stakes` | `rg-portugal-prd` | Reader | Reader |
    | `sg-portugal-devs` | `rg-portugal-dev` | Contributor | Contributor |
    | `sg-portugal-admins` | `rg-portugal-prd` | Owner | Project Administrators |
@@ -117,6 +116,7 @@ The numbering reflects the order in which administrators and enterprise architec
    | `sg-netherlands-admins` | `rg-netherlands-prd` | Owner | Project Administrators |
    | `sg-shared-devs` | `rg-shared-dev` | Contributor | Contributor |
    | `sg-shared-admins` | `rg-shared-prd` | Owner | Project Administrators |
+   | `sg-portugal-collab-on-repo-a` ¹ | Repo-scoped permissions only | - | - |
 
    ¹ Limited collaboration group. For cross-project scenarios where the Portugal team needs to share a single repository with Netherlands team. See [Cross-project Collaboration Scenario](./cross-project-collaboration-scenario.md) for details.
 
