@@ -1,5 +1,5 @@
 {
-    "$schema": "../../../schemas/config.schema.json",
+    "$schema": "https://raw.githubusercontent.com/msc365/az-devops-governance/refs/heads/main/schemas/config.schema.json",
     "uniqueId": "2vk6",
     "prefix": "demo",
     "service": "e2egov",
