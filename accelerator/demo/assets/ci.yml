@@ -1,0 +1,3 @@
+# Placeholder
+# This file is used to test pushes with multiple files, including a binary file.
+# The content of the files is not important, as the test will mock the API calls and verify that the correct data is being sent.

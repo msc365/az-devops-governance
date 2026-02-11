@@ -63,6 +63,7 @@ cd accelerator/demo/pipeline-scripts
 
 # Stage 2 - Azure DevOps
 ./Deploy-Projects.ps1
+./Deploy-InitialCommit.ps1
 ./Deploy-Teams.ps1
 ./Deploy-Memberships.ps1
 ./Deploy-Environments.ps1
@@ -270,7 +271,15 @@ Create Azure DevOps projects:
 ./Deploy-Projects.ps1
 ```
 
-### 2. Teams (Optional)
+### 2. Initial Repository Commit
+
+Push initial files to project repositories:
+
+```powershell
+./Deploy-InitialCommit.ps1
+```
+
+### 3. Teams (Optional)
 
 Create additional teams within projects:
 
@@ -278,7 +287,7 @@ Create additional teams within projects:
 ./Deploy-Teams.ps1
 ```
 
-### 3. Group Memberships
+### 4. Group Memberships
 
 Sync Microsoft Entra groups into Azure DevOps project security groups:
 
@@ -286,7 +295,7 @@ Sync Microsoft Entra groups into Azure DevOps project security groups:
 ./Deploy-Memberships.ps1
 ```
 
-### 4. Environments
+### 5. Environments
 
 Create Azure DevOps environments for deployment approvals and checks:
 
@@ -294,7 +303,7 @@ Create Azure DevOps environments for deployment approvals and checks:
 ./Deploy-Environments.ps1
 ```
 
-### 5. Service Connections
+### 6. Service Connections
 
 Create service connections using workload identity federation:
 
@@ -339,6 +348,12 @@ After successful deployment, you will have the following resources:
   - `projects-Netherlands`
   - `shared-Collaboration`
   - `shared-Services`
+
+- **Repository Initialization**  
+  Initial files pushed to project repositories, such as:
+  - a README file
+  - CI/CD pipeline definitions
+  - Configuration files
 
 - **Teams**  
   Additional teams within projects for specialized workloads
