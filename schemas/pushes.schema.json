@@ -1,0 +1,131 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://github.com/msc365/az-devops-governance/schemas/pushes.schema.json",
+    "title": "Azure DevOps Git Push Parameters",
+    "description": "Schema for defining Azure DevOps git push operations with projects, repositories, and files",
+    "type": "object",
+    "required": [
+        "collectionUri",
+        "projects"
+    ],
+    "properties": {
+        "$schema": {
+            "type": "string",
+            "description": "JSON Schema reference"
+        },
+        "collectionUri": {
+            "type": "string",
+            "description": "Azure DevOps organization collection URI"
+        },
+        "projects": {
+            "type": "array",
+            "description": "List of projects to push files to",
+            "minItems": 1,
+            "items": {
+                "$ref": "#/definitions/project"
+            }
+        }
+    },
+    "definitions": {
+        "project": {
+            "type": "object",
+            "description": "Project configuration for git push operation",
+            "required": [
+                "projectName",
+                "repositoryName",
+                "branchName",
+                "message",
+                "files"
+            ],
+            "properties": {
+                "projectName": {
+                    "type": "string",
+                    "description": "Name of the Azure DevOps project",
+                    "minLength": 1,
+                    "examples": [
+                        "{prefix}-{service}",
+                        "myproject-app"
+                    ]
+                },
+                "repositoryName": {
+                    "type": "string",
+                    "description": "Name of the repository within the project",
+                    "minLength": 1,
+                    "examples": [
+                        "{prefix}-{service}",
+                        "myproject-app"
+                    ]
+                },
+                "branchName": {
+                    "type": "string",
+                    "description": "Target branch name for the push",
+                    "minLength": 1,
+                    "examples": [
+                        "main",
+                        "develop",
+                        "feature/my-feature"
+                    ]
+                },
+                "message": {
+                    "type": "string",
+                    "description": "Commit message for the push",
+                    "minLength": 1,
+                    "examples": [
+                        "Initial commit",
+                        "Add new feature"
+                    ]
+                },
+                "files": {
+                    "type": "array",
+                    "description": "List of files to push to the repository",
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/definitions/file"
+                    }
+                }
+            }
+        },
+        "file": {
+            "type": "object",
+            "description": "File configuration for git push",
+            "required": [
+                "path",
+                "content",
+                "contentType"
+            ],
+            "properties": {
+                "path": {
+                    "type": "string",
+                    "description": "Target path for the file in the repository",
+                    "minLength": 1,
+                    "examples": [
+                        "/README.md",
+                        "/devops/pipeline/ci.yml",
+                        "/.assets/tools.zip"
+                    ]
+                },
+                "content": {
+                    "type": "string",
+                    "description": "Source path to the file content or the actual content",
+                    "minLength": 1,
+                    "examples": [
+                        "C:/_tmp/README.md",
+                        "C:/_tmp/tools.zip"
+                    ]
+                },
+                "contentType": {
+                    "type": "string",
+                    "description": "Type of content encoding",
+                    "enum": [
+                        "rawtext",
+                        "base64encoded"
+                    ],
+                    "examples": [
+                        "rawtext",
+                        "base64encoded"
+                    ]
+                }
+            }
+        }
+    }
+}
