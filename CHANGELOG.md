@@ -19,9 +19,14 @@ All notable changes to this project will be documented in this file.
 
 <br> -->
 
-## [UNRELEASED]
+## [v0.1.0]
+
+### Summary
+
+First stable release providing governance-focused Azure and DevOps templates with end‑to‑end repository initialization capabilities.
 
 ### What's Changed
+- feat: Add end‑to‑end repo initialization including basic files
 - docs(e2e-governance): Improved some content for clarity
 
 ### Breaking Changes

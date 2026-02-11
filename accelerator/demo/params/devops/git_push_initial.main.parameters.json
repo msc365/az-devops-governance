@@ -1,0 +1,29 @@
+{
+    "$schema": "../../../../schemas/pushes.schema.json",
+    "collectionUri": "{collectionUri}",
+    "projects": [
+        {
+            "projectName": "projects-Portugal",
+            "repositoryName": "projects-Portugal",
+            "branchName": "main",
+            "message": "Initial commit",
+            "files": [
+                {
+                    "path": "/README.md",
+                    "content": "assets/README.md",
+                    "contentType": "rawtext"
+                },
+                {
+                    "path": "/devops/pipeline/ci.yml",
+                    "content": "assets/ci.yml",
+                    "contentType": "rawtext"
+                },
+                {
+                    "path": "/.assets/tools.zip",
+                    "content": "assets/tools.zip",
+                    "contentType": "base64encoded"
+                }
+            ]
+        }
+    ]
+}
