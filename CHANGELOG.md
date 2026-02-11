@@ -19,6 +19,19 @@ All notable changes to this project will be documented in this file.
 
 <br> -->
 
+## [UNRELEASED]
+
+### Summary
+- _None_
+
+### What's Changed
+- fix: Update schema URLs in JSON configuration files to point to the remote
+
+### Breaking Changes
+- _None_
+
+<br>
+
 ## [v0.1.0]
 
 ### Summary
