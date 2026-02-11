@@ -1,7 +1,7 @@
 <!-- omit from toc -->
 # Azure DevOps Accelerator [`PowerShell`]
 
-[![GitHub release (latest)](https://img.shields.io/github/v/release/msc365/az-devops-governance?include_prereleases&logo=github)](https://github.com/msc365/az-devops-governance/releases) [![License](https://img.shields.io/badge/license-MIT-purple)](https://github.com/msc365/az-devops-governance/blob/main/LICENSE)
+[![GitHub release (latest)](https://img.shields.io/github/v/release/msc365/az-devops-governance?include_prereleases&color=blue&logo=github)](https://github.com/msc365/az-devops-governance/releases) [![License](https://img.shields.io/badge/license-MIT-purple)](https://github.com/msc365/az-devops-governance/blob/main/LICENSE)
 
 <!-- markdownlint-disable-next-line MD001 -->
 ### Azure Governance from CI/CD Pipeline to Azure Resource Manager
