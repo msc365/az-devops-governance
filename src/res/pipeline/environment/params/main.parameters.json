@@ -1,5 +1,5 @@
 {
-    "$schema": "../../../../../schemas/environment.schema.json",
+    "$schema": "https://raw.githubusercontent.com/msc365/az-devops-governance/refs/heads/main/schemas/environment.schema.json",
     "collectionUri": "{collectionUri}",
     "projects": [
         {
