@@ -2,8 +2,6 @@
 
 A one-time bootstrap execution seeds a brand-new Azure DevOps project with versioned solution files from this repo. From that point, the project governs itself: developers change config files, raise a PR, and the in-project governance pipeline enforces the desired state. New releases of the solution can be pulled in independently using an upgrade script, making the version boundary explicit and safe.
 
----
-
 ## Architecture Diagram
 
 ```mermaid
@@ -67,8 +65,6 @@ flowchart TD
     style UPGRADE fill:#faf5ff,color:#3b0764,stroke:#a855f7
 ```
 
----
-
 ## Phases
 
 ### Phase 1. Bootstrap (one-time, run by a platform engineer)
@@ -90,8 +86,6 @@ flowchart TD
 3. Download the release archive for the specified solution version from `msc365/az-devops-governance` and extract it into `solutions/az-devops-governance/v{version}/`, then bundle project-specific files: `config/main.config.json`, `params/`, `.azure-pipelines/governance.yml`
 4. Call `Deploy-InitialCommit.ps1` to push all files to the default repo in a single commit
 5. Create the Azure Pipeline definition pointing at `.azure-pipelines/governance.yml` in the new repo
-
----
 
 ### Phase 2. Bootstrapped Project Repository Layout
 
