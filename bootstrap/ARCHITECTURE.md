@@ -4,66 +4,8 @@ A one-time bootstrap execution seeds a brand-new Azure DevOps project with versi
 
 ## Architecture Diagram
 
-```mermaid
-flowchart TD
-    subgraph PREREQ["Prerequisites<br/>(before bootstrap)"]
-        direction TB
-        P0A["Azure Subscription +<br/>Entra tenant access"]
-        P0B["Managed Identity<br/>Contributor +<br/>Project Collection Administrator"]
-        P0C["Service Connection<br/>in bootstrap project"]
-        P0A --> P0B --> P0C
-    end
-
-    subgraph BOOTSTRAP["Phase 1 · Bootstrap<br/>(one-time)"]
-        direction TB
-        A([Platform Engineer]) -->|triggers| BP["Bootstrap Pipeline<br/>(management project)"]
-        BP -->|uses service connection| B["Invoke-Bootstrap.ps1<br/>(bootstrap.config.json)"]
-        B --> C["1 · Read bootstrap.config.json<br/>(project name, org URI, solution version)"]
-        C --> D["2 · Create ADO Project<br/>(use Deploy-Projects.ps1)"]
-        D --> E["3 · Download release archive into<br/>➜  solutions/v{ver}/"]
-        E --> F["4 · Initial commit<br/>(use Deploy-InitialCommit.ps1)"]
-        F --> G["5 · Configure Pipeline<br/>(governance.yml)"]
-    end
-
-    PREREQ -->|service connection| BP
-
-    subgraph REPO["Phase 2 · Bootstrapped Project Repo"]
-        direction TB
-        R1[".azure-pipelines/governance.yml"]
-        R2["config/main.config.json"]
-        R3["params/azure/**<br/>params/devops/**"]
-        R4["solutions/az-devops-governance/<br/>  v0.1.0/  ← immutable snapshot"]
-    end
-
-    subgraph PIPELINE["Phase 3 · Self-Governing Pipeline  (ongoing)"]
-        direction LR
-        P1["PR raised<br/>config or params changed"]
-        P2["Stage: Validate<br/>Lint + WhatIf dry-run"]
-        P3["Stage: Approve<br/>Manual gate / env approval"]
-        P4["Stage: Azure<br/>Bicep deployments"]
-        P5["Stage: DevOps<br/>Projects, Teams, Environments<br/>Service Connections, Memberships"]
-        P1 --> P2 --> P3 --> P4 --> P5
-    end
-
-    subgraph UPGRADE["Phase 4 · Solution Upgrade  (on-demand)"]
-        direction TB
-        U1([Engineer]) -->|runs| U2["Update-GovernanceSolution.ps1<br/>-Version latest or v0.X.X"]
-        U2 --> U3["Fetch GitHub Release<br/>msc365/az-devops-governance"]
-        U3 --> U4["Extract ➜<br/>solutions/az-devops-governance/vX.Y.Z/"]
-        U4 --> U5["Update governance.yml<br/>solution path ref"]
-        U5 --> U6["Open PR<br/>(goes through approval gate)"]
-    end
-
-    G --> REPO
-    REPO -->|PR / push to main triggers| PIPELINE
-    UPGRADE -->|new version committed| REPO
-
-    style PREREQ fill:#fefce8,color:#1a1a00,stroke:#ca8a04
-    style BOOTSTRAP fill:#eff6ff,color:#1e3a5f,stroke:#3b82f6
-    style REPO fill:#f0fdf4,color:#14532d,stroke:#22c55e
-    style PIPELINE fill:#fff7ed,color:#431407,stroke:#f97316
-    style UPGRADE fill:#faf5ff,color:#3b0764,stroke:#a855f7
-```
+![architecture diagram](../.assets/bootstrap-design.png)  
+<sub>Image: Architecture diagram</sub>
 
 ## Phases
 
