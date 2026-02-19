@@ -60,11 +60,11 @@ flowchart TD
     REPO -->|PR / push to main triggers| PIPELINE
     UPGRADE -->|new version committed| REPO
 
-    style PREREQ fill:#3a3a1a,color:#fff,stroke:#d9d94a
-    style BOOTSTRAP fill:#1a3a5c,color:#fff,stroke:#4a90d9
-    style REPO fill:#1a4a2e,color:#fff,stroke:#4aad6f
-    style PIPELINE fill:#4a2e1a,color:#fff,stroke:#d98c4a
-    style UPGRADE fill:#3a1a4a,color:#fff,stroke:#9c4ad9
+    style PREREQ fill:#fefce8,color:#1a1a00,stroke:#ca8a04
+    style BOOTSTRAP fill:#eff6ff,color:#1e3a5f,stroke:#3b82f6
+    style REPO fill:#f0fdf4,color:#14532d,stroke:#22c55e
+    style PIPELINE fill:#fff7ed,color:#431407,stroke:#f97316
+    style UPGRADE fill:#faf5ff,color:#3b0764,stroke:#a855f7
 ```
 
 ---
