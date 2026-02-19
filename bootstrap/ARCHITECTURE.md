@@ -25,7 +25,7 @@ A one-time bootstrap execution seeds a brand-new Azure DevOps project with versi
 
 1. Read `bootstrap.config.json` (project name, org URI, solution version, solution source path)
 2. Call `Deploy-Projects.ps1` to create the new Azure DevOps project
-3. Download the release archive for the specified solution version from `msc365/az-devops-governance` and extract it into `solutions/az-devops-governance/v{version}/`, then bundle project-specific files: `config/main.config.json`, `params/`, `.azure-pipelines/governance.yml`
+3. Download the release archive for the specified solution version from `msc365/az-devops-governance` and extract it into `solutions/az-devops-gov/v{version}/`, then bundle project-specific files: `config/main.config.json`, `params/`, `.azure-pipelines/governance.yml`
 4. Call `Deploy-InitialCommit.ps1` to push all files to the default repo in a single commit
 5. Create the Azure Pipeline definition pointing at `.azure-pipelines/governance.yml` in the new repo
 
@@ -41,7 +41,7 @@ A one-time bootstrap execution seeds a brand-new Azure DevOps project with versi
 │   ├── azure/  ...                 ← Bicep parameter files
 │   └── devops/ ...                 ← DevOps parameter files
 └── solutions/
-    └── az-devops-governance/
+    └── az-devops-gov/
         └── v0.1.0/                 ← versioned, immutable snapshot of this repo
             ├── src/
             ├── iac/
@@ -73,7 +73,7 @@ A developer or platform engineer runs `Update-GovernanceSolution.ps1`, which:
 
 1. Queries the GitHub Releases API for the latest (or specified) release of `msc365/az-devops-governance`
 2. Downloads and extracts the release archive
-3. Copies files into `solutions/az-devops-governance/v{new-version}/`
+3. Copies files into `solutions/az-devops-gov/v{new-version}/`
 4. Updates the `governance.yml` solution path reference to the new version
 5. Opens a PR — so the upgrade itself goes through the approval gate
 
@@ -81,7 +81,7 @@ A developer or platform engineer runs `Update-GovernanceSolution.ps1`, which:
 
 | Decision | Rationale |
 | --- | --- |
-| **Versioned solution subfolder** (`solutions/az-devops-governance/v{ver}/`) | The solution files are immutable per version. Multiple versions can coexist, making rollback trivial and the upgrade path explicit. |
+| **Versioned solution subfolder** (`solutions/az-devops-gov/v{ver}/`) | The solution files are immutable per version. Multiple versions can coexist, making rollback trivial and the upgrade path explicit. |
 | **`governance.yml` references solution by version path** | A single variable (e.g., `solutionVersion: v0.1.0`) in the pipeline file controls which version is active. Upgrading means updating that one variable. |
 | **Bootstrap uses existing script patterns** | `Deploy-Projects.ps1`, `Deploy-InitialCommit.ps1` and related already exist. `Invoke-Bootstrap.ps1` is an orchestrator on top. No new paradigms, just a higher-level entrypoint. |
 | **Azure prerequisites bootstrapped once, then managed by pipeline** | The managed identity and service connection are created by the bootstrap script. Subsequent pipeline runs use them and can update them as governed resources. |
@@ -95,5 +95,5 @@ A developer or platform engineer runs `Update-GovernanceSolution.ps1`, which:
 | --- | --- |
 | `scripts/Invoke-Bootstrap.ps1` | Orchestrator: reads config, calls existing deploy scripts in sequence, then creates the pipeline definition |
 | `bootstrap/bootstrap.config.json` | Schema-backed config describing the new project, source version, and solution target path |
-| `.azure-pipelines/governance.yml` | Template pipeline committed into the new repo; references `solutions/az-devops-governance/{solutionVersion}/` |
+| `.azure-pipelines/governance.yml` | Template pipeline committed into the new repo; references `solutions/az-devops-gov/{solutionVersion}/` |
 | `scripts/Update-GovernanceSolution.ps1` | Fetches a GitHub release, extracts it into the versioned subfolder, updates the pipeline version reference, optionally creates a branch/PR |
