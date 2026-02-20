@@ -1,0 +1,13 @@
+---
+title: Bootstrap Overview Diagram
+version: 0.1.0
+author: Martin Swinkels
+---
+flowchart TD
+    A([Platform Engineer]) -->|triggers| B(fa:fa-spinner Bootstrap</br>Solution v0.1.0)
+    B --> C[fa:fa-tasks Base Project]
+    C --> D([Developer</br>fa:fa-cog Config / Params])
+    C -.- E(Upgrade</br>Solution v0.1.x)
+    D e1@-.->|pr| F[fa:fa-briefcase Self-governed</br>Project]
+    e1@{ animate: true, animation: 'slow' }
+    E -.->|pr| F

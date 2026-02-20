@@ -4,8 +4,7 @@ A one-time bootstrap execution seeds a brand-new Azure DevOps project with versi
 
 ## Architecture Diagram
 
-![architecture diagram](../.assets/bootstrap.png)  
-<sub>Image: Architecture diagram</sub>
+![bootstrap overview ](../.assets/bootstrap-overview.svg)
 
 ## Phases
 
