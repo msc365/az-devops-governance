@@ -2,9 +2,11 @@
 
 A one-time bootstrap execution seeds a brand-new Azure DevOps project with versioned solution files from this repo. From that point, the project governs itself: developers change config files, raise a PR, and the in-project governance pipeline enforces the desired state. New releases of the solution can be pulled in independently using an upgrade script, making the version boundary explicit and safe.
 
-## Architecture Diagram
+## Architecture
 
-![bootstrap overview ](../.assets/bootstrap-overview.svg)
+<img src="../.assets/bootstrap-overview.svg" alt="bootstrap overview" width="400" />
+
+<sub>Image: Bootstrap Overview Diagram</sub>
 
 ## Phases
 
