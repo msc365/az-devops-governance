@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD024 -->
 <!-- omit from toc -->
-# Azure DevOps Self‑Governing Project Bootstrap
+# Scaffolding an Azure DevOps Self‑Governing Project
 
 This architecture proposal describes a _one-time bootstrap execution_ that seeds a brand-new Azure DevOps project with versioned solution files from this repo. From that point, _the project governs itself_: developers change config files, raise a PR, and the in-project governance pipeline enforces the desired state. New releases of the solution can be pulled in independently using an upgrade script, making the version boundary explicit and safe.
 
