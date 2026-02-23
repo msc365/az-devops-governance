@@ -1,0 +1,25 @@
+---
+version: 0.1.0
+author: Martin Swinkels
+config:
+  theme: default
+---
+flowchart LR
+    subgraph phase1["`**Bootstrap**`"]
+        A([Platform Engineer]) -->|once| B(fa:fa-shield Invoke<br>Prerequisites)
+        B -->|triggers| C(fa:fa-spinner Bootstrap<br>Solution v0.1.0)
+        C --> D[fa:fa-tasks Base Project]
+    end
+
+    subgraph phase2["`**Governance**`"]
+        E([Project Administrator<br>fa:fa-cog Config / Params])
+        E e1@-.->|pr| F[fa:fa-briefcase Self-governed<br>Project]
+        e1@{ animate: true, animation: 'slow' }
+        F -.- G(Upgrade<br>Solution v0.1.x)
+        G -.->|pr| F
+    end
+
+    phase1 --> phase2
+
+    classDef optional fill:#fffbe6, stroke:#d4b106, stroke-dasharray:5 5, color:#614700
+    class B optional
